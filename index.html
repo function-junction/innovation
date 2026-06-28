@@ -3079,7 +3079,8 @@
       for (let x = map.xMin; x <= map.xMax; x += step) {
         const y = fn(x);
         const py = map.py(y);
-        const visible = Number.isFinite(y) && py > map.top - 80 && py < map.bottom + 80;
+        const margin = width + 2;
+        const visible = Number.isFinite(y) && py > map.top + margin && py < map.bottom - margin;
         if (!visible) {
           started = false;
           continue;
@@ -3099,20 +3100,47 @@
     function drawCleanMappingMini(ctx, w, h) {
       miniText(ctx, "1. Functions, Relations, Domain and Range", 28, 22, "#0b2d55", 16, "left");
       const leftX = w * 0.29, rightX = w * 0.74, cy = h * 0.56;
+      const rx = w * 0.105, ry = h * 0.31;
       ctx.save();
       ctx.strokeStyle = "rgba(9, 49, 84, 0.86)";
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.ellipse(leftX, cy, w * 0.105, h * 0.31, 0, 0, Math.PI * 2);
-      ctx.ellipse(rightX, cy, w * 0.105, h * 0.31, 0, 0, Math.PI * 2);
+      ctx.ellipse(leftX, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.ellipse(rightX, cy, rx, ry, 0, 0, Math.PI * 2);
       ctx.stroke();
       const leftYs = [cy - h * 0.2, cy - h * 0.03, cy + h * 0.22];
       const rightYs = [cy - h * 0.2, cy - h * 0.03, cy + h * 0.11, cy + h * 0.24];
       ["1", "9", "0"].forEach((text, i) => miniText(ctx, text, leftX, leftYs[i], "#061b36", 28));
       ["1", "3", "-3", "0"].forEach((text, i) => miniText(ctx, text, rightX, rightYs[i], "#061b36", 28));
-      [[0, 0], [1, 1], [1, 2], [2, 3]].forEach(([from, to]) => {
-        drawArrow(ctx, leftX + w * 0.05, leftYs[from], rightX - w * 0.05, rightYs[to], "#20324f");
-      });
+
+      const drawLink = (sx, sy, ex, ey, bend = 0) => {
+        const c1x = sx + w * 0.12;
+        const c2x = ex - w * 0.12;
+        ctx.save();
+        ctx.strokeStyle = "#20324f";
+        ctx.fillStyle = "#20324f";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.bezierCurveTo(c1x, sy + bend, c2x, ey + bend, ex, ey);
+        ctx.stroke();
+        const angle = Math.atan2(ey - (ey + bend), ex - c2x);
+        ctx.beginPath();
+        ctx.moveTo(ex, ey);
+        ctx.lineTo(ex - 10 * Math.cos(angle - Math.PI / 6), ey - 10 * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(ex - 10 * Math.cos(angle + Math.PI / 6), ey - 10 * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      };
+
+      const startX = leftX + rx - 4;
+      const endX = rightX - rx + 6;
+      drawLink(startX, leftYs[0], endX, rightYs[0], 0);
+      drawLink(startX - 2, leftYs[1] - 5, endX, rightYs[1], -2);
+      drawLink(startX - 2, leftYs[1] + 7, endX, rightYs[2], 6);
+      drawLink(startX, leftYs[2], endX, rightYs[3], 0);
       ctx.restore();
     }
     function drawCleanLineTestsMini(ctx, w, h) {
@@ -3127,27 +3155,27 @@
       ctx.lineTo(w * 0.5, h * 0.9);
       ctx.stroke();
       ctx.restore();
-      const leftMap = miniAxis(ctx, { x: w * 0.07, y: h * 0.28, w: w * 0.35, h: h * 0.56 }, { x0: w * 0.2, y0: h * 0.76, xMin: -2.1, xMax: 2.2, yMin: -0.5, yMax: 4, width: 3 });
-      miniPlot(ctx, leftMap, x => Math.exp(x), "#07152f", 4, 0.025);
+      const leftMap = miniAxis(ctx, { x: w * 0.07, y: h * 0.28, w: w * 0.35, h: h * 0.56 }, { x0: w * 0.2, y0: h * 0.76, xMin: -2.1, xMax: 1.35, yMin: -0.5, yMax: 4.4, width: 3 });
+      miniPlot(ctx, leftMap, x => Math.exp(x), "#07152f", 4, 0.02);
       ctx.save();
-      ctx.strokeStyle = "rgba(11, 45, 85, 0.55)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = "rgba(11, 45, 85, 0.82)";
+      ctx.lineWidth = 2.6;
+      ctx.setLineDash([6, 5]);
       ctx.beginPath();
-      const vx = leftMap.px(1.3);
+      const vx = leftMap.px(0.95);
       ctx.moveTo(vx, leftMap.top + 8);
       ctx.lineTo(vx, leftMap.bottom - 6);
       ctx.stroke();
       ctx.restore();
       miniText(ctx, "y", leftMap.x0 - 10, leftMap.top + 8, "#0b2d55", 16);
       miniText(ctx, "x", leftMap.right - 4, leftMap.y0 + 14, "#0b2d55", 16);
-      miniText(ctx, "y = e^x", leftMap.right - 6, leftMap.top + 42, "#20324f", 16, "right");
+      miniText(ctx, "y = e^x", leftMap.right - 10, leftMap.top + 38, "#20324f", 16, "right");
       const rightMap = miniAxis(ctx, { x: w * 0.57, y: h * 0.28, w: w * 0.35, h: h * 0.56 }, { x0: w * 0.72, y0: h * 0.76, xMin: -2.2, xMax: 2.2, yMin: -0.5, yMax: 4, width: 3 });
       miniPlot(ctx, rightMap, x => x * x, "#07152f", 4, 0.025);
       ctx.save();
-      ctx.strokeStyle = "rgba(11, 45, 85, 0.55)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = "rgba(11, 45, 85, 0.72)";
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([6, 5]);
       ctx.beginPath();
       const hy = rightMap.py(1.4);
       ctx.moveTo(rightMap.left + 10, hy);
@@ -3199,8 +3227,8 @@
       ctx.restore();
       const boxes = [
         { x: w * 0.08, y: h * 0.22, w: w * 0.34, h: h * 0.22, title: "Radical Function", fn: x => x >= 0 ? Math.sqrt(x) : Infinity, range: [-0.2, 3, -0.4, 2.2] },
-        { x: w * 0.58, y: h * 0.22, w: w * 0.34, h: h * 0.22, title: "Rational Function", fn: x => x === 0 ? Infinity : 0.8 / x, range: [-2.2, 2.2, -2, 2] },
-        { x: w * 0.08, y: h * 0.62, w: w * 0.34, h: h * 0.22, title: "Exponential Function", fn: x => Math.exp(x * 0.9), range: [-1.7, 1.4, -0.3, 3.2] },
+        { x: w * 0.58, y: h * 0.22, w: w * 0.34, h: h * 0.22, title: "Reciprocal Function", fn: x => Math.abs(x) < 0.06 ? Infinity : 0.9 / x, range: [-2.2, 2.2, -2, 2] },
+        { x: w * 0.08, y: h * 0.62, w: w * 0.34, h: h * 0.22, title: "Exponential Function", fn: x => Math.exp(x * 0.9), range: [-1.7, 1.2, -0.3, 3.2] },
         { x: w * 0.58, y: h * 0.62, w: w * 0.34, h: h * 0.22, title: "Logarithmic Function", fn: x => x > 0 ? Math.log(x) + 0.2 : Infinity, range: [-0.2, 3, -1.8, 1.8] }
       ];
       boxes.forEach(box => {
@@ -3214,21 +3242,27 @@
     }
     function drawCleanInversePairMini(ctx, w, h) {
       miniText(ctx, "5. Inverse Functions", 28, 22, "#0b2d55", 16, "left");
-      const map = miniAxis(ctx, { x: w * 0.16, y: h * 0.2, w: w * 0.68, h: h * 0.62 }, { x0: w * 0.41, y0: h * 0.76, xMin: -2.3, xMax: 3.8, yMin: -2.2, yMax: 3.2, width: 3 });
-      miniPlot(ctx, map, x => 0.22 * x * x * x + 0.35 * x + 0.8, "#2467ff", 5, 0.025);
-      miniPlot(ctx, map, x => x > 0.6 ? Math.cbrt((x - 0.8) / 0.22) - 0.2 : Infinity, "#00a8a8", 5, 0.025);
+      const map = miniAxis(ctx, { x: w * 0.16, y: h * 0.2, w: w * 0.68, h: h * 0.62 }, { x0: w * 0.41, y0: h * 0.76, xMin: -2.4, xMax: 3.5, yMin: -2.2, yMax: 4.2, width: 3 });
+      miniPlot(ctx, map, x => x <= 1.32 ? Math.exp(x) : Infinity, "#2467ff", 5, 0.02);
+      miniPlot(ctx, map, x => x > 0.08 ? Math.log(x) : Infinity, "#00a8a8", 5, 0.02);
       ctx.save();
       ctx.strokeStyle = "rgba(33, 44, 52, 0.55)";
       ctx.lineWidth = 2;
       ctx.setLineDash([9, 7]);
       ctx.beginPath();
-      ctx.moveTo(map.left + 10, map.bottom - 10);
-      ctx.lineTo(map.right - 10, map.top + 10);
+      const p1x = Math.max(map.left + 8, map.px(-1.8));
+      const p1y = Math.min(map.bottom - 8, Math.max(map.top + 8, map.py(-1.8)));
+      const p2x = Math.min(map.right - 8, map.px(3.0));
+      const p2y = Math.min(map.bottom - 8, Math.max(map.top + 8, map.py(3.0)));
+      ctx.moveTo(p1x, p1y);
+      ctx.lineTo(p2x, p2y);
       ctx.stroke();
       ctx.restore();
+      miniText(ctx, "y", map.x0 - 10, map.top + 8, "#0b2d55", 16);
+      miniText(ctx, "x", map.right - 4, map.y0 + 14, "#0b2d55", 16);
       miniText(ctx, "f(x)", w * 0.63, h * 0.26, "#2467ff", 20);
-      miniText(ctx, "f^-1(x)", w * 0.78, h * 0.54, "#00a8a8", 20);
-      miniText(ctx, "y = x", w * 0.73, h * 0.37, "rgba(33, 44, 52, 0.8)", 18);
+      miniText(ctx, "f^-1(x)", w * 0.79, h * 0.56, "#00a8a8", 20);
+      miniText(ctx, "y = x", w * 0.74, h * 0.37, "rgba(33, 44, 52, 0.8)", 18);
     }
     function drawCleanExpLogMini(ctx, w, h) {
       miniText(ctx, "6. Exponential and Logarithmic Functions", 28, 22, "#0b2d55", 16, "left");
@@ -3242,19 +3276,19 @@
       ctx.restore();
       miniText(ctx, "Exponential Function", w * 0.25, 56, "#0b2d55", 14);
       miniText(ctx, "y = e^x", w * 0.25, 84, "#0b2d55", 22);
-      const leftMap = miniAxis(ctx, { x: w * 0.07, y: h * 0.32, w: w * 0.35, h: h * 0.5 }, { x0: w * 0.18, y0: h * 0.76, xMin: -1.9, xMax: 2.2, yMin: -0.4, yMax: 3.2, width: 3 });
-      miniPlot(ctx, leftMap, x => Math.exp(x * 0.85), "#07152f", 4, 0.025);
+      const leftMap = miniAxis(ctx, { x: w * 0.07, y: h * 0.32, w: w * 0.35, h: h * 0.5 }, { x0: w * 0.18, y0: h * 0.76, xMin: -1.9, xMax: 1.55, yMin: -0.4, yMax: 5.2, width: 3 });
+      miniPlot(ctx, leftMap, x => Math.exp(x), "#07152f", 4, 0.02);
       miniText(ctx, "y", leftMap.x0 - 10, leftMap.top + 8, "#0b2d55", 14);
       miniText(ctx, "x", leftMap.right - 4, leftMap.y0 + 12, "#0b2d55", 14);
       miniText(ctx, "1", leftMap.x0 - 16, leftMap.py(1), "#0b2d55", 14);
       miniText(ctx, "Natural Logarithm Function", w * 0.75, 56, "#0b2d55", 14);
       miniText(ctx, "y = ln x", w * 0.75, 84, "#0b2d55", 22);
       const rightMap = miniAxis(ctx, { x: w * 0.58, y: h * 0.32, w: w * 0.31, h: h * 0.5 }, { x0: w * 0.64, y0: h * 0.76, xMin: -0.2, xMax: 3.1, yMin: -2.1, yMax: 2.2, width: 3 });
-      miniPlot(ctx, rightMap, x => x > 0 ? Math.log(x) : Infinity, "#07152f", 4, 0.025);
+      miniPlot(ctx, rightMap, x => x > 0.08 ? Math.log(x) : Infinity, "#07152f", 4, 0.02);
       ctx.save();
-      ctx.strokeStyle = "rgba(11, 45, 85, 0.55)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([7, 6]);
+      ctx.strokeStyle = "rgba(11, 45, 85, 0.8)";
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([6, 5]);
       ctx.beginPath();
       const asymX = rightMap.px(0.12);
       ctx.moveTo(asymX, rightMap.top + 6);
