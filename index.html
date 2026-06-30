@@ -217,9 +217,9 @@
 
     .chapter-tabs {
       display: grid;
-      grid-template-columns: repeat(2, minmax(210px, 1fr));
-      gap: clamp(10px, 1.2vw, 16px);
-      max-width: 720px;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: clamp(12px, 1.4vw, 18px);
+      max-width: 880px;
     }
 
     .tab-btn,
@@ -232,12 +232,12 @@
     }
 
     .tab-btn {
-      min-height: clamp(120px, 13vh, 142px);
-      padding: clamp(12px, 1.4vw, 16px) clamp(12px, 1.5vw, 18px) clamp(10px, 1.2vw, 14px);
+      min-height: clamp(170px, 19vh, 210px);
+      padding: clamp(16px, 1.7vw, 22px) clamp(16px, 1.8vw, 24px) clamp(14px, 1.6vw, 20px);
       display: grid;
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto auto minmax(86px, 1fr);
       align-items: start;
-      gap: 10px;
+      gap: 12px;
       text-align: left;
       background:
         linear-gradient(rgba(32, 119, 255, 0.035) 1px, transparent 1px),
@@ -274,20 +274,21 @@
 
     .chapter-title {
       display: block;
-      font-size: clamp(1rem, 1.18vw, 1.24rem);
-      line-height: 1.16;
+      font-size: clamp(1.08rem, 1.35vw, 1.42rem);
+      line-height: 1.12;
     }
 
     .chapter-icons {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      align-self: end;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-self: stretch;
+      min-height: 92px;
     }
 
     .chapter-mini {
-      min-height: clamp(38px, 5vh, 46px);
+      min-height: clamp(82px, 9vh, 104px);
       border-radius: 9px;
       display: grid;
       place-items: center;
@@ -305,7 +306,7 @@
       width: 100%;
       height: 100%;
       display: block;
-      padding: 5px;
+      padding: 7px;
       overflow: visible;
     }
 
@@ -1492,13 +1493,16 @@
       }
     }
 
-    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(560px, 1.45fr) minmax(360px, 0.55fr); gap: 18px; min-height: 520px; }
-    .desmos-canvas-wrap { min-height: 500px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,168,168,0.22); background: linear-gradient(135deg, #f8ffff, #fff8f0); }
-    .desmos-canvas-wrap canvas { width: 100%; height: 500px; display: block; }
-    .desmos-controls { display: grid; gap: 16px; align-content: start; font-size: 1.08rem; }
-    .desmos-controls label { font-weight: 800; color: #173754; display: grid; gap: 8px; }
-    .desmos-controls input[type="range"], .desmos-controls select { width: 100%; accent-color: var(--teal); font-size: 1rem; min-height: 34px; }
-    .desmos-equation { font-family: Georgia, serif; font-size: 1.35rem; color: #0b2d55; background: rgba(216,255,243,0.58); border: 1px solid rgba(0,168,168,0.22); border-radius: 8px; padding: 14px; }
+    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(640px, 1.55fr) minmax(390px, 0.45fr); gap: 18px; min-height: 720px; }
+    .desmos-canvas-wrap { min-height: 680px; height: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,168,168,0.22); background: linear-gradient(135deg, #f8ffff, #fff8f0); }
+    .desmos-canvas-wrap canvas { width: 100%; height: 680px; display: block; }
+    #desmosCalculator { width: 100%; height: 680px; display: none; }
+    .desmos-controls { display: grid; gap: 20px; align-content: start; font-size: 1.28rem; }
+    .desmos-controls label { font-weight: 800; color: #173754; display: grid; gap: 10px; font-size: 1.18rem; }
+    .desmos-controls small { font-size: 1.02rem; line-height: 1.35; }
+    .desmos-controls input[type="range"], .desmos-controls select { width: 100%; accent-color: var(--teal); font-size: 1.12rem; min-height: 42px; }
+    .desmos-controls input[type="range"] { min-height: 44px; }
+    .desmos-equation { font-family: Georgia, serif; font-size: 1.55rem; color: #0b2d55; background: rgba(216,255,243,0.58); border: 1px solid rgba(0,168,168,0.22); border-radius: 8px; padding: 16px; }
     @media (max-width: 760px) { .desmos-lab-card { grid-template-columns: 1fr; } }
 
   </style>
@@ -1532,17 +1536,16 @@
             <span class="chapter-kicker">Chapter</span>
             <span class="chapter-title">Sketching Graph Based on Function</span>
             <span class="chapter-icons" aria-hidden="true">
-              <span class="chapter-mini"><svg viewBox="0 0 100 54"><path class="mini-axis" d="M16 42H88M24 48V10" /><path class="mini-mark mini-blue" d="M18 24H86" /><text x="63" y="20">y=k</text></svg></span>
-              <span class="chapter-mini"><svg viewBox="0 0 100 54"><path class="mini-axis" d="M14 43H88M50 48V8" /><path class="mini-mark mini-coral" d="M24 15C35 42 66 42 78 15" /><path class="mini-mark mini-green" d="M18 43L50 16L84 43" /></svg></span>
-              <span class="chapter-mini"><svg viewBox="0 0 100 54"><path class="mini-axis" d="M14 43H88M28 48V8" /><path class="mini-mark mini-blue" d="M16 40C34 39 46 35 55 23C60 16 64 10 70 7" /><path class="mini-mark mini-green" d="M42 49C42 36 50 26 64 21C73 18 82 18 88 17" /></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M74 74V12" /><path class="mini-mark mini-coral" d="M28 61L74 24L120 61" /><text x="86" y="30">y=|x|</text><text x="127" y="78">x</text><text x="80" y="18">y</text><text x="63" y="78">0</text></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M52 74V12" /><path class="mini-mark mini-blue" d="M24 61C42 61 57 58 72 50C89 41 102 25 116 12" /><path class="mini-mark mini-coral mini-dash" d="M22 64H130" /><text x="90" y="25">y=e^x</text><text x="127" y="78">x</text><text x="58" y="18">y</text><text x="41" y="78">0</text></svg></span>
             </span>
           </button>
-          <button class="tab-btn" data-chapter="desmos" aria-label="Open Desmos Graph Adjuster">
+          <button class="tab-btn" data-chapter="desmos" aria-label="Open Graph Adjuster">
             <span class="chapter-kicker">Practice</span>
-            <span class="chapter-title">Desmos Graph Adjuster</span>
+            <span class="chapter-title">Graph Adjuster</span>
             <span class="chapter-icons" aria-hidden="true">
-              <span class="chapter-mini"><svg viewBox="0 0 100 54"><path class="mini-axis" d="M14 43H88M26 48V8" /><path class="mini-mark mini-blue" d="M18 39C35 39 47 30 55 17C58 13 60 10 63 8" /><path class="mini-mark mini-coral mini-dash" d="M16 43H86" /><text x="66" y="17">a</text></svg></span>
-              <span class="chapter-mini"><svg viewBox="0 0 100 54"><path class="mini-axis" d="M13 27H88M50 48V7" /><path class="mini-mark mini-coral" d="M14 27C24 13 36 13 46 27S68 41 84 27" /><path class="mini-mark mini-blue" d="M14 35C27 44 39 44 50 35S70 26 84 35" /></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 45H134M66 74V12" /><path class="mini-mark mini-blue" d="M20 45C33 25 48 25 61 45S89 65 103 45S123 25 134 38" /><text x="92" y="24">y=sin x</text><text x="127" y="59">x</text><text x="72" y="18">y</text><text x="55" y="59">0</text></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 48H134M52 74V12" /><path class="mini-mark mini-teal" d="M57 76C58 62 63 51 72 44C85 34 105 29 128 25" /><path class="mini-mark mini-coral mini-dash" d="M52 74V12" /><text x="96" y="25">y=ln x</text><text x="127" y="62">x</text><text x="58" y="18">y</text><text x="38" y="62">0</text></svg></span>
             </span>
           </button>
         </div>
@@ -2218,7 +2221,7 @@
             ]
       },
       "desmos": {
-            "title": "Desmos Graph Adjuster",
+            "title": "Graph Adjuster",
             "intro": "Use slider-style controls to test how parameters change graph shape, domain, range, asymptotes, amplitude and period.",
             "topics": [
                   {
@@ -2788,7 +2791,7 @@
         y = valid ? 1.28 * Math.sqrt(x) : 0;
       }
       if (kind === "cuberoot") y = 1.35 * Math.sign(x) * Math.pow(Math.abs(x), 1 / 3);
-      if (kind === "exp") y = Math.exp(x / 1.85);
+      if (kind === "exp") y = Math.max(0.22, Math.exp(x / 1.85));
       if (kind === "log") {
         valid = x > 0.08;
         y = valid ? 1.35 * Math.log(x) : 0;
@@ -3151,24 +3154,34 @@
       const sliderData = [["a", "1", "vertical stretch / amplitude"], ["b", "1", "period or horizontal shift"], ["c", "0", "phase shift"], ["d", "0", "vertical shift"]];
       const sliders = sliderData.map(([name, value, hint]) => `<label>${name}: <span id="${name}Val">${Number(value).toFixed(1)}</span><small>${hint}</small><input id="${name}Slider" type="range" min="-4" max="4" step="0.1" value="${value}"></label>`).join("");
       lab.innerHTML = `
-        <div class="desmos-canvas-wrap"><canvas id="desmosCanvas" aria-label="Interactive Desmos-style graph adjuster"></canvas></div>
+        <div class="desmos-canvas-wrap">
+          <canvas id="desmosCanvas" aria-label="Interactive fallback graph adjuster"></canvas>
+          <div id="desmosCalculator" aria-label="Desmos graphing calculator model"></div>
+        </div>
         <div class="desmos-controls">
           <div class="desmos-equation" id="desmosEquation">y = a sin(bx + c) + d</div>
           <label>Graph type
             <select id="desmosType">
               <option value="linear">Linear: y = ax + d</option>
               <option value="quadratic">Quadratic: y = a(x-b)^2 + d</option>
+              <option value="cubic">Cubic: y = a(x-b)^3 + d</option>
               <option value="exp">Exponential: y = a e^x + d</option>
               <option value="log">Logarithm: y = a ln(x-b) + d</option>
+              <option value="sqrt">Square root: y = a sqrt(x-b) + d</option>
+              <option value="absLinear">Absolute linear: y = a|x-b| + d</option>
+              <option value="absQuadratic">Absolute quadratic: y = |a(x-b)^2 + c| + d</option>
               <option value="sin" selected>Sine: y = a sin(bx+c)+d</option>
               <option value="cos">Cosine: y = a cos(bx+c)+d</option>
+              <option value="tan">Tangent: y = a tan(bx+c)+d</option>
             </select>
           </label>
           ${sliders}
         </div>
       `;
       el.topicGrid.appendChild(lab);
-      ["desmosType", "aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => drawDesmosAdjuster(lab)));
+      ["aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => drawDesmosAdjuster(lab)));
+      lab.querySelector("#desmosType").addEventListener("input", () => drawDesmosAdjuster(lab));
+      lab.querySelector("#desmosType").addEventListener("change", () => drawDesmosAdjuster(lab));
       requestAnimationFrame(() => drawDesmosAdjuster(lab));
     }
     function drawMini(canvas, type) {
@@ -3935,6 +3948,75 @@
       else if (type === "desmosTrig") { const a = 1.2 + 0.5 * Math.sin(t); plot(ctx, map, x => a * Math.sin(1.4 * x), "#2077ff", 5); dash(map.pad, map.y0, w - map.pad, map.y0, "#00a8a8"); label(ctx, "amplitude and period", 58, 58, "#0b2d55"); }
     }
 
+    let desmosApiPromise = null;
+    function loadDesmosApi() {
+      if (window.Desmos) return Promise.resolve(window.Desmos);
+      if (desmosApiPromise) return desmosApiPromise;
+      desmosApiPromise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://www.desmos.com/api/v1.11/calculator.js?apiKey=desmos";
+        script.async = true;
+        script.onload = () => window.Desmos ? resolve(window.Desmos) : reject(new Error("Desmos did not load"));
+        script.onerror = () => reject(new Error("Desmos API unavailable"));
+        document.head.appendChild(script);
+      });
+      return desmosApiPromise;
+    }
+    function ensureDesmosCalculator(lab) {
+      const holder = lab.querySelector("#desmosCalculator");
+      if (!holder || !window.Desmos) return null;
+      if (!lab._desmosCalculator) {
+        lab._desmosCalculator = window.Desmos.GraphingCalculator(holder, {
+          expressions: false,
+          keypad: false,
+          settingsMenu: false,
+          zoomButtons: true,
+          lockViewport: false,
+          border: false
+        });
+        lab._desmosCalculator.setMathBounds({ left: -8, right: 8, bottom: -5, top: 5 });
+      }
+      return lab._desmosCalculator;
+    }
+    function desmosLatex(type, a, b, c, d, safeB) {
+      const A = a.toFixed(2), B = b.toFixed(2), C = c.toFixed(2), D = d.toFixed(2), SB = safeB.toFixed(2);
+      const latex = {
+        linear: "y=" + A + "x+" + D,
+        quadratic: "y=" + A + "\\left(x-" + B + "\\right)^2+" + D,
+        cubic: "y=" + A + "\\left(x-" + B + "\\right)^3+" + D,
+        exp: "y=" + A + "e^x+" + D,
+        log: "y=" + A + "\\ln\\left(x-" + B + "\\right)+" + D,
+        sqrt: "y=" + A + "\\sqrt{x-" + B + "}+" + D,
+        absLinear: "y=" + A + "\\left|x-" + B + "\\right|+" + D,
+        absQuadratic: "y=\\left|" + A + "\\left(x-" + B + "\\right)^2+" + C + "\\right|+" + D,
+        sin: "y=" + A + "\\sin\\left(" + SB + "x+" + C + "\\right)+" + D,
+        cos: "y=" + A + "\\cos\\left(" + SB + "x+" + C + "\\right)+" + D,
+        tan: "y=" + A + "\\tan\\left(" + SB + "x+" + C + "\\right)+" + D
+      };
+      return latex[type];
+    }
+    function updateDesmosModel(lab, type, latex) {
+      const canvas = lab.querySelector("#desmosCanvas");
+      const holder = lab.querySelector("#desmosCalculator");
+      if (!holder) return;
+      loadDesmosApi().then(() => {
+        const calculator = ensureDesmosCalculator(lab);
+        if (!calculator) return;
+        holder.style.display = "block";
+        canvas.style.display = "none";
+        calculator.setExpression({ id: "mainGraph", latex, color: "#2077ff", lineWidth: 4 });
+        if (["log", "sqrt"].includes(type)) {
+          const boundary = Number(lab.querySelector("#bSlider").value).toFixed(2);
+          calculator.setExpression({ id: "domainBoundary", latex: "x=" + boundary, color: "#ff6f61", lineStyle: window.Desmos.Styles.DASHED });
+        } else {
+          calculator.removeExpression({ id: "domainBoundary" });
+        }
+      }).catch(() => {
+        holder.style.display = "none";
+        canvas.style.display = "block";
+      });
+    }
+
     function drawDesmosAdjuster(lab) {
       const canvas = lab.querySelector("#desmosCanvas");
       const type = lab.querySelector("#desmosType").value;
@@ -3942,17 +4024,42 @@
       const b = Number(lab.querySelector("#bSlider").value);
       const c = Number(lab.querySelector("#cSlider").value);
       const d = Number(lab.querySelector("#dSlider").value);
-      ["a","b","c","d"].forEach(name => lab.querySelector(`#${name}Val`).textContent = Number(lab.querySelector(`#${name}Slider`).value).toFixed(1));
+      ["a","b","c","d"].forEach(name => lab.querySelector("#" + name + "Val").textContent = Number(lab.querySelector("#" + name + "Slider").value).toFixed(1));
       const safeB = Math.abs(b) < 0.1 ? 1 : b;
-      const eq = { linear: `y = ${a.toFixed(1)}x + ${d.toFixed(1)}`, quadratic: `y = ${a.toFixed(1)}(x - ${b.toFixed(1)})^2 + ${d.toFixed(1)}`, exp: `y = ${a.toFixed(1)}e^x + ${d.toFixed(1)}`, log: `y = ${a.toFixed(1)}ln(x - ${b.toFixed(1)}) + ${d.toFixed(1)}`, sin: `y = ${a.toFixed(1)}sin(${safeB.toFixed(1)}x + ${c.toFixed(1)}) + ${d.toFixed(1)}`, cos: `y = ${a.toFixed(1)}cos(${safeB.toFixed(1)}x + ${c.toFixed(1)}) + ${d.toFixed(1)}` }[type];
+      const eq = {
+        linear: "y = " + a.toFixed(1) + "x + " + d.toFixed(1),
+        quadratic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^2 + " + d.toFixed(1),
+        cubic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^3 + " + d.toFixed(1),
+        exp: "y = " + a.toFixed(1) + "e^x + " + d.toFixed(1),
+        log: "y = " + a.toFixed(1) + "ln(x - " + b.toFixed(1) + ") + " + d.toFixed(1),
+        sqrt: "y = " + a.toFixed(1) + "sqrt(x - " + b.toFixed(1) + ") + " + d.toFixed(1),
+        absLinear: "y = " + a.toFixed(1) + "|x - " + b.toFixed(1) + "| + " + d.toFixed(1),
+        absQuadratic: "y = |" + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^2 + " + c.toFixed(1) + "| + " + d.toFixed(1),
+        sin: "y = " + a.toFixed(1) + "sin(" + safeB.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
+        cos: "y = " + a.toFixed(1) + "cos(" + safeB.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
+        tan: "y = " + a.toFixed(1) + "tan(" + safeB.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1)
+      }[type];
       lab.querySelector("#desmosEquation").textContent = eq;
+      updateDesmosModel(lab, type, desmosLatex(type, a, b, c, d, safeB));
       const { ctx, w, h } = resizeCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
       const pad = 54, xMin = -8, xMax = 8, yMin = -5, yMax = 5;
       const sx = (w - pad * 2) / (xMax - xMin), sy = (h - pad * 2) / (yMax - yMin);
       const px = x => pad + (x - xMin) * sx, py = y => h - pad - (y - yMin) * sy;
       const x0 = px(0), y0 = py(0);
-      const fn = { linear: x => a * x + d, quadratic: x => a * (x - b) ** 2 + d, exp: x => a * Math.exp(x) + d, log: x => x > b ? a * Math.log(x - b) + d : Infinity, sin: x => a * Math.sin(safeB * x + c) + d, cos: x => a * Math.cos(safeB * x + c) + d }[type];
+      const fn = {
+        linear: x => a * x + d,
+        quadratic: x => a * (x - b) ** 2 + d,
+        cubic: x => a * (x - b) ** 3 + d,
+        exp: x => a * Math.exp(x) + d,
+        log: x => x > b ? a * Math.log(x - b) + d : Infinity,
+        sqrt: x => x >= b ? a * Math.sqrt(x - b) + d : Infinity,
+        absLinear: x => a * Math.abs(x - b) + d,
+        absQuadratic: x => Math.abs(a * (x - b) ** 2 + c) + d,
+        sin: x => a * Math.sin(safeB * x + c) + d,
+        cos: x => a * Math.cos(safeB * x + c) + d,
+        tan: x => { const v = Math.cos(safeB * x + c); return Math.abs(v) < 0.04 ? Infinity : a * Math.tan(safeB * x + c) + d; }
+      }[type];
       const grad = ctx.createLinearGradient(0, 0, w, h); grad.addColorStop(0, "#fff9db"); grad.addColorStop(0.55, "#effff9"); grad.addColorStop(1, "#eef5ff"); ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
       ctx.strokeStyle = "rgba(16,32,51,0.12)"; ctx.lineWidth = 1; ctx.fillStyle = "rgba(16,32,51,0.62)"; ctx.font = "13px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
       for (let x = Math.ceil(xMin); x <= xMax; x++) { const X = px(x); ctx.beginPath(); ctx.moveTo(X, pad); ctx.lineTo(X, h - pad); ctx.stroke(); if (x !== 0) { ctx.fillText(String(x), X, y0 + 18); ctx.beginPath(); ctx.moveTo(X, y0 - 5); ctx.lineTo(X, y0 + 5); ctx.stroke(); } }
@@ -3960,7 +4067,7 @@
       for (let y = Math.ceil(yMin); y <= yMax; y++) { const Y = py(y); ctx.beginPath(); ctx.moveTo(pad, Y); ctx.lineTo(w - pad, Y); ctx.stroke(); if (y !== 0) { ctx.fillText(String(y), x0 - 10, Y); ctx.beginPath(); ctx.moveTo(x0 - 5, Y); ctx.lineTo(x0 + 5, Y); ctx.stroke(); } }
       ctx.strokeStyle = "#102033"; ctx.fillStyle = "#102033"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(w - pad + 12, y0); ctx.stroke(); drawMiniArrowHead(ctx, w - pad + 12, y0, 0, "#102033"); ctx.beginPath(); ctx.moveTo(x0, h - pad); ctx.lineTo(x0, pad - 12); ctx.stroke(); drawMiniArrowHead(ctx, x0, pad - 12, -Math.PI / 2, "#102033");
       ctx.font = "bold 18px Arial"; ctx.textAlign = "left"; ctx.fillText("x", w - pad + 22, y0 + 18); ctx.fillText("y", x0 + 10, pad - 20); ctx.fillText("0", x0 - 22, y0 + 22);
-      if (type === "log") { ctx.save(); ctx.strokeStyle = "rgba(255,111,97,0.75)"; ctx.lineWidth = 3; ctx.setLineDash([8,7]); ctx.beginPath(); ctx.moveTo(px(b), pad); ctx.lineTo(px(b), h - pad); ctx.stroke(); ctx.restore(); }
+      if (["log", "sqrt"].includes(type)) { ctx.save(); ctx.strokeStyle = "rgba(255,111,97,0.75)"; ctx.lineWidth = 3; ctx.setLineDash([8,7]); ctx.beginPath(); ctx.moveTo(px(b), pad); ctx.lineTo(px(b), h - pad); ctx.stroke(); ctx.restore(); }
       if (type === "exp") { ctx.save(); ctx.strokeStyle = "rgba(255,111,97,0.75)"; ctx.lineWidth = 3; ctx.setLineDash([8,7]); ctx.beginPath(); ctx.moveTo(pad, py(d)); ctx.lineTo(w - pad, py(d)); ctx.stroke(); ctx.restore(); }
       ctx.save(); ctx.strokeStyle = "#2077ff"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath(); let started = false;
       for (let x = xMin; x <= xMax; x += 0.025) { const y = fn(x); if (!Number.isFinite(y) || y < yMin - 0.5 || y > yMax + 0.5) { started = false; continue; } const X = px(x), Y = py(y); if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y); }
@@ -4084,7 +4191,7 @@
       if (has(["tan", "tangent", "正切"])) return "For y=tan x, range is R, period is pi, and vertical asymptotes occur at x=pi/2+n pi.";
       if (has(["amplitude", "period", "midline", "振幅", "周期"])) return "For y=a sin(bx+c)+d or y=a cos(bx+c)+d, amplitude is |a|, period is 2pi/|b|, and midline is y=d. For tangent, period is pi/|b|.";
       if (has(["transform", "shift", "reflect", "stretch", "平移", "反射"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, x-h shifts horizontally, and +k shifts vertically.";
-      if (has(["desmos", "slider", "adjust", "滑杆", "调整"])) return "Open the Desmos Graph Adjuster section. Move a, b, c and d: a changes steepness/amplitude/reflection, b often affects horizontal shift or period, c shifts trig graphs, and d moves the graph up or down.";
+      if (has(["desmos", "slider", "adjust", "滑杆", "调整"])) return "Open the Graph Adjuster section. Move a, b, c and d: a changes steepness/amplitude/reflection, b often affects horizontal shift or period, c shifts trig graphs, and d moves the graph up or down.";
       if (has(["practice", "quiz", "test me", "练习"])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so the graph starts at x=3.";
       if (slide) return `This page is about ${slide.title}. ${slide.text} Focus on these PDF-style graph facts: ${slide.keys.join(" ")}`;
       return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^x, y=ln x, y=sin x, or y=a(x-h)^2+k. I will help identify the graph type, domain and range.";
@@ -4212,7 +4319,19 @@
       });
     });
 
-    document.getElementById("jumpTop").addEventListener("click", () => document.getElementById("home").scrollIntoView({ behavior: "smooth" }));
+    function returnHome() {
+      state.topic = null;
+      state.slide = 0;
+      state.game = null;
+      el.topicGrid.innerHTML = "";
+      el.lessonShell.style.display = "none";
+      el.gamePanel.style.display = "none";
+      document.body.classList.remove("content-open");
+      document.getElementById("subtopics").classList.add("hidden");
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.getElementById("home").scrollIntoView({ behavior: "smooth" });
+    }
+    document.getElementById("jumpTop").addEventListener("click", returnHome);
     document.getElementById("closeLesson").addEventListener("click", () => {
       el.lessonShell.style.display = "none";
       document.getElementById("subtopics").scrollIntoView({ behavior: "smooth" });
@@ -4273,7 +4392,7 @@
       if (state.topic) drawLesson();
     });
 
-    addBot("Hello, I'm Ms. F(x). This site now focuses on sketching graphs from the PDF: identify the function type, read domain and range from the graph, then test transformations with the Desmos Graph Adjuster.");
+    addBot("Hello, I'm Ms. F(x). This site now focuses on sketching graphs from the PDF: identify the function type, read domain and range from the graph, then test transformations with the Graph Adjuster.");
     animate();
   </script>
 </body>
