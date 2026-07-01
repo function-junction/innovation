@@ -3441,15 +3441,15 @@
     };
     function updateVisibleGraphParams(lab) {
       const type = lab.querySelector("#desmosType").value;
-      const config = graphParamConfig[type] || graphParamConfig.sin;
+      const config = graphParamConfig[type];
       ["a", "b", "c", "d"].forEach(name => {
         const row = lab.querySelector('[data-param="' + name + '"]');
         if (!row) return;
-        const show = config.params.includes(name);
+        const show = !!config && config.params.includes(name);
         row.hidden = !show;
         row.style.display = show ? "grid" : "none";
         const hint = row.querySelector("small");
-        if (hint && config.hints[name]) hint.textContent = config.hints[name];
+        if (hint) hint.textContent = config?.hints?.[name] || "";
       });
     }
     function renderDesmosAdjuster() {
@@ -3463,9 +3463,10 @@
           <div id="desmosCalculator" aria-label="Desmos graphing calculator model"></div>
         </div>
         <div class="desmos-controls">
-          <div class="desmos-equation" id="desmosEquation">y = a sin(bx + c) + d</div>
+          <div class="desmos-equation" id="desmosEquation">Select function graph</div>
           <label>Graph type
             <select id="desmosType">
+              <option value="" selected disabled hidden>Select function graph</option>
               <option value="linear">Linear: y = ax + b</option>
               <option value="quadratic">Quadratic: y = a(x-b)^2 + c</option>
               <option value="cubic">Cubic: y = a(x-b)^3 + c</option>
@@ -3474,7 +3475,7 @@
               <option value="sqrt">Square root: y = a sqrt(x-b) + c</option>
               <option value="absLinear">Absolute linear: y = a|x-b| + c</option>
               <option value="absQuadratic">Absolute quadratic: y = |a(x-b)^2 + c| + d</option>
-              <option value="sin" selected>Sine: y = a sin(bx+c)+d</option>
+              <option value="sin">Sine: y = a sin(bx+c)+d</option>
               <option value="cos">Cosine: y = a cos(bx+c)+d</option>
               <option value="tan">Tangent: y = a tan(bx+c)+d</option>
             </select>
@@ -3484,7 +3485,6 @@
       `;
       el.topicGrid.appendChild(lab);
       ["aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => drawDesmosAdjuster(lab)));
-      lab.querySelector("#desmosType").addEventListener("input", () => drawDesmosAdjuster(lab));
       lab.querySelector("#desmosType").addEventListener("change", () => drawDesmosAdjuster(lab));
       updateVisibleGraphParams(lab);
       requestAnimationFrame(() => drawDesmosAdjuster(lab));
@@ -4338,6 +4338,20 @@
       const c = Number(lab.querySelector("#cSlider").value);
       const d = Number(lab.querySelector("#dSlider").value);
       ["a","b","c","d"].forEach(name => lab.querySelector("#" + name + "Val").textContent = Number(lab.querySelector("#" + name + "Slider").value).toFixed(1));
+      updateVisibleGraphParams(lab);
+      if (!type) {
+        lab.querySelector("#desmosEquation").textContent = "Select function graph";
+        updateDesmosModel(lab, type, "", false);
+        const blank = resizeCanvas(canvas);
+        const ctx = blank.ctx, w = blank.w, h = blank.h;
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, "#fff9db");
+        grad.addColorStop(0.55, "#effff9");
+        grad.addColorStop(1, "#eef5ff");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+        return;
+      }
       const eq = {
         linear: "y = " + a.toFixed(1) + "x + " + b.toFixed(1),
         quadratic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^2 + " + c.toFixed(1),
@@ -4352,7 +4366,6 @@
         tan: "y = " + a.toFixed(1) + "tan(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1)
       }[type];
       lab.querySelector("#desmosEquation").textContent = eq;
-      updateVisibleGraphParams(lab);
       const isValid = isGraphAdjusterValid(type, a, b, c, d);
       updateDesmosModel(lab, type, desmosLatex(type, a, b, c, d), isValid);
       const { ctx, w, h } = resizeCanvas(canvas);
