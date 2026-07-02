@@ -2784,23 +2784,44 @@
       ctx.restore();
     }
 
+    function canvasMathText(text) {
+      return String(text)
+        .replace(/sqrt\(([^)]+)\)/g, "√$1")
+        .replace(/e\^\{x\}/g, "eˣ")
+        .replace(/e\^x/g, "eˣ")
+        .replace(/x\^\{2\}/g, "x²")
+        .replace(/x\^\{3\}/g, "x³")
+        .replace(/sin\^\{2\}/g, "sin²")
+        .replace(/cos\^\{2\}/g, "cos²")
+        .replace(/tan\^\{2\}/g, "tan²")
+        .replace(/cot\^\{2\}/g, "cot²")
+        .replace(/sec\^\{2\}/g, "sec²")
+        .replace(/cosec\^\{2\}/g, "cosec²")
+        .replace(/1\/\(([^)]+)\)/g, "1∕($1)")
+        .replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, "$1∕$2")
+        .replace(/!=/g, "≠")
+        .replace(/>=/g, "≥")
+        .replace(/<=/g, "≤");
+    }
+
     function label(ctx, text, x, y, color = "#102033") {
       ctx.save();
       ctx.fillStyle = color;
       ctx.font = "700 16px Inter, sans-serif";
-      ctx.fillText(text, x, y);
+      ctx.fillText(canvasMathText(text), x, y);
       ctx.restore();
     }
 
     function drawFittedText(ctx, text, x, y, maxWidth, size, weight, color, family = "Georgia, serif") {
       let fittedSize = size;
+      const fittedText = canvasMathText(text);
       ctx.save();
       ctx.fillStyle = color;
       do {
-        ctx.font = `${weight} ${fittedSize}px ${family}`;
+        ctx.font = weight + " " + fittedSize + "px " + family;
         fittedSize -= 0.5;
-      } while (fittedSize > 10 && ctx.measureText(text).width > maxWidth);
-      ctx.fillText(text, x, y);
+      } while (fittedSize > 10 && ctx.measureText(fittedText).width > maxWidth);
+      ctx.fillText(fittedText, x, y);
       ctx.restore();
     }
 
@@ -3433,8 +3454,8 @@
 
     function renderTopics() {
       const chapter = chapters[state.chapter];
-      el.chapterTitle.textContent = chapter.title;
-      el.chapterIntro.textContent = chapter.intro;
+      el.chapterTitle.innerHTML = formatMathHTML(chapter.title);
+      el.chapterIntro.innerHTML = formatMathHTML(chapter.intro);
       el.topicGrid.innerHTML = "";
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.chapter === state.chapter));
       if (state.chapter === "desmos") {
@@ -3449,8 +3470,8 @@
             <canvas aria-label="${topic.title} illustration"></canvas>
           </div>
           <div class="topic-body">
-            <h3>${index + 1}. ${topic.title}</h3>
-            <p>${topic.summary}</p>
+            <h3>${index + 1}. ${formatMathHTML(topic.title)}</h3>
+            <p>${formatMathHTML(topic.summary)}</p>
             <button class="primary-btn">Start Learning</button>
           </div>
         `;
@@ -3504,9 +3525,9 @@
               <option value="linear">Linear: y = ax + b</option>
               <option value="quadratic">Quadratic: y = a(x-b)² + c</option>
               <option value="cubic">Cubic: y = a(x-b)³ + c</option>
-              <option value="exp">Exponential: y = a e^{x} + b</option>
+              <option value="exp">Exponential: y = aeˣ + b</option>
               <option value="log">Logarithm: y = a ln(x-b) + c</option>
-              <option value="sqrt">Square root: y = a sqrt(x-b) + c</option>
+              <option value="sqrt">Square root: y = a√(x-b) + c</option>
               <option value="absLinear">Absolute linear: y = a|x-b| + c</option>
               <option value="absQuadratic">Absolute quadratic: y = |a(x-b)² + c| + d</option>
               <option value="sin">Sine: y = a sin(bx+c)+d</option>
@@ -3629,7 +3650,7 @@
       ctx.font = "800 " + size + "px Inter, Georgia, serif";
       ctx.textAlign = align;
       ctx.textBaseline = "middle";
-      ctx.fillText(text, x, y);
+      ctx.fillText(canvasMathText(text), x, y);
       ctx.restore();
     }
 
@@ -3916,7 +3937,7 @@
       el.gamePanel.style.display = "none";
       el.lessonShell.scrollIntoView({ behavior: "smooth", block: "start" });
       addBot(`You opened ${topic.title}. I can explain the slides, give examples, or help you solve related questions.`);
-      renderSlide();
+      renderSlide(true);
       state.game = null;
     }
 
@@ -3924,21 +3945,22 @@
       return state.topic.slides[state.slide];
     }
 
-    function renderSlide() {
+    function renderSlide(autoSpeak = false) {
       const slide = currentSlide();
-      el.lessonCrumb.textContent = `${chapters[state.chapter].title} / Page ${state.slide + 1}`;
-      el.lessonTitle.textContent = state.topic.title;
-      el.slideTitle.textContent = slide.title;
-      el.slideText.textContent = slide.text;
-      el.keyList.innerHTML = slide.keys.map(k => `<li>${k}</li>`).join("");
-      el.mathChips.innerHTML = slide.chips.map(c => `<span class="math-chip">${c}</span>`).join("");
-      el.visualCaption.textContent = slide.caption;
+      el.lessonCrumb.innerHTML = formatMathHTML(`${chapters[state.chapter].title} / Page ${state.slide + 1}`);
+      el.lessonTitle.innerHTML = formatMathHTML(state.topic.title);
+      el.slideTitle.innerHTML = formatMathHTML(slide.title);
+      el.slideText.innerHTML = formatMathHTML(slide.text);
+      el.keyList.innerHTML = slide.keys.map(k => `<li>${formatMathHTML(k)}</li>`).join("");
+      el.mathChips.innerHTML = slide.chips.map(c => `<span class="math-chip">${formatMathHTML(c)}</span>`).join("");
+      el.visualCaption.innerHTML = formatMathHTML(slide.caption);
       el.slideCount.textContent = `${state.slide + 1} / ${state.topic.slides.length}`;
       el.progressFill.style.width = `${((state.slide + 1) / state.topic.slides.length) * 100}%`;
       document.getElementById("prevSlide").disabled = state.slide === 0;
       document.getElementById("nextSlide").textContent = state.slide === state.topic.slides.length - 1 ? "Start Game" : "Next Page";
       addBot(`Page ${state.slide + 1}: ${slide.text}`);
       drawLesson();
+      if (autoSpeak) setTimeout(speakCurrentSlide, 120);
     }
 
     function drawLesson() {
@@ -4399,7 +4421,7 @@
         cos: "y = " + a.toFixed(1) + "cos(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
         tan: "y = " + a.toFixed(1) + "tan(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1)
       }[type];
-      lab.querySelector("#desmosEquation").textContent = eq;
+      lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(eq);
       const isValid = isGraphAdjusterValid(type, a, b, c, d);
       updateDesmosModel(lab, type, desmosLatex(type, a, b, c, d), isValid);
       const { ctx, w, h } = resizeCanvas(canvas);
@@ -4511,10 +4533,35 @@
       }
     }
 
+    function escapeHTML(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatMathHTML(value) {
+      let text = escapeHTML(value);
+      text = text.replace(/!=/g, "≠").replace(/&gt;=/g, "≥").replace(/&lt;=/g, "≤");
+      text = text.replace(/1\/\(([^()]+)\)/g, `<span class="math-frac"><span>1</span><span class="den">$1</span></span>`);
+      text = text.replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, `<span class="math-frac"><span>$1</span><span class="den">$2</span></span>`);
+      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
+      text = text.replace(/√\(([^()]+)\)/g, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
+      text = text.replace(/e\^\{([^}]+)\}/g, `<span class="math-inline">e<sup>$1</sup></span>`);
+      text = text.replace(/e\^([a-zA-Z0-9+\-]+)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
+      text = text.replace(/([A-Za-zθ]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/\b([A-Za-zθ]+)\^(\d+)/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)²/g, `<span class="math-inline">$1<sup>2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)³/g, `<span class="math-inline">$1<sup>3</sup></span>`);
+      return text;
+    }
+
     function addBot(text) {
       const msg = document.createElement("div");
       msg.className = "msg bot";
-      msg.textContent = text;
+      msg.innerHTML = formatMathHTML(text);
       el.chatLog.appendChild(msg);
       el.chatLog.scrollTop = el.chatLog.scrollHeight;
     }
@@ -4599,7 +4646,7 @@
       if (has(["absolute", "modulus", "|x|", "绝对值"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
       if (has(["rational", "reciprocal", "1/x", "asymptote", "渐近线"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
       if (has(["surd", "sqrt", "square root", "根号", "√"])) return "For surd graphs, first make the expression inside the square root non-negative. y=sqrt(x-a) starts at (a,0), domain is [a,infinity), range is [0,infinity).";
-      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "For y=e^x, domain is R, range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
+      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "For y=e^{x}, domain is R, range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
       if (has(["ln", "log", "logarithm", "对数"])) return "For y=ln x, domain is (0,infinity), range is R, and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
       if (has(["sin", "sine", "正弦"])) return "For y=sin x, domain is R, range is [-1,1], period is 2π, and x-intercepts occur at x=nπ. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
       if (has(["cos", "cosine", "余弦"])) return "For y=cos x, domain is R, range is [-1,1], period is 2π, and the y-intercept is 1 for the parent graph.";
@@ -4610,8 +4657,63 @@
       if (has(["practice", "quiz", "test me", "练习"])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so the graph starts at x=3 and domain is [3,infinity).";
       if (functionType) return "This is related to " + functionType + " graphs. Tell me the exact equation or where the graph starts/crosses/asymptotes are, and I will help you find its domain and range.";
       if (slide) return "This page is about " + slide.title + ". " + slide.text + " Focus on these PDF-style graph facts: " + slide.keys.join(" ");
-      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^x, y=ln x, y=sin x, or y=a(x-b)²+c. I will help identify the graph type, domain and range.";
+      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^{x}, y=ln x, y=sin x, or y=a(x-b)²+c. I will help identify the graph type, domain and range.";
     }
+    function plainSpeechText(value) {
+      const box = document.createElement("div");
+      box.innerHTML = formatMathHTML(value);
+      return box.textContent
+        .replace(/∞/g, "infinity")
+        .replace(/π/g, "pi")
+        .replace(/θ/g, "theta")
+        .replace(/²/g, " squared")
+        .replace(/³/g, " cubed")
+        .replace(/ˣ/g, " to the power of x")
+        .replace(/√/g, " square root of ")
+        .replace(/≥/g, " greater than or equal to ")
+        .replace(/≤/g, " less than or equal to ")
+        .replace(/≠/g, " not equal to ")
+        .replace(/∕/g, " over ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function selectTeacherVoice() {
+      if (!("speechSynthesis" in window)) return null;
+      const voices = speechSynthesis.getVoices();
+      const preferredFemaleName = /sonia|libby|maisie|hazel|susan|serena|zira|jenny|aria|samantha|natasha|female/i;
+      return voices.find(v => preferredFemaleName.test(v.name) && /^en-GB/i.test(v.lang))
+        || voices.find(v => /^en-GB/i.test(v.lang))
+        || voices.find(v => preferredFemaleName.test(v.name) && /^en-/i.test(v.lang))
+        || voices.find(v => /^en/i.test(v.lang))
+        || voices[0]
+        || null;
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(plainSpeechText(text));
+      const voice = selectTeacherVoice();
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+      } else {
+        utterance.lang = "en-GB";
+      }
+      utterance.rate = 0.9;
+      utterance.pitch = 1.06;
+      utterance.volume = 1;
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakCurrentSlide() {
+      if (!state.topic) return;
+      const slide = currentSlide();
+      speak(slide.title + ". " + slide.text + " " + slide.keys.join(" "));
+    }
+
+
     function shuffle(arr) {
       return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
     }
@@ -4620,7 +4722,7 @@
       const questions = shuffle([...state.topic.questions]).slice(0, 5);
       state.game = { index: 0, score: 0, questions, locked: false, scene: Math.random() > 0.5 ? "beach" : "forest" };
       el.gamePanel.style.display = "block";
-      el.gameTitle.textContent = `${state.topic.title} Challenge`;
+      el.gameTitle.innerHTML = formatMathHTML(`${state.topic.title} Challenge`);
       el.pixelScene.classList.toggle("beach", state.game.scene === "beach");
       el.pixelScene.classList.toggle("forest", state.game.scene === "forest");
       el.hazard.textContent = state.game.scene === "beach" ? "Wrong route: the shark wins." : "Wrong route: the forest beast wins.";
@@ -4639,13 +4741,13 @@
       const choices = shuffle([item.a, ...item.choices]).slice(0, 3);
       game.correctRoute = choices.indexOf(item.a);
       el.gameProgress.textContent = `Question ${game.index + 1} of ${game.questions.length}`;
-      el.gameQuestion.textContent = item.q;
+      el.gameQuestion.innerHTML = formatMathHTML(item.q);
       el.answers.innerHTML = "";
       choices.forEach((choice, idx) => {
         document.getElementById(`route${idx}`).textContent = choice;
         const btn = document.createElement("button");
         btn.className = "answer-btn";
-        btn.textContent = `Route ${String.fromCharCode(65 + idx)}: ${choice}`;
+        btn.innerHTML = `Route ${String.fromCharCode(65 + idx)}: ${formatMathHTML(choice)}`;
         btn.addEventListener("click", () => chooseRoute(idx));
         el.answers.appendChild(btn);
       });
@@ -4668,6 +4770,7 @@
             el.gameStatus.textContent = `Congratulations. You completed the route with ${game.score}/${game.questions.length} correct answers.`;
             el.crowd.style.display = "flex";
             burstConfetti();
+            speak("Congratulations. You completed the route.");
           } else {
             game.index++;
             setTimeout(renderQuestion, 850);
@@ -4675,7 +4778,7 @@
         } else {
           el.player.style.left = "4%";
           el.player.style.top = game.scene === "beach" ? "44%" : "72%";
-          el.gameStatus.textContent = `Wrong route. The correct answer was: ${game.questions[game.index].a}. Try a new random game.`;
+          el.gameStatus.innerHTML = formatMathHTML(`Wrong route. The correct answer was: ${game.questions[game.index].a}. Try a new random game.`);
         }
       }, 650);
     }
@@ -4721,26 +4824,25 @@
     document.getElementById("prevSlide").addEventListener("click", () => {
       if (state.slide > 0) {
         state.slide--;
-        renderSlide();
+        renderSlide(true);
       }
     });
     document.getElementById("nextSlide").addEventListener("click", () => {
       if (state.slide < state.topic.slides.length - 1) {
         state.slide++;
-        renderSlide();
+        renderSlide(true);
       } else {
         startGame();
       }
     });
     document.getElementById("gameBtn").addEventListener("click", startGame);
     document.getElementById("restartGame").addEventListener("click", startGame);
-    document.getElementById("speakBtn").addEventListener("click", () => {
-      const slide = currentSlide();
-      addBot(`${slide.title}. ${slide.text} ${slide.keys.join(" ")}`);
-      openAiPanel();
-    });
+    document.getElementById("speakBtn").addEventListener("click", speakCurrentSlide);
     el.aiLauncher.addEventListener("click", openAiPanel);
     el.aiClose.addEventListener("click", closeAiPanel);
+    if ("speechSynthesis" in window) {
+      speechSynthesis.onvoiceschanged = selectTeacherVoice;
+    }
     el.sendChat.addEventListener("click", () => {
       const text = el.chatInput.value.trim();
       if (!text) return;
@@ -4748,6 +4850,7 @@
       el.chatInput.value = "";
       const reply = tutorReply(text);
       addBot(reply);
+      speak(reply);
     });
     el.chatInput.addEventListener("keydown", e => {
       if (e.key === "Enter") el.sendChat.click();
