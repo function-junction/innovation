@@ -62,7 +62,7 @@
     }
 
     body::after {
-      content: "f(x)   y=sin x   Df   Rf   y=x   ln x   e^{x}   x^{2}   tan x   π   Σ";
+      content: "f(x)   y=sin x   Df   Rf   y=x   ln x   e^{x}   x^{2}   tan x   Ï€   Î£";
       position: fixed;
       top: 18%;
       left: -4%;
@@ -454,6 +454,27 @@
       padding: 0.06em 0.18em 0;
     }
 
+    .math-sqrt {
+      display: inline-flex;
+      align-items: flex-start;
+      margin: 0 0.08em;
+      vertical-align: -0.12em;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .math-sqrt .root-symbol {
+      font-size: 1.2em;
+      line-height: 0.95;
+      margin-right: -0.02em;
+    }
+
+    .math-sqrt .radicand {
+      border-top: 2px solid currentColor;
+      padding: 0.05em 0.1em 0;
+      line-height: 1.05;
+    }
+
     .floating-formula {
       position: absolute;
       padding: 10px 12px;
@@ -643,7 +664,7 @@
       grid-template-columns: minmax(420px, 1.08fr) minmax(340px, 0.92fr);
       gap: 20px;
       align-items: stretch;
-      min-height: clamp(520px, 64vh, 680px);
+      min-height: clamp(590px, 70vh, 760px);
     }
 
     .concept-card {
@@ -660,30 +681,63 @@
 
     .concept-card h3 {
       margin: 0;
-      font-size: 1.55rem;
+      font-family: var(--font-subtopic);
+      font-size: clamp(1.85rem, 2.6vw, 2.7rem);
+      line-height: 1.05;
+      color: #102033;
+      text-shadow: 0 2px 0 rgba(245, 182, 66, 0.22);
     }
 
     .concept-card p {
       margin: 0;
-      color: #304a63;
-      line-height: 1.65;
+      color: #173754;
+      font-size: clamp(1.14rem, 1.55vw, 1.42rem);
+      line-height: 1.72;
+      font-weight: 760;
+      background: linear-gradient(90deg, rgba(255,244,176,0.9), rgba(224,255,247,0.55));
+      border-left: 6px solid #f5b642;
+      padding: 14px 16px;
+      border-radius: var(--radius);
     }
 
     .key-list {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       margin: 0;
       padding: 0;
       list-style: none;
+      counter-reset: noteStep;
     }
 
     .key-list li {
-      padding: 11px 12px;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(16, 32, 51, 0.08);
+      position: relative;
+      padding: 14px 16px 14px 52px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(16, 32, 51, 0.1);
       border-radius: var(--radius);
-      color: #243d55;
-      line-height: 1.45;
+      color: #173754;
+      font-size: clamp(1.04rem, 1.25vw, 1.2rem);
+      font-weight: 760;
+      line-height: 1.5;
+      box-shadow: 0 10px 24px rgba(16,32,51,0.05);
+    }
+
+    .key-list li::before {
+      counter-increment: noteStep;
+      content: counter(noteStep);
+      position: absolute;
+      left: 13px;
+      top: 12px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2077ff, #00a8a8);
+      color: #fff;
+      font-weight: 950;
+      font-size: 0.95rem;
+      box-shadow: 0 3px 0 rgba(16,32,51,0.15);
     }
 
     .math-chip-row {
@@ -712,7 +766,7 @@
       border-radius: var(--radius);
       overflow: hidden;
       position: relative;
-      min-height: clamp(390px, 52vh, 500px);
+      min-height: clamp(450px, 58vh, 580px);
       display: grid;
       grid-template-rows: 1fr auto;
     }
@@ -720,7 +774,7 @@
     #lessonCanvas {
       width: 100%;
       height: 100%;
-      min-height: clamp(340px, 44vh, 420px);
+      min-height: clamp(390px, 50vh, 500px);
       display: block;
     }
 
@@ -1148,7 +1202,75 @@
     .game-panel {
       display: none;
       margin-top: 18px;
+      overflow: visible;
+    }
+
+    html.game-playing,
+    body.game-playing {
+      height: 100%;
       overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body.game-playing {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+    }
+
+    body.game-playing .hero,
+    body.game-playing #subtopics > .section-head,
+    body.game-playing #topicGrid,
+    body.game-playing .lesson-panel,
+    body.game-playing .ai-launcher,
+    body.game-playing .ai-panel {
+      display: none !important;
+    }
+
+    body.game-playing .app,
+    body.game-playing #subtopics,
+    body.game-playing .lesson-shell {
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    body.game-playing .game-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: grid !important;
+      grid-template-rows: 1fr;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: #050b08;
+      overflow: hidden;
+    }
+
+    body.game-playing .game-top {
+      display: none;
+    }
+
+    body.game-playing .game-embed {
+      height: 100vh;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      background: #050b08;
+    }
+
+    body.game-playing .game-embed-frame-wrap {
+      width: 100vw;
+      height: 100vh;
+      max-width: calc(100vh * 16 / 9);
+      max-height: calc(100vw * 9 / 16);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
     }
 
     .game-top {
@@ -1171,6 +1293,43 @@
       grid-template-columns: minmax(0, 1fr) 330px;
       gap: 18px;
       padding: 18px;
+    }
+
+    .game-embed {
+      padding: clamp(12px, 2vw, 22px);
+      display: flex;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(236,244,255,0.66));
+    }
+
+    .game-embed-frame-wrap {
+      position: relative;
+      width: min(100%, 1280px);
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(16, 32, 51, 0.12);
+      box-shadow: 0 22px 46px rgba(15, 35, 60, 0.22);
+      background: #0c2518;
+    }
+
+    .game-embed-frame {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .game-embed {
+        padding: 12px;
+      }
+
+      .game-embed-frame-wrap {
+        width: 100%;
+      }
     }
 
     .pixel-scene {
@@ -1819,15 +1978,15 @@
 <body>
   <div class="math-bg" aria-hidden="true">
     <span class="doodle-big doodle-outline" style="top: 7%; left: 6%; --rot:-8deg; --dur:15s;">ALGEBRA</span>
-    <span class="doodle-mid" style="top: 17%; left: 38%; --rot:10deg; --dur:12s; --delay:-2s;">x² + y²</span>
-    <span class="doodle-big" style="top: 22%; right: 8%; --rot:-6deg; --dur:16s; --delay:-5s;">π</span>
-    <span class="doodle-small" style="top: 33%; left: 3%; --rot:7deg; --dur:11s; --delay:-1s;">√x</span>
+    <span class="doodle-mid" style="top: 17%; left: 38%; --rot:10deg; --dur:12s; --delay:-2s;">xÂ² + yÂ²</span>
+    <span class="doodle-big" style="top: 22%; right: 8%; --rot:-6deg; --dur:16s; --delay:-5s;">Ï€</span>
+    <span class="doodle-small" style="top: 33%; left: 3%; --rot:7deg; --dur:11s; --delay:-1s;">âˆšx</span>
     <span class="doodle-mid doodle-outline" style="top: 42%; left: 18%; --rot:-13deg; --dur:14s; --delay:-4s;">y = cos x</span>
     <span class="doodle-small" style="top: 50%; right: 19%; --rot:9deg; --dur:13s; --delay:-6s;">log<sub>a</sub>x</span>
-    <span class="doodle-big doodle-outline" style="top: 58%; right: 5%; --rot:5deg; --dur:17s; --delay:-3s;">Σ</span>
-    <span class="doodle-mid" style="bottom: 15%; left: 7%; --rot:-4deg; --dur:12s; --delay:-7s;">a² + b²</span>
-    <span class="doodle-small doodle-outline" style="bottom: 8%; left: 45%; --rot:11deg; --dur:15s; --delay:-2.5s;">f(x) = ax² + bx + c</span>
-    <span class="doodle-mid" style="bottom: 12%; right: 12%; --rot:-10deg; --dur:13s; --delay:-8s;">∞</span>
+    <span class="doodle-big doodle-outline" style="top: 58%; right: 5%; --rot:5deg; --dur:17s; --delay:-3s;">Î£</span>
+    <span class="doodle-mid" style="bottom: 15%; left: 7%; --rot:-4deg; --dur:12s; --delay:-7s;">aÂ² + bÂ²</span>
+    <span class="doodle-small doodle-outline" style="bottom: 8%; left: 45%; --rot:11deg; --dur:15s; --delay:-2.5s;">f(x) = axÂ² + bx + c</span>
+    <span class="doodle-mid" style="bottom: 12%; right: 12%; --rot:-10deg; --dur:13s; --delay:-8s;">âˆž</span>
   </div>
   <main class="app">
     <section class="hero" id="home">
@@ -1841,9 +2000,9 @@
           Learn to recognise function types, sketch their graphs, and read domain and range directly from the graph using the Matriculation Topic 5 framework.
         </p>
         <div class="chapter-tabs" role="tablist" aria-label="Sketching graph selector">
-          <button class="tab-btn" data-chapter="functions" aria-label="Open Sketching Graph Based on Function">
+          <button class="tab-btn" data-chapter="functions" aria-label="Open Function Graph Types">
             <span class="chapter-kicker">Chapter</span>
-            <span class="chapter-title">Sketching Graph Based on Function</span>
+            <span class="chapter-title">Function Graph Types</span>
             <span class="chapter-icons" aria-hidden="true">
               <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M74 74V12" /><path class="mini-mark mini-coral" d="M32 26L74 64L116 26" /><circle cx="74" cy="64" r="3.2" class="mini-fill" /><text x="88" y="33">y=|x|</text><text x="127" y="78">x</text><text x="80" y="18">y</text><text x="63" y="78">0</text></svg></span>
               <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M52 74V12" /><path class="mini-mark mini-blue" d="M24 61C42 61 57 58 72 50C89 41 102 25 116 12" /><path class="mini-mark mini-coral mini-dash" d="M22 64H130" /><text x="90" y="25">y=e^{x}</text><text x="127" y="78">x</text><text x="58" y="18">y</text><text x="41" y="78">0</text></svg></span>
@@ -1871,7 +2030,7 @@
     <section id="subtopics" class="hidden">
       <div class="section-head">
         <div>
-          <h2 id="chapterTitle">Sketching Graph Based on Function</h2>
+          <h2 id="chapterTitle">Function Graph Types</h2>
           <p id="chapterIntro">Recognise each function by its graph shape, then read domain and range from the picture.</p>
         </div>
         <button class="ghost-btn" id="jumpTop">Return</button>
@@ -1921,31 +2080,15 @@
               <div class="crumb">Pixel Knowledge Route</div>
               <h3 id="gameTitle">Game</h3>
             </div>
-            <button class="ghost-btn" id="restartGame">New Random Game</button>
+            <button class="ghost-btn" id="restartGame">Restart Game</button>
           </div>
-          <div class="game-grid">
-            <div class="pixel-scene beach" id="pixelScene">
-              <div class="path" style="--top: 24%; --rot: 8deg"></div>
-              <div class="path" style="--top: 46%; --rot: 0deg"></div>
-              <div class="path" style="--top: 68%; --rot: -8deg"></div>
-              <div class="route-label" id="route0" style="--top: 20%">Route A</div>
-              <div class="route-label" id="route1" style="--top: 42%">Route B</div>
-              <div class="route-label" id="route2" style="--top: 64%">Route C</div>
-              <div class="player" id="player"></div>
-              <div class="hazard" id="hazard">Wrong route: the shark wins.</div>
-              <div class="crowd" id="crowd"><span style="--c:#2077ff"></span><span style="--c:#ff6f61"></span><span style="--c:#f5b642"></span><span style="--c:#37a66b"></span></div>
-              <div class="confetti" id="confetti"></div>
-            </div>
-            <div class="game-side">
-              <div class="question-box">
-                <div class="crumb" id="gameProgress">Question 1</div>
-                <p id="gameQuestion">Question text</p>
-              </div>
-              <div class="answer-list" id="answers"></div>
-              <div class="game-status" id="gameStatus">Choose the route with the correct answer.</div>
+          <div class="game-embed">
+            <div class="game-embed-frame-wrap">
+              <iframe id="pixelGameFrame" class="game-embed-frame" title="Function Junction Pixel Quiz Battle" allow="autoplay; fullscreen" loading="eager"></iframe>
             </div>
           </div>
         </article>
+
       </div>
 
     </section>
@@ -1986,548 +2129,19 @@
   <script>
     const chapters = {
       "functions": {
-            "title": "Sketching Graph Based on Function",
-            "intro": "Use the Topic 5 graph families from the PDF: identify the parent shape, mark restrictions, then read domain and range from the graph.",
+            "title": "Function Graph Types",
+            "intro": "Learn each parent graph type from the Topic 5 framework: recognise the shape, understand transformations, then read domain and range directly from the graph.",
             "topics": [
-                  {
-                        "id": "parent-polynomial-graphs",
-                        "title": "Parent Graphs: Constant, Linear, Quadratic and Cubic",
-                        "summary": "Recognise the four basic graph shapes and their domain-range fingerprints.",
-                        "color": "linear-gradient(135deg, #d8fff3, #e6eeff 48%, #f5fbff)",
-                        "visual": "parentMini",
-                        "slides": [
-                              {
-                                    "title": "Constant Function",
-                                    "text": "A constant function f(x)=k is a horizontal line. The graph accepts every x-value, but the output is always k.",
-                                    "keys": [
-                                          "Domain: R or (-infinity, infinity).",
-                                          "Range: {k}.",
-                                          "Shape: horizontal line y=k."
-                                    ],
-                                    "chips": [
-                                          "f(x)=k",
-                                          "D=R",
-                                          "R={k}"
-                                    ],
-                                    "visual": "constantGraph",
-                                    "caption": "Domain stretches left and right forever; range is one horizontal height."
-                              },
-                              {
-                                    "title": "Linear Function",
-                                    "text": "A linear function f(x)=ax+b, a not equal 0, is a straight line. Positive a rises, negative a falls.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: R.",
-                                          "b is the y-intercept."
-                                    ],
-                                    "chips": [
-                                          "f(x)=ax+b",
-                                          "a>0 rises",
-                                          "a<0 falls"
-                                    ],
-                                    "visual": "linearGraph",
-                                    "caption": "A non-horizontal line covers all x-values and all y-values."
-                              },
-                              {
-                                    "title": "Quadratic Function",
-                                    "text": "A quadratic function f(x)=ax^{2}+bx+c forms a parabola. The vertex gives the minimum when a>0 and maximum when a<0.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "If a>0, range is [k, infinity).",
-                                          "If a<0, range is (-infinity, k]."
-                                    ],
-                                    "chips": [
-                                          "parabola",
-                                          "vertex (h,k)",
-                                          "turning point"
-                                    ],
-                                    "visual": "quadraticRange",
-                                    "caption": "The vertex controls the range boundary."
-                              },
-                              {
-                                    "title": "Cubic Function",
-                                    "text": "A cubic function f(x)=ax^{3}+bx^{2}+cx+d, a not equal 0, has an S-like graph and takes all real x and y values.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: R.",
-                                          "Leading coefficient controls end direction."
-                                    ],
-                                    "chips": [
-                                          "cubic",
-                                          "S-shape",
-                                          "D=R, R=R"
-                                    ],
-                                    "visual": "cubicGraph",
-                                    "caption": "The cubic graph continues through every x-value and every y-value."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "The range of f(x)=k is...",
-                                    "a": "{k}",
-                                    "choices": [
-                                          "R",
-                                          "(0, infinity)"
-                                    ]
-                              },
-                              {
-                                    "q": "For f(x)=ax+b, a not equal 0, the graph is a...",
-                                    "a": "Straight line",
-                                    "choices": [
-                                          "Parabola",
-                                          "V-shape"
-                                    ]
-                              },
-                              {
-                                    "q": "A quadratic graph with a>0 has a...",
-                                    "a": "Minimum",
-                                    "choices": [
-                                          "Maximum",
-                                          "Vertical asymptote"
-                                    ]
-                              },
-                              {
-                                    "q": "The basic cubic graph has range...",
-                                    "a": "R",
-                                    "choices": [
-                                          "[0, infinity)",
-                                          "{k}"
-                                    ]
-                              }
-                        ]
-                  },
-                  {
-                        "id": "absolute-rational-graphs",
-                        "title": "Absolute and Rational Graphs",
-                        "summary": "Compare V-shapes with reciprocal branches and their different restrictions.",
-                        "color": "linear-gradient(135deg, #fff2df, #e8f9ff 58%, #f3fff1)",
-                        "visual": "absoluteRationalMini",
-                        "slides": [
-                              {
-                                    "title": "Absolute Function",
-                                    "text": "The absolute function f(x)=|x-a| makes a V-shape with vertex at x=a.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: [0, infinity) for the basic positive graph.",
-                                          "The vertex is the lowest point."
-                                    ],
-                                    "chips": [
-                                          "|x-a|",
-                                          "V-shape",
-                                          "vertex"
-                                    ],
-                                    "visual": "absoluteGraph",
-                                    "caption": "The corner tells you where the minimum occurs."
-                              },
-                              {
-                                    "title": "Rational Function",
-                                    "text": "The rational function f(x)=1/(ax-b) has two branches separated by a vertical asymptote.",
-                                    "keys": [
-                                          "Domain: (-infinity,b/a) union (b/a,infinity).",
-                                          "Range: (-infinity,0) union (0,infinity).",
-                                          "Vertical asymptote: x=b/a."
-                                    ],
-                                    "chips": [
-                                          "1/(ax-b)",
-                                          "x != b/a",
-                                          "y != 0"
-                                    ],
-                                    "visual": "rationalGraph",
-                                    "caption": "The graph approaches the asymptotes but never touches them."
-                              },
-                              {
-                                    "title": "Graphical Domain and Range",
-                                    "text": "For absolute graphs, scan the V from left to right and bottom to top. For rational graphs, notice the missing x-value and missing y-value.",
-                                    "keys": [
-                                          "Domain is horizontal coverage.",
-                                          "Range is vertical coverage.",
-                                          "Asymptotes show excluded values."
-                                    ],
-                                    "chips": [
-                                          "scan x",
-                                          "scan y",
-                                          "excluded values"
-                                    ],
-                                    "visual": "absoluteRational",
-                                    "caption": "The graph itself tells which x and y values are allowed."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "Which function gives a V-shaped graph?",
-                                    "a": "Absolute function",
-                                    "choices": [
-                                          "Cubic function",
-                                          "Rational function"
-                                    ]
-                              },
-                              {
-                                    "q": "For f(x)=1/(ax-b), x cannot equal...",
-                                    "a": "b/a",
-                                    "choices": [
-                                          "a/b",
-                                          "0 always"
-                                    ]
-                              },
-                              {
-                                    "q": "The basic reciprocal graph never reaches y=...",
-                                    "a": "0",
-                                    "choices": [
-                                          "1",
-                                          "-1"
-                                    ]
-                              }
-                        ]
-                  },
-                  {
-                        "id": "surd-graphs",
-                        "title": "Surd Graphs and Domain Restrictions",
-                        "summary": "Use the starting point of square-root graphs to identify domain and range.",
-                        "color": "linear-gradient(135deg, #e8fff7, #fff8de 56%, #edf2ff)",
-                        "visual": "surdMini",
-                        "slides": [
-                              {
-                                    "title": "y = sqrt(x-a)",
-                                    "text": "For y=sqrt(x-a), the graph starts at x=a and moves to the right above the x-axis.",
-                                    "keys": [
-                                          "Domain: [a, infinity).",
-                                          "Range: [0, infinity).",
-                                          "Starting point: (a,0)."
-                                    ],
-                                    "chips": [
-                                          "sqrt(x-a)",
-                                          "x>=a",
-                                          "y>=0"
-                                    ],
-                                    "visual": "surdRightUp",
-                                    "caption": "The root begins when the inside becomes zero."
-                              },
-                              {
-                                    "title": "y = -sqrt(x-a)",
-                                    "text": "A negative sign outside reflects the square-root graph below the x-axis.",
-                                    "keys": [
-                                          "Domain: [a, infinity).",
-                                          "Range: (-infinity,0].",
-                                          "Same starting x-value."
-                                    ],
-                                    "chips": [
-                                          "-sqrt(x-a)",
-                                          "x>=a",
-                                          "y<=0"
-                                    ],
-                                    "visual": "surdRightDown",
-                                    "caption": "The domain stays the same; the range flips downward."
-                              },
-                              {
-                                    "title": "y = sqrt(a-x)",
-                                    "text": "For y=sqrt(a-x), the graph starts at x=a and moves to the left.",
-                                    "keys": [
-                                          "Domain: (-infinity,a].",
-                                          "Range: [0, infinity).",
-                                          "The inside needs a-x >= 0."
-                                    ],
-                                    "chips": [
-                                          "sqrt(a-x)",
-                                          "x<=a",
-                                          "y>=0"
-                                    ],
-                                    "visual": "surdLeftUp",
-                                    "caption": "Changing x-a to a-x changes the direction of the graph."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "For y=sqrt(x-a), the domain is...",
-                                    "a": "[a, infinity)",
-                                    "choices": [
-                                          "(-infinity,a]",
-                                          "R"
-                                    ]
-                              },
-                              {
-                                    "q": "For y=-sqrt(x-a), the range is...",
-                                    "a": "(-infinity,0]",
-                                    "choices": [
-                                          "[0, infinity)",
-                                          "R"
-                                    ]
-                              },
-                              {
-                                    "q": "For y=sqrt(a-x), x must be...",
-                                    "a": "x <= a",
-                                    "choices": [
-                                          "x >= a",
-                                          "x != a"
-                                    ]
-                              }
-                        ]
-                  },
-                  {
-                        "id": "exponential-log-graphs",
-                        "title": "Exponential and Logarithmic Graphs",
-                        "summary": "Study e^{x} and ln x as parent graphs with different domains, ranges and asymptotes.",
-                        "color": "linear-gradient(135deg, #e2fff2, #f1f7ff 52%, #fff6df)",
-                        "visual": "expLogMini",
-                        "slides": [
-                              {
-                                    "title": "Exponential Function",
-                                    "text": "The exponential parent graph y=e^{x} is defined for every real x and always stays above the x-axis.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: (0, infinity).",
-                                          "Horizontal asymptote: y=0."
-                                    ],
-                                    "chips": [
-                                          "y=e^{x}",
-                                          "D=R",
-                                          "R=(0,infinity)"
-                                    ],
-                                    "visual": "expPdf",
-                                    "caption": "The curve grows quickly and never touches y=0."
-                              },
-                              {
-                                    "title": "Logarithmic Function",
-                                    "text": "The natural logarithm y=ln x is only defined for x>0 and has a vertical asymptote at x=0.",
-                                    "keys": [
-                                          "Domain: (0, infinity).",
-                                          "Range: R.",
-                                          "Vertical asymptote: x=0."
-                                    ],
-                                    "chips": [
-                                          "y=ln x",
-                                          "x>0",
-                                          "R=R"
-                                    ],
-                                    "visual": "logPdf",
-                                    "caption": "The log graph crosses the x-axis at (1,0)."
-                              },
-                              {
-                                    "title": "Reflections in the PDF",
-                                    "text": "The PDF also shows reflected forms such as e^{-x}, -e^{x}, ln(-x), and -ln x. Reflection changes the position and range direction.",
-                                    "keys": [
-                                          "Negative outside reflects in the x-axis.",
-                                          "Negative inside reflects in the y-axis.",
-                                          "Asymptotes help identify the graph."
-                                    ],
-                                    "chips": [
-                                          "e^{-x}",
-                                          "-e^{x}",
-                                          "ln(-x)",
-                                          "-ln x"
-                                    ],
-                                    "visual": "expLogPdf",
-                                    "caption": "Use reflection to recognise related exponential and logarithmic shapes."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "The range of y=e^{x} is...",
-                                    "a": "(0, infinity)",
-                                    "choices": [
-                                          "R",
-                                          "(-infinity,0)"
-                                    ]
-                              },
-                              {
-                                    "q": "The domain of y=ln x is...",
-                                    "a": "(0, infinity)",
-                                    "choices": [
-                                          "R",
-                                          "(-infinity,0)"
-                                    ]
-                              },
-                              {
-                                    "q": "The graph y=ln x has vertical asymptote...",
-                                    "a": "x=0",
-                                    "choices": [
-                                          "y=0",
-                                          "x=1"
-                                    ]
-                              }
-                        ]
-                  },
-                  {
-                        "id": "trigonometric-graphs",
-                        "title": "Trigonometric Graphs: sin, cos and tan",
-                        "summary": "Read amplitude, period, range, intercepts and asymptotes from trigonometric graphs.",
-                        "color": "linear-gradient(135deg, #eaf7ff, #fff0f0 52%, #f5fff2)",
-                        "visual": "trigMini",
-                        "slides": [
-                              {
-                                    "title": "Sine Graph",
-                                    "text": "The graph y=sin x has one period from 0 to 2pi, range [-1,1], and x-intercepts at n pi.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: [-1,1].",
-                                          "Period: 2pi."
-                                    ],
-                                    "chips": [
-                                          "sin x",
-                                          "amplitude 1",
-                                          "period 2pi"
-                                    ],
-                                    "visual": "sin",
-                                    "caption": "Sine begins at the origin and completes one wave by 2pi."
-                              },
-                              {
-                                    "title": "Cosine Graph",
-                                    "text": "The graph y=cos x also has period 2pi and range [-1,1], but it starts at y=1.",
-                                    "keys": [
-                                          "Domain: R.",
-                                          "Range: [-1,1].",
-                                          "y-intercept: 1."
-                                    ],
-                                    "chips": [
-                                          "cos x",
-                                          "starts at 1",
-                                          "period 2pi"
-                                    ],
-                                    "visual": "cos",
-                                    "caption": "Cosine is shifted compared with sine."
-                              },
-                              {
-                                    "title": "Tangent Graph",
-                                    "text": "The graph y=tan x has period pi and vertical asymptotes at x=pi/2+n pi.",
-                                    "keys": [
-                                          "Domain excludes pi/2+n pi.",
-                                          "Range: R.",
-                                          "Period: pi."
-                                    ],
-                                    "chips": [
-                                          "tan x",
-                                          "asymptotes",
-                                          "period pi"
-                                    ],
-                                    "visual": "tan",
-                                    "caption": "Tangent repeats between its vertical asymptotes."
-                              },
-                              {
-                                    "title": "Amplitude and Period",
-                                    "text": "For y=a sin(bx+c)+d or y=a cos(bx+c)+d, amplitude is |a| and period is 2pi/|b|.",
-                                    "keys": [
-                                          "Amplitude: |a|.",
-                                          "Period: 2pi/|b|.",
-                                          "d moves the midline."
-                                    ],
-                                    "chips": [
-                                          "|a|",
-                                          "2pi/|b|",
-                                          "midline y=d"
-                                    ],
-                                    "visual": "amplitude",
-                                    "caption": "Changing a stretches the graph vertically."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "The range of y=sin x is...",
-                                    "a": "[-1,1]",
-                                    "choices": [
-                                          "R",
-                                          "(0, infinity)"
-                                    ]
-                              },
-                              {
-                                    "q": "The period of y=tan x is...",
-                                    "a": "pi",
-                                    "choices": [
-                                          "2pi",
-                                          "pi/2"
-                                    ]
-                              },
-                              {
-                                    "q": "For y=a sin(bx+c)+d, amplitude is...",
-                                    "a": "|a|",
-                                    "choices": [
-                                          "b",
-                                          "d"
-                                    ]
-                              }
-                        ]
-                  },
-                  {
-                        "id": "transformations-domain-range",
-                        "title": "Transformations and Graph-Based Domain/Range",
-                        "summary": "Use shifts, reflections and stretches to sketch transformed graphs and read their domains and ranges.",
-                        "color": "linear-gradient(135deg, #f2ebff, #e7fbff 56%, #fff9e8)",
-                        "visual": "transformMini",
-                        "slides": [
-                              {
-                                    "title": "Transformation Checklist",
-                                    "text": "Start from the parent graph, then apply vertical stretch, reflection, horizontal shift and vertical shift.",
-                                    "keys": [
-                                          "a controls vertical stretch/reflection.",
-                                          "x-h shifts left or right.",
-                                          "+k shifts up or down."
-                                    ],
-                                    "chips": [
-                                          "a f(x-h)+k",
-                                          "reflect",
-                                          "shift"
-                                    ],
-                                    "visual": "transformLab",
-                                    "caption": "A transformed graph is still recognisable from its parent shape."
-                              },
-                              {
-                                    "title": "Read Domain from the Graph",
-                                    "text": "Domain is the set of x-values covered by the graph. Scan from left to right and mark missing points or asymptotes.",
-                                    "keys": [
-                                          "Use interval notation.",
-                                          "Surd and log graphs have restricted x-values.",
-                                          "Rational graphs exclude asymptotes."
-                                    ],
-                                    "chips": [
-                                          "left to right",
-                                          "excluded x",
-                                          "asymptote"
-                                    ],
-                                    "visual": "domainScan",
-                                    "caption": "The horizontal coverage gives the domain."
-                              },
-                              {
-                                    "title": "Read Range from the Graph",
-                                    "text": "Range is the set of y-values reached by the graph. Scan from bottom to top and look for minimum, maximum or missing y-values.",
-                                    "keys": [
-                                          "Quadratic has a vertex boundary.",
-                                          "Constant has one y-value.",
-                                          "Exponential never reaches y=0."
-                                    ],
-                                    "chips": [
-                                          "bottom to top",
-                                          "minimum",
-                                          "maximum"
-                                    ],
-                                    "visual": "rangeScan",
-                                    "caption": "The vertical coverage gives the range."
-                              }
-                        ],
-                        "questions": [
-                              {
-                                    "q": "To read domain from a graph, scan...",
-                                    "a": "Left to right",
-                                    "choices": [
-                                          "Bottom to top",
-                                          "Only the y-axis"
-                                    ]
-                              },
-                              {
-                                    "q": "To read range from a graph, scan...",
-                                    "a": "Bottom to top",
-                                    "choices": [
-                                          "Left to right",
-                                          "Only the x-axis"
-                                    ]
-                              },
-                              {
-                                    "q": "In a f(x-h)+k, k moves the graph...",
-                                    "a": "Up or down",
-                                    "choices": [
-                                          "Only wider",
-                                          "Only reflected"
-                                    ]
-                              }
-                        ]
-                  }
+                  {"id":"constant-function","title":"Constant Function","summary":"A horizontal line with one fixed output value.","color":"linear-gradient(135deg, #fff6c7, #e2fff6 55%, #eaf1ff)","visual":"constantGraph","slides":[{"title":"Constant Function","text":"General form: f(x)=k, where k is a constant. The graph is a horizontal straight line, so the y-value stays the same for every x-value.","keys":["If k increases, the line moves upwards; if k decreases, it moves downwards.","Domain: (-infinity, infinity).","Range: {k}, because the output is always one fixed value."],"chips":["f(x)=k","horizontal line","Range={k}"],"visual":"constantGraph","caption":"y = k"},{"title":"How To Read It","text":"Scan the graph from left to right to get the domain, then scan from bottom to top to get the range. A constant graph covers every x-value but only one y-value.","keys":["Domain is all real numbers.","Range is the single horizontal level y=k.","When k=0, the graph lies on the x-axis."],"chips":["D=R","R={k}","y=k"],"visual":"constantGraph","caption":"y = k"}],"questions":[{"q":"The graph of f(x)=k is a...","a":"Horizontal line","choices":["Parabola","V-shape"]},{"q":"The range of f(x)=k is...","a":"{k}","choices":["R","(0, infinity)"]}]},
+                  {"id":"linear-function","title":"Linear Function","summary":"A straight line where a controls gradient and b controls the y-intercept.","color":"linear-gradient(135deg, #e7f7ff, #fff7d9 55%, #e8fff0)","visual":"linearGraph","slides":[{"title":"Linear Function","text":"General form: f(x)=ax+b, where a is not zero. A linear function is represented by a straight line.","keys":["a controls the gradient of the line.","b is the y-intercept.","Domain: (-infinity, infinity); Range: (-infinity, infinity)."],"chips":["f(x)=ax+b","gradient a","y-intercept b"],"visual":"linearGraph","caption":"y = x"},{"title":"Parameter Effects","text":"If a>0, the line slopes upwards from left to right. If a<0, the line slopes downwards. A larger |a| makes the line steeper.","keys":["Increasing b shifts the line upwards.","Decreasing b shifts the line downwards.","The shape stays a straight line."],"chips":["a>0 rises","a<0 falls","D=R, R=R"],"visual":"linearGraph","caption":"y = x"}],"questions":[{"q":"In f(x)=ax+b, a controls the...","a":"Gradient","choices":["Asymptote","Amplitude"]},{"q":"A non-horizontal linear graph has range...","a":"R","choices":["{b}","[0, infinity)"]}]},
+                  {"id":"quadratic-function","title":"Quadratic Function","summary":"A parabola with a turning point that controls the range.","color":"linear-gradient(135deg, #ffe9ef, #eef7ff 52%, #fff9dc)","visual":"quadraticRange","slides":[{"title":"Quadratic Function","text":"General form: f(x)=ax^{2}+bx+c, where a is not zero. Vertex form: f(x)=a(x-h)^{2}+k.","keys":["The graph forms a parabola.","If a>0, it opens upwards and has a minimum point.","If a<0, it opens downwards and has a maximum point."],"chips":["parabola","vertex (h,k)","f(x)=a(x-h)^{2}+k"],"visual":"quadraticRange","caption":"y = x^{2}"},{"title":"Domain And Range","text":"The domain is all real numbers. The range depends on the vertex and the opening direction.","keys":["If a>0, Range: [k, infinity).","If a<0, Range: (-infinity, k].","A larger |a| makes the parabola narrower."],"chips":["D=R","a>0 minimum","a<0 maximum"],"visual":"quadraticRange","caption":"y = x^{2}"}],"questions":[{"q":"A quadratic graph forms a...","a":"Parabola","choices":["Horizontal line","Reciprocal branch"]},{"q":"If a>0, the parabola has a...","a":"Minimum","choices":["Maximum","Vertical asymptote"]}]},
+                  {"id":"cubic-function","title":"Cubic Function","summary":"An S-shaped curve with all real domain and range.","color":"linear-gradient(135deg, #e4fff4, #fff1dd 55%, #edf2ff)","visual":"cubicGraph","slides":[{"title":"Cubic Function","text":"General form: f(x)=ax^{3}+bx^{2}+cx+d, where a is not zero. A simpler parent form is f(x)=ax^{3}.","keys":["The graph usually has an S-shaped curve.","If a>0, it generally rises from left to right.","If a<0, it generally falls from left to right."],"chips":["x^{3}","S-shape","a not equal 0"],"visual":"cubicGraph","caption":"y = x^{3}"},{"title":"Transformations","text":"For f(x)=a(x-h)^{3}+k, a controls direction and steepness, h shifts the graph horizontally, and k shifts it vertically.","keys":["Domain: (-infinity, infinity).","Range: (-infinity, infinity).","A larger |a| makes the graph steeper."],"chips":["D=R","R=R","a(x-h)^{3}+k"],"visual":"cubicGraph","caption":"y = x^{3}"}],"questions":[{"q":"The basic cubic graph is usually...","a":"S-shaped","choices":["V-shaped","Horizontal"]},{"q":"The range of y=x^{3} is...","a":"R","choices":["[0, infinity)","{0}"]}]},
+                  {"id":"absolute-function","title":"Absolute Function","summary":"A V-shaped graph with a clear vertex.","color":"linear-gradient(135deg, #fff0f4, #eafff8 50%, #fff8d8)","visual":"absoluteGraph","slides":[{"title":"Absolute Function","text":"General form: f(x)=|x-a|. A more general form is f(x)=p|x-a|+q. The graph forms a V-shape.","keys":["For f(x)=|x-a|, the vertex is (a,0).","If p>0, the V opens upwards.","If p<0, the V opens downwards."],"chips":["|x-a|","V-shape","vertex"],"visual":"absoluteGraph","caption":"y = |x|"},{"title":"Domain And Range","text":"The domain is all real numbers. The range depends on the vertex height and whether the V opens upwards or downwards.","keys":["For y=|x-a|, Range: [0, infinity).","For p|x-a|+q with p>0, Range: [q, infinity).","For p<0, Range: (-infinity, q]."],"chips":["D=R","p>0: y>=q","p<0: y<=q"],"visual":"absoluteGraph","caption":"y = |x|"}],"questions":[{"q":"An absolute function has a...","a":"V-shape","choices":["S-shape","Wave"]},{"q":"The vertex of y=|x-a| is...","a":"(a,0)","choices":["(0,a)","(a,1)"]}]},
+                  {"id":"rational-function","title":"Rational / Reciprocal Function","summary":"Two separate branches with vertical and horizontal asymptotes.","color":"linear-gradient(135deg, #f0ecff, #e8fbff 50%, #fff6df)","visual":"rationalGraph","slides":[{"title":"Rational Function","text":"A common form is f(x)=1/(ax-b), where a is not zero. The graph has two separate reciprocal branches.","keys":["Vertical asymptote: x=b/a.","Horizontal asymptote: y=0.","The graph approaches the asymptotes but never touches them."],"chips":["1/(ax-b)","x=b/a","y=0"],"visual":"rationalGraph","caption":"y = 1/x"},{"title":"Domain And Range","text":"The denominator cannot be zero, so one x-value is excluded. The basic reciprocal graph also never reaches y=0.","keys":["Domain: (-infinity,b/a) union (b/a,infinity).","Range: (-infinity,0) union (0,infinity).","If a<0, the branches are reflected."],"chips":["x not equal b/a","y not equal 0","asymptotes"],"visual":"rationalGraph","caption":"y = 1/x"}],"questions":[{"q":"A reciprocal graph has how many branches?","a":"Two","choices":["One","Four"]},{"q":"For f(x)=1/(ax-b), x cannot equal...","a":"b/a","choices":["a/b","0 always"]}]},
+                  {"id":"surd-function","title":"Surd Function","summary":"Square-root graphs start at an endpoint and move in one direction.","color":"linear-gradient(135deg, #e8fff7, #fff8de 56%, #edf2ff)","visual":"surdRightUp","slides":[{"title":"Positive Surd Function","text":"General form: f(x)=sqrt(x-a). The graph starts at (a,0), curves to the right, and gives non-negative y-values.","keys":["Domain: [a, infinity).","Range: [0, infinity).","The starting point is where the expression under the root becomes zero."],"chips":["sqrt(x-a)","x>=a","y>=0"],"visual":"surdRightUp","caption":"y = sqrt(x-a)"},{"title":"Other Surd Directions","text":"A negative sign outside reflects the graph in the x-axis. Replacing x-a with a-x makes the graph face left.","keys":["y=-sqrt(x-a): Domain [a,infinity), Range (-infinity,0].","y=sqrt(a-x): Domain (-infinity,a], Range [0,infinity).","y=-sqrt(a-x): Domain (-infinity,a], Range (-infinity,0]."],"chips":["-sqrt(x-a)","sqrt(a-x)","endpoint (a,0)"],"visual":"surdFour","caption":"Four square-root graph directions"}],"questions":[{"q":"For y=sqrt(x-a), the domain is...","a":"[a, infinity)","choices":["(-infinity,a]","R"]},{"q":"For y=sqrt(a-x), the graph moves...","a":"To the left","choices":["To the right","In two branches"]}]},
+                  {"id":"exponential-function","title":"Exponential Function","summary":"A rapid growth or decay curve with a horizontal asymptote.","color":"linear-gradient(135deg, #e2fff2, #f1f7ff 52%, #fff6df)","visual":"expPdf","slides":[{"title":"Exponential Function","text":"Basic form: f(x)=e^{x}. The graph is always above the x-axis and passes through (0,1).","keys":["Domain: (-infinity, infinity).","Range: (0, infinity).","Horizontal asymptote: y=0."],"chips":["e^{x}","(0,1)","y=0 asymptote"],"visual":"expPdf","caption":"y = e^{x}"},{"title":"Transformations","text":"For f(x)=ae^{b(x-h)}+k, a controls vertical stretch and reflection, b controls growth or decay rate, h shifts horizontally, and k shifts vertically.","keys":["If b>0, the graph shows exponential growth.","If b<0, the graph shows exponential decay.","The horizontal asymptote becomes y=k."],"chips":["ae^{b(x-h)}+k","growth/decay","asymptote y=k"],"visual":"expPdf","caption":"y = e^{x}"}],"questions":[{"q":"The range of y=e^{x} is...","a":"(0, infinity)","choices":["R","[0, infinity)"]},{"q":"The horizontal asymptote of y=e^{x} is...","a":"y=0","choices":["x=0","y=1"]}]},
+                  {"id":"logarithmic-function","title":"Logarithmic Function","summary":"The inverse of an exponential graph with a vertical asymptote.","color":"linear-gradient(135deg, #eaf7ff, #fff2df 52%, #e8fff4)","visual":"logPdf","slides":[{"title":"Logarithmic Function","text":"Basic form: f(x)=ln x. It is defined only when x>0, has vertical asymptote x=0, and passes through (1,0).","keys":["Domain: (0, infinity).","Range: (-infinity, infinity).","Vertical asymptote: x=0."],"chips":["ln x","x>0","(1,0)"],"visual":"logPdf","caption":"y = ln x"},{"title":"Transformations","text":"For f(x)=a ln[b(x-h)]+k, a controls vertical stretch and reflection, b affects horizontal compression or reflection, h moves the asymptote, and k shifts vertically.","keys":["If b>0, Domain: (h, infinity).","If b<0, Domain: (-infinity, h).","The vertical asymptote is x=h."],"chips":["a ln[b(x-h)]+k","asymptote x=h","Range=R"],"visual":"logPdf","caption":"y = ln x"}],"questions":[{"q":"The domain of y=ln x is...","a":"(0, infinity)","choices":["R","(-infinity,0)"]},{"q":"The graph y=ln x passes through...","a":"(1,0)","choices":["(0,1)","(0,0)"]}]},
+                  {"id":"trigonometric-functions","title":"Trigonometric Functions","summary":"Sine, cosine and tangent graphs with period, amplitude and asymptotes.","color":"linear-gradient(135deg, #eef7ff, #fff0f8 52%, #f8fff0)","visual":"trigMini","slides":[{"title":"Sine Function","text":"Basic form: y=sin x. The sine graph is a smooth wave that passes through the origin and repeats every 2pi.","keys":["Domain: (-infinity, infinity).","Range: [-1,1].","Period: 2pi; x-intercepts: x=npi."],"chips":["sin x","amplitude 1","period 2pi"],"visual":"sin","caption":"Parent graph: y=sin x. One complete cycle takes 2pi."},{"title":"Cosine Function","text":"Basic form: y=cos x. The cosine graph is also a smooth wave, but it starts at y=1 when x=0.","keys":["Domain: (-infinity, infinity).","Range: [-1,1].","Period: 2pi; y-intercept: 1."],"chips":["cos x","starts at 1","period 2pi"],"visual":"cos","caption":"Parent graph: y=cos x. It has the same range and period as sine."},{"title":"Tangent Function","text":"Basic form: y=tan x. The tangent graph repeats every pi and has vertical asymptotes.","keys":["Domain excludes x=pi/2+npi.","Range: (-infinity, infinity).","Period: pi."],"chips":["tan x","period pi","asymptotes"],"visual":"tan","caption":"Parent graph: y=tan x. Each branch lies between two vertical asymptotes."},{"title":"Amplitude And Period","text":"For y=a sin[b(x-c)]+d or y=a cos[b(x-c)]+d, amplitude is |a| and period is 2pi/|b|.","keys":["a changes amplitude and reflection.","b changes the period.","d moves the midline to y=d."],"chips":["Amplitude=|a|","Period=2pi/|b|","midline y=d"],"visual":"amplitude","caption":"Use amplitude, period and midline to sketch trigonometric transformations."}],"questions":[{"q":"The range of y=sin x is...","a":"[-1,1]","choices":["R","(0, infinity)"]},{"q":"The period of y=tan x is...","a":"pi","choices":["2pi","pi/2"]},{"q":"For y=a sin[b(x-c)]+d, amplitude is...","a":"|a|","choices":["b","d"]}]}
             ]
       },
       "desmos": {
@@ -2701,15 +2315,7 @@
       sendChat: document.getElementById("sendChat"),
       gamePanel: document.getElementById("gamePanel"),
       gameTitle: document.getElementById("gameTitle"),
-      pixelScene: document.getElementById("pixelScene"),
-      gameProgress: document.getElementById("gameProgress"),
-      gameQuestion: document.getElementById("gameQuestion"),
-      answers: document.getElementById("answers"),
-      gameStatus: document.getElementById("gameStatus"),
-      player: document.getElementById("player"),
-      hazard: document.getElementById("hazard"),
-      crowd: document.getElementById("crowd"),
-      confetti: document.getElementById("confetti"),
+      pixelGameFrame: document.getElementById("pixelGameFrame"),
       heroFormula: document.getElementById("heroFormula"),
       heroFunctionName: document.getElementById("heroFunctionName")
     };
@@ -2786,22 +2392,21 @@
 
     function canvasMathText(text) {
       return String(text)
-        .replace(/sqrt\(([^)]+)\)/g, "√$1")
-        .replace(/e\^\{x\}/g, "eˣ")
-        .replace(/e\^x/g, "eˣ")
-        .replace(/x\^\{2\}/g, "x²")
-        .replace(/x\^\{3\}/g, "x³")
-        .replace(/sin\^\{2\}/g, "sin²")
-        .replace(/cos\^\{2\}/g, "cos²")
-        .replace(/tan\^\{2\}/g, "tan²")
-        .replace(/cot\^\{2\}/g, "cot²")
-        .replace(/sec\^\{2\}/g, "sec²")
-        .replace(/cosec\^\{2\}/g, "cosec²")
-        .replace(/1\/\(([^)]+)\)/g, "1∕($1)")
-        .replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, "$1∕$2")
-        .replace(/!=/g, "≠")
-        .replace(/>=/g, "≥")
-        .replace(/<=/g, "≤");
+        .replace(/sqrt\(([^)]+)\)/g, "\u221a$1")
+        .replace(/e\^\{x\}/g, "e\u02e3")
+        .replace(/e\^x/g, "e\u02e3")
+        .replace(/x\^\{2\}/g, "x\u00b2")
+        .replace(/x\^\{3\}/g, "x\u00b3")
+        .replace(/sin\^\{2\}/g, "sin\u00b2")
+        .replace(/cos\^\{2\}/g, "cos\u00b2")
+        .replace(/tan\^\{2\}/g, "tan\u00b2")
+        .replace(/cot\^\{2\}/g, "cot\u00b2")
+        .replace(/sec\^\{2\}/g, "sec\u00b2")
+        .replace(/cosec\^\{2\}/g, "cosec\u00b2")
+        .replace(/1\/\(([^)]+)\)/g, "1/($1)")
+        .replace(/!=/g, "\u2260")
+        .replace(/>=/g, "\u2265")
+        .replace(/<=/g, "\u2264");
     }
 
     function label(ctx, text, x, y, color = "#102033") {
@@ -3523,13 +3128,13 @@
             <select id="desmosType">
               <option value="" selected disabled hidden>Select function graph</option>
               <option value="linear">Linear: y = ax + b</option>
-              <option value="quadratic">Quadratic: y = a(x-b)² + c</option>
-              <option value="cubic">Cubic: y = a(x-b)³ + c</option>
-              <option value="exp">Exponential: y = aeˣ + b</option>
+              <option value="quadratic">Quadratic: y = a(x-b)^2 + c</option>
+              <option value="cubic">Cubic: y = a(x-b)^3 + c</option>
+              <option value="exp">Exponential: y = ae^x + b</option>
               <option value="log">Logarithm: y = a ln(x-b) + c</option>
-              <option value="sqrt">Square root: y = a√(x-b) + c</option>
+              <option value="sqrt">Square root: y = a sqrt(x-b) + c</option>
               <option value="absLinear">Absolute linear: y = a|x-b| + c</option>
-              <option value="absQuadratic">Absolute quadratic: y = |a(x-b)² + c| + d</option>
+              <option value="absQuadratic">Absolute quadratic: y = |a(x-b)^2 + c| + d</option>
               <option value="sin">Sine: y = a sin(bx+c)+d</option>
               <option value="cos">Cosine: y = a cos(bx+c)+d</option>
               <option value="tan">Tangent: y = a tan(bx+c)+d</option>
@@ -3547,6 +3152,8 @@
     function drawMini(canvas, type) {
       const { ctx, w, h } = resizeCanvas(canvas);
       clearPretty(ctx, w, h);
+      const functionCardTypes = ["constantGraph", "linearGraph", "quadraticRange", "cubicGraph", "absoluteGraph", "rationalGraph", "surdRightUp", "surdFour", "expPdf", "logPdf", "trigMini"];
+      if (functionCardTypes.includes(type)) return drawFunctionCardMini(ctx, w, h, type);
       const cleanTypes = ["mappingClean", "lineTestsClean", "surdFamiliesClean", "domainFamiliesClean", "inversePairClean", "expLogClean"];
       const sketchMiniTypes = ["parentMini", "absoluteRationalMini", "surdMini", "expLogMini", "trigMini", "transformMini", "desmosPolyMini", "desmosExpLogMini", "desmosTrigMini"];
       if (sketchMiniTypes.includes(type)) return drawSketchMini(ctx, w, h, type);
@@ -3596,6 +3203,100 @@
         plot(ctx, map, x => x, "#2077ff", 3);
         plot(ctx, map, x => x * x / 2 - 1, "#ff6f61", 3);
         plot(ctx, map, x => Math.abs(x) - 1, "#00a8a8", 3);
+      }
+    }
+
+    function drawFunctionCardMini(ctx, w, h, type) {
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, "rgba(255,255,255,0.72)");
+      bg.addColorStop(0.5, "rgba(255,247,204,0.42)");
+      bg.addColorStop(1, "rgba(213,249,255,0.42)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const makeMap = (x0Ratio = 0.5, y0Ratio = 0.63, xMin = -3.2, xMax = 3.2, yMin = -2.2, yMax = 2.8) => {
+        const box = { x: w * 0.08, y: h * 0.12, w: w * 0.84, h: h * 0.73 };
+        const map = miniAxis(ctx, box, {
+          x0: box.x + ((0 - xMin) / (xMax - xMin)) * box.w,
+          y0: box.y + (1 - ((0 - yMin) / (yMax - yMin))) * box.h,
+          xMin, xMax, yMin, yMax,
+          axisColor: "#000",
+          width: 3.4
+        });
+        miniText(ctx, "x", map.right + 4, map.y0 + 15, "#000", 18, "left");
+        miniText(ctx, "y", map.x0 + 9, map.top - 7, "#000", 18, "left");
+        miniText(ctx, "0", map.x0 - 13, map.y0 + 16, "#000", 16, "right");
+        return map;
+      };
+      const write = (text, x, y, color, size = 21, align = "left") => {
+        ctx.save();
+        ctx.font = "900 " + size + "px Georgia, 'Times New Roman', serif";
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(255,255,255,0.82)";
+        ctx.strokeText(canvasMathText(text), x, y);
+        ctx.fillText(canvasMathText(text), x, y);
+        ctx.restore();
+      };
+
+      if (type === "constantGraph") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -2, 2.7);
+        miniPlot(ctx, m, x => 0.92, "#e11d48", 5, 0.025);
+        write("y = a", m.x0 + 32, m.py(1.55), "#e11d48");
+      } else if (type === "linearGraph") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -2, 2.7);
+        miniPlot(ctx, m, x => 0.72 * x + 0.05, "#1d64ff", 5, 0.025);
+        write("y = x", m.x0 + 72, m.py(1.62), "#1d64ff");
+      } else if (type === "quadraticRange") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -1.8, 3.2);
+        miniPlot(ctx, m, x => 0.45 * x * x, "#e11d48", 5, 0.025);
+        write("y = x^{2}", m.x0 + 28, m.py(2.72), "#e11d48");
+      } else if (type === "cubicGraph") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -2.4, 2.8);
+        miniPlot(ctx, m, x => 0.26 * x * x * x, "#e11d48", 5, 0.025);
+        write("y = x^{3}", m.x0 + 28, m.py(2.42), "#e11d48");
+      } else if (type === "absoluteGraph") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -1.8, 3.1);
+        miniPlot(ctx, m, x => Math.abs(x), "#e11d48", 5, 0.025);
+        write("y = |x|", m.x0 + 76, m.py(1.92), "#e11d48");
+      } else if (type === "rationalGraph") {
+        const m = makeMap(0.49, 0.62, -3.2, 3.2, -2.5, 2.8);
+        miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#e11d48", 5, 0.018);
+        write("y = 1/x", m.x0 + 92, m.py(2.15), "#e11d48");
+      } else if (type === "surdRightUp" || type === "surdFour") {
+        const m = makeMap(0.5, 0.56, -3.2, 3.2, -2.1, 2.2);
+        miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 5, 0.018);
+        miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#f2b300", 5, 0.018);
+        miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#087f5b", 5, 0.018);
+        miniPlot(ctx, m, x => x <= 0 ? -Math.sqrt(-x) : Infinity, "#6d28d9", 5, 0.018);
+        write("y = sqrt(x)", m.right - 30, m.top + 18, "#1d64ff", 18, "right");
+        write("y = -sqrt(x)", m.right - 28, m.bottom - 18, "#f2b300", 18, "right");
+        write("y = sqrt(-x)", m.left + 28, m.top + 18, "#087f5b", 18, "left");
+        write("y = -sqrt(-x)", m.left + 26, m.bottom - 18, "#6d28d9", 18, "left");
+      } else if (type === "expPdf") {
+        const m = makeMap(0.45, 0.64, -3.4, 2.4, -0.9, 4.8);
+        miniPlot(ctx, m, x => Math.exp(x), "#e11d48", 5, 0.018);
+        write("y = e^{x}", m.right - 26, m.top + 24, "#e11d48", 22, "right");
+      } else if (type === "logPdf") {
+        const m = makeMap(0.4, 0.62, -0.9, 4.6, -2.2, 2.8);
+        miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#e11d48", 5, 0.018);
+        write("y = ln x", m.right - 32, m.top + 24, "#e11d48", 22, "right");
+      } else if (type === "trigMini") {
+        const boxes = [
+          { x: w * 0.04, y: h * 0.19, w: w * 0.3, h: h * 0.62, fn: x => Math.sin(x), color: "#e11d48", text: "y = sin x" },
+          { x: w * 0.35, y: h * 0.19, w: w * 0.3, h: h * 0.62, fn: x => Math.cos(x), color: "#1d64ff", text: "y = cos x" },
+          { x: w * 0.66, y: h * 0.19, w: w * 0.3, h: h * 0.62, fn: x => Math.abs(Math.cos(x)) < 0.08 ? Infinity : Math.tan(x), color: "#7c3aed", text: "y = tan x" }
+        ];
+        boxes.forEach((box, i) => {
+          const m = miniAxis(ctx, box, { x0: box.x + box.w * 0.5, y0: box.y + box.h * 0.52, xMin: -Math.PI, xMax: Math.PI, yMin: -2, yMax: 2, axisColor: "#000", width: 3.2 });
+          miniText(ctx, "x", m.right + 1, m.y0 + 12, "#000", 15, "left");
+          miniText(ctx, "y", m.x0 + 7, m.top - 5, "#000", 15, "left");
+          miniText(ctx, "0", m.x0 - 8, m.y0 + 13, "#000", 13, "right");
+          miniPlot(ctx, m, box.fn, box.color, 4.2, 0.018);
+          write(box.text, box.x + box.w * 0.5, i === 2 ? box.y + 13 : box.y + box.h + 18, box.color, 16, "center");
+        });
       }
     }
 
@@ -3931,10 +3632,12 @@
       miniText(ctx, "1", rightMap.px(1), rightMap.y0 + 16, "#0b2d55", 14);
     }
     function openTopic(topic) {
+      exitGameMode();
       state.topic = topic;
       state.slide = 0;
       el.lessonShell.style.display = "grid";
       el.gamePanel.style.display = "none";
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
       el.lessonShell.scrollIntoView({ behavior: "smooth", block: "start" });
       addBot(`You opened ${topic.title}. I can explain the slides, give examples, or help you solve related questions.`);
       renderSlide(true);
@@ -3976,7 +3679,7 @@
       if (["inverseAlgebra", "inverseReflect"].includes(type)) return drawInverse(ctx, w, h, type, t);
       if (["expOnly", "logOnly", "expLogPair", "expLog"].includes(type)) return drawExpLog(ctx, w, h, type, t);
       if (["sin", "cos", "tan", "transformSine", "amplitude", "periodShift"].includes(type)) return drawTrigGraphs(ctx, w, h, type, t);
-      if (["constantGraph", "linearGraph", "quadraticRange", "cubicGraph", "absoluteGraph", "rationalGraph", "absoluteRational", "surdRightUp", "surdRightDown", "surdLeftUp", "expPdf", "logPdf", "expLogPdf", "transformLab", "rangeScan", "desmosPoly", "desmosExpLog", "desmosTrig"].includes(type)) return drawSketchingVisual(ctx, w, h, type, t);
+      if (["constantGraph", "linearGraph", "quadraticRange", "cubicGraph", "absoluteGraph", "rationalGraph", "absoluteRational", "surdRightUp", "surdRightDown", "surdLeftUp", "surdFour", "expPdf", "logPdf", "expLogPdf", "transformLab", "rangeScan", "desmosPoly", "desmosExpLog", "desmosTrig"].includes(type)) return drawSketchingVisual(ctx, w, h, type, t);
       if (["triangleRatios", "reciprocal", "identity", "complementary", "specialTriangles", "valueTable"].includes(type)) return drawTriangle(ctx, w, h, type, t);
       if (["angleRotation", "negativeIdentities", "identityFamily"].includes(type)) return drawUnitCircle(ctx, w, h, type, t);
       drawFamilies(ctx, w, h, "power", t);
@@ -4286,27 +3989,109 @@
     }
 
     function drawSketchingVisual(ctx, w, h, type, t) {
+      const graphTypes = ["constantGraph", "linearGraph", "quadraticRange", "cubicGraph", "absoluteGraph", "rationalGraph", "surdRightUp", "surdRightDown", "surdLeftUp", "surdFour", "expPdf", "logPdf"];
+      if (graphTypes.includes(type)) return drawCleanLessonGraph(ctx, w, h, type);
       const map = axes(ctx, w, h, { pad: 50 });
       map.w = w; map.h = h;
       const dash = (x1, y1, x2, y2, color = "#ff6f61") => { ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash([9, 7]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); };
-      const xPix = x => map.x0 + x * map.sx;
-      const yPix = y => map.y0 - y * map.sy;
-      if (type === "constantGraph") { plot(ctx, map, x => 1.2, "#07152f", 5); label(ctx, "y = k", 58, 58, "#0b2d55"); label(ctx, "Range = {k}", 58, 88, "#00a8a8"); }
-      else if (type === "linearGraph") { plot(ctx, map, x => 0.8 * x + 0.5, "#2077ff", 5); plot(ctx, map, x => -0.8 * x + 0.5, "#ff6f61", 4); label(ctx, "a>0 rises, a<0 falls", 58, 58, "#0b2d55"); }
-      else if (type === "quadraticRange") { const k = -1.1; plot(ctx, map, x => 0.45 * (x - 0.5) ** 2 + k, "#2077ff", 5); dash(map.pad, yPix(k), w - map.pad, yPix(k), "#00a8a8"); label(ctx, "minimum k", xPix(0.9), yPix(k) - 10, "#00a8a8"); label(ctx, "Range [k, infinity)", 58, 58, "#0b2d55"); }
-      else if (type === "cubicGraph") { plot(ctx, map, x => 0.22 * x ** 3 - 0.35 * x + 0.2, "#07152f", 5); label(ctx, "Domain = R, Range = R", 58, 58, "#0b2d55"); }
-      else if (type === "absoluteGraph") { plot(ctx, map, x => Math.abs(x - 0.4), "#ff6f61", 5); label(ctx, "V-shape", 58, 58, "#0b2d55"); label(ctx, "range starts at vertex", 58, 86, "#00a8a8"); }
-      else if (type === "rationalGraph") { dash(map.x0, map.pad, map.x0, h - map.pad); dash(map.pad, map.y0, w - map.pad, map.y0); plot(ctx, map, x => Math.abs(x) < 0.12 ? Infinity : 1.1 / x, "#07152f", 5); label(ctx, "x != b/a, y != 0", 58, 58, "#0b2d55"); }
-      else if (type === "absoluteRational") { plot(ctx, map, x => Math.abs(x + 1.7) - 0.6, "#ff6f61", 4); plot(ctx, map, x => Math.abs(x - 1.1) < 0.12 ? Infinity : 0.75 / (x - 1.1), "#2077ff", 4); dash(xPix(1.1), map.pad, xPix(1.1), h - map.pad); label(ctx, "corner vs asymptote", 58, 58, "#0b2d55"); }
-      else if (["surdRightUp", "surdRightDown", "surdLeftUp"].includes(type)) { const a = 0.6; if (type === "surdRightUp") plot(ctx, map, x => x >= a ? Math.sqrt(x - a) : Infinity, "#2077ff", 5); if (type === "surdRightDown") plot(ctx, map, x => x >= a ? -Math.sqrt(x - a) : Infinity, "#00a8a8", 5); if (type === "surdLeftUp") plot(ctx, map, x => x <= a ? Math.sqrt(a - x) : Infinity, "#7765e3", 5); dash(xPix(a), map.pad, xPix(a), h - map.pad, "#f5b642"); label(ctx, type === "surdLeftUp" ? "x <= a" : "x >= a", 58, 58, "#0b2d55"); }
-      else if (type === "expPdf") { plot(ctx, map, x => Math.exp(x / 1.5), "#2077ff", 5); dash(map.pad, map.y0, w - map.pad, map.y0); label(ctx, "Domain R, Range (0, infinity)", 58, 58, "#0b2d55"); }
-      else if (type === "logPdf") { plot(ctx, map, x => x > 0 ? Math.log(x) : Infinity, "#00a8a8", 5); dash(map.x0, map.pad, map.x0, h - map.pad); label(ctx, "Domain (0, infinity), Range R", 58, 58, "#0b2d55"); }
+      if (type === "absoluteRational") { plot(ctx, map, x => Math.abs(x + 1.7) - 0.6, "#ff6f61", 4); plot(ctx, map, x => Math.abs(x - 1.1) < 0.12 ? Infinity : 0.75 / (x - 1.1), "#2077ff", 4); label(ctx, "corner vs asymptote", 58, 58, "#0b2d55"); }
       else if (type === "expLogPdf") { plot(ctx, map, x => Math.exp(x / 1.7), "#2077ff", 4); plot(ctx, map, x => -Math.exp(x / 1.7), "#ff6f61", 4); plot(ctx, map, x => x > 0 ? Math.log(x) : Infinity, "#00a8a8", 4); plot(ctx, map, x => x < 0 ? Math.log(-x) : Infinity, "#7765e3", 4); label(ctx, "reflections of e^{x} and ln x", 58, 58, "#0b2d55"); }
       else if (type === "transformLab") { plot(ctx, map, x => x * x / 2 - 1, "rgba(16,32,51,0.3)", 3); plot(ctx, map, x => -0.8 * (x - 1) ** 2 + 1.2, "#2077ff", 5); label(ctx, "reflect, shift, stretch", 58, 58, "#0b2d55"); }
       else if (type === "rangeScan") { plot(ctx, map, x => 0.45 * (x + 0.2) ** 2 - 1.3, "#2077ff", 5); ctx.fillStyle = "rgba(0,168,168,0.12)"; ctx.fillRect(map.pad, map.pad, w - map.pad * 2, h * 0.5); label(ctx, "scan bottom to top", 58, 58, "#00a8a8"); }
       else if (type === "desmosPoly") { plot(ctx, map, x => 0.65 * (x - Math.sin(t)) ** 2 - 1, "#2077ff", 5); plot(ctx, map, x => (0.5 + Math.sin(t) * 0.25) * x + 0.6, "#ff6f61", 4); label(ctx, "try sliders below", 58, 58, "#0b2d55"); }
       else if (type === "desmosExpLog") { plot(ctx, map, x => Math.exp(x / 1.7) - 0.5, "#2077ff", 5); plot(ctx, map, x => x > 0 ? Math.log(x) + 0.3 : Infinity, "#00a8a8", 5); label(ctx, "growth vs restriction", 58, 58, "#0b2d55"); }
       else if (type === "desmosTrig") { const a = 1.2 + 0.5 * Math.sin(t); plot(ctx, map, x => a * Math.sin(1.4 * x), "#2077ff", 5); dash(map.pad, map.y0, w - map.pad, map.y0, "#00a8a8"); label(ctx, "amplitude and period", 58, 58, "#0b2d55"); }
+    }
+
+    function drawCleanLessonGraph(ctx, w, h, type) {
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, "rgba(255,255,255,0.7)");
+      bg.addColorStop(0.45, "rgba(255,244,178,0.42)");
+      bg.addColorStop(1, "rgba(187,246,255,0.44)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const makeMap = (x0Ratio = 0.5, y0Ratio = 0.62, xMin = -4, xMax = 4, yMin = -3, yMax = 4) => {
+        const box = { x: w * 0.07, y: h * 0.08, w: w * 0.86, h: h * 0.82 };
+        const map = miniAxis(ctx, box, {
+          x0: box.x + ((0 - xMin) / (xMax - xMin)) * box.w,
+          y0: box.y + (1 - ((0 - yMin) / (yMax - yMin))) * box.h,
+          xMin, xMax, yMin, yMax,
+          axisColor: "#000",
+          width: 3.2
+        });
+        miniText(ctx, "x", map.right + 8, map.y0 + 18, "#000", 20, "left");
+        miniText(ctx, "y", map.x0 + 10, map.top - 10, "#000", 20, "left");
+        miniText(ctx, "0", map.x0 - 14, map.y0 + 18, "#000", 18, "right");
+        return map;
+      };
+      const write = (text, x, y, color, size = 32, align = "left") => {
+        ctx.save();
+        ctx.font = "900 " + size + "px Georgia, 'Times New Roman', serif";
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        ctx.textBaseline = "middle";
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = "rgba(255,255,255,0.86)";
+        ctx.strokeText(canvasMathText(text), x, y);
+        ctx.fillText(canvasMathText(text), x, y);
+        ctx.restore();
+      };
+
+      if (type === "constantGraph") {
+        const m = makeMap(0.5, 0.62, -4, 4, -2.2, 3.4);
+        miniPlot(ctx, m, x => 1.12, "#1d64ff", 7, 0.02);
+        write("y = k", m.x0 + 48, m.py(1.75), "#1d64ff", 36);
+      } else if (type === "linearGraph") {
+        const m = makeMap(0.5, 0.62, -4, 4, -3, 4);
+        miniPlot(ctx, m, x => x, "#1d64ff", 7, 0.02);
+        write("y = x", m.x0 + 120, m.py(2.45), "#1d64ff", 34);
+      } else if (type === "quadraticRange") {
+        const m = makeMap(0.5, 0.62, -4, 4, -1.8, 5.2);
+        miniPlot(ctx, m, x => x * x, "#1d64ff", 7, 0.02);
+        write("y = x^{2}", m.x0 + 128, m.py(3.55), "#1d64ff", 34);
+      } else if (type === "cubicGraph") {
+        const m = makeMap(0.5, 0.62, -4, 4, -4, 4);
+        miniPlot(ctx, m, x => x * x * x, "#1d64ff", 7, 0.018);
+        write("y = x^{3}", m.x0 + 112, m.py(2.72), "#1d64ff", 34);
+      } else if (type === "absoluteGraph") {
+        const m = makeMap(0.5, 0.62, -4, 4, -1.8, 4.8);
+        miniPlot(ctx, m, x => Math.abs(x), "#1d64ff", 7, 0.02);
+        write("y = |x|", m.x0 + 130, m.py(2.68), "#1d64ff", 34);
+      } else if (type === "rationalGraph") {
+        const m = makeMap(0.5, 0.62, -4, 4, -4, 4);
+        miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#1d64ff", 7, 0.014);
+        write("y = 1/x", m.x0 + 108, m.py(2.42), "#1d64ff", 34);
+      } else if (type === "surdRightUp" || type === "surdRightDown" || type === "surdLeftUp" || type === "surdFour") {
+        const m = makeMap(0.5, 0.52, -4, 4, -2.6, 2.6);
+        if (type === "surdRightUp") {
+          miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 7, 0.016);
+          write("y = sqrt(x)", m.right - 34, m.top + 44, "#1d64ff", 30, "right");
+        } else if (type === "surdRightDown") {
+          miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#1d64ff", 7, 0.016);
+          write("y = -sqrt(x)", m.right - 34, m.bottom - 44, "#1d64ff", 30, "right");
+        } else if (type === "surdLeftUp") {
+          miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#1d64ff", 7, 0.016);
+          write("y = sqrt(-x)", m.left + 34, m.top + 44, "#1d64ff", 30, "left");
+        } else {
+          miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 6, 0.016);
+          miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#f2b300", 6, 0.016);
+          miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#087f5b", 6, 0.016);
+          miniPlot(ctx, m, x => x <= 0 ? -Math.sqrt(-x) : Infinity, "#6d28d9", 6, 0.016);
+          write("y = sqrt(x)", m.right - 28, m.top + 34, "#1d64ff", 24, "right");
+          write("y = -sqrt(x)", m.right - 28, m.bottom - 34, "#f2b300", 24, "right");
+          write("y = sqrt(-x)", m.left + 28, m.top + 34, "#087f5b", 24, "left");
+          write("y = -sqrt(-x)", m.left + 28, m.bottom - 34, "#6d28d9", 24, "left");
+        }
+      } else if (type === "expPdf") {
+        const m = makeMap(0.47, 0.68, -4, 3, -0.8, 6);
+        miniPlot(ctx, m, x => Math.exp(x), "#1d64ff", 7, 0.014);
+        write("y = e^{x}", m.right - 40, m.top + 46, "#1d64ff", 34, "right");
+      } else if (type === "logPdf") {
+        const m = makeMap(0.43, 0.58, -0.8, 5, -3.2, 3.2);
+        miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#1d64ff", 7, 0.014);
+        write("y = ln x", m.right - 40, m.top + 46, "#1d64ff", 34, "right");
+      }
     }
 
     let desmosApiPromise = null;
@@ -4410,13 +4195,13 @@
       }
       const eq = {
         linear: "y = " + a.toFixed(1) + "x + " + b.toFixed(1),
-        quadratic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")² + " + c.toFixed(1),
-        cubic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")³ + " + c.toFixed(1),
+        quadratic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^2 + " + c.toFixed(1),
+        cubic: "y = " + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^3 + " + c.toFixed(1),
         exp: "y = " + a.toFixed(1) + "e^{x} + " + b.toFixed(1),
         log: "y = " + a.toFixed(1) + "ln(x - " + b.toFixed(1) + ") + " + c.toFixed(1),
         sqrt: "y = " + a.toFixed(1) + "sqrt(x - " + b.toFixed(1) + ") + " + c.toFixed(1),
         absLinear: "y = " + a.toFixed(1) + "|x - " + b.toFixed(1) + "| + " + c.toFixed(1),
-        absQuadratic: "y = |" + a.toFixed(1) + "(x - " + b.toFixed(1) + ")² + " + c.toFixed(1) + "| + " + d.toFixed(1),
+        absQuadratic: "y = |" + a.toFixed(1) + "(x - " + b.toFixed(1) + ")^2 + " + c.toFixed(1) + "| + " + d.toFixed(1),
         sin: "y = " + a.toFixed(1) + "sin(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
         cos: "y = " + a.toFixed(1) + "cos(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
         tan: "y = " + a.toFixed(1) + "tan(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1)
@@ -4544,14 +4329,31 @@
 
     function formatMathHTML(value) {
       let text = escapeHTML(value);
-      text = text.replace(/!=/g, "≠").replace(/&gt;=/g, "≥").replace(/&lt;=/g, "≤");
+      text = text.replace(/!=/g, "â‰ ").replace(/&gt;=/g, "â‰¥").replace(/&lt;=/g, "â‰¤");
       text = text.replace(/1\/\(([^()]+)\)/g, `<span class="math-frac"><span>1</span><span class="den">$1</span></span>`);
       text = text.replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, `<span class="math-frac"><span>$1</span><span class="den">$2</span></span>`);
-      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
-      text = text.replace(/√\(([^()]+)\)/g, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
+      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt">âˆš<span class="radicand">$1</span></span>`);
+      text = text.replace(/âˆš\(([^()]+)\)/g, `<span class="math-sqrt">âˆš<span class="radicand">$1</span></span>`);
+      text = text.replace(/e\^\{([^}]+)\}/g, `<span class="math-inline">e<sup>$1</sup></span>`);
+      text = text.replace(/e\^([a-zA-Z0-9+\-]+)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
+      text = text.replace(/([A-Za-zÎ¸]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/\b([A-Za-zÎ¸]+)\^(\d+)/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)Â²/g, `<span class="math-inline">$1<sup>2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)Â³/g, `<span class="math-inline">$1<sup>3</sup></span>`);
+      return text;
+    }
+
+    function formatMathHTML(value) {
+      let text = escapeHTML(value);
+      text = text.replace(/!=/g, "&ne;").replace(/&gt;=/g, "&ge;").replace(/&lt;=/g, "&le;");
+      text = text.replace(/1\/\(([^()]+)\)/g, `<span class="math-frac"><span class="top">1</span><span class="bottom">$1</span></span>`);
+      text = text.replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, `<span class="math-frac"><span class="top">$1</span><span class="bottom">$2</span></span>`);
+      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt"><span class="root-symbol">&radic;</span><span class="radicand">$1</span></span>`);
+      text = text.replace(/√\(([^()]+)\)/g, `<span class="math-sqrt"><span class="root-symbol">&radic;</span><span class="radicand">$1</span></span>`);
       text = text.replace(/e\^\{([^}]+)\}/g, `<span class="math-inline">e<sup>$1</sup></span>`);
       text = text.replace(/e\^([a-zA-Z0-9+\-]+)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
       text = text.replace(/([A-Za-zθ]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)\^\{?(\d+)\}?/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
       text = text.replace(/\b([A-Za-zθ]+)\^(\d+)/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
       text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)²/g, `<span class="math-inline">$1<sup>2</sup></span>`);
       text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)³/g, `<span class="math-inline">$1<sup>3</sup></span>`);
@@ -4606,18 +4408,18 @@
     function detectFunctionWords(q) {
       const compact = q.replace(/\s+/g, "");
       const has = words => words.some(word => q.includes(word) || compact.includes(word.replace(/\s+/g, "")));
-      if (has(["quadratic", "parabola", "x^{2}", "x^2", "二次"])) return "quadratic";
-      if (has(["cubic", "x^{3}", "x^3", "三次"])) return "cubic";
-      if (has(["absolute", "modulus", "|x|", "绝对值"])) return "absolute";
-      if (has(["rational", "reciprocal", "1/x", "asymptote", "渐近线"])) return "reciprocal";
-      if (has(["surd", "sqrt", "square root", "根号", "√"])) return "surd";
-      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "exponential";
-      if (has(["ln", "log", "logarithm", "对数"])) return "logarithmic";
-      if (has(["sin", "sine", "正弦"])) return "sine";
-      if (has(["cos", "cosine", "余弦"])) return "cosine";
-      if (has(["tan", "tangent", "正切"])) return "tangent";
-      if (has(["linear", "straight", "slope", "gradient", "直线"])) return "linear";
-      if (has(["constant", "y=k", "水平线"])) return "constant";
+      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "quadratic";
+      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "cubic";
+      if (has(["absolute", "modulus", "|x|", "ç»å¯¹å€¼"])) return "absolute";
+      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸è¿‘çº¿"])) return "reciprocal";
+      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "surd";
+      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "exponential";
+      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "logarithmic";
+      if (has(["sin", "sine", "æ­£å¼¦"])) return "sine";
+      if (has(["cos", "cosine", "ä½™å¼¦"])) return "cosine";
+      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "tangent";
+      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "linear";
+      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "constant";
       return "";
     }
 
@@ -4635,45 +4437,45 @@
       const has = words => words.some(word => q.includes(word) || compact.includes(word.replace(/\s+/g, "")));
       const opener = "Based on the PDF graph framework, ";
       const functionType = detectFunctionWords(q);
-      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["你好", "嗨", "早安", "午安", "晚上好", "谢谢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or upload a graph image and then type what you want me to check.";
-      if (has(["help", "what can you do", "assist", "帮我", "可以做什么", "怎么用"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
-      if (has(["domain", "定义域", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right: surd starts where the square root is valid, ln needs input > 0, reciprocal excludes vertical asymptotes, and polynomial/trigonometric parent graphs usually have domain R.";
-      if (has(["range", "值域", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read from bottom to top: constant has one y-value, quadratic starts from its vertex, exponential is above its horizontal asymptote, and sine/cosine stay between their minimum and maximum.";
-      if (has(["constant", "y=k", "水平线"])) return "For f(x)=k, the graph is a horizontal line. Domain is R and range is {k}.";
-      if (has(["linear", "straight", "slope", "gradient", "直线"])) return "For f(x)=ax+b with a not equal 0, the graph is a straight line. Domain is R and range is R. a controls gradient; b is the y-intercept.";
-      if (has(["quadratic", "parabola", "x^{2}", "x^2", "二次"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)²+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R; range depends on the vertex and opening direction.";
-      if (has(["cubic", "x^{3}", "x^3", "三次"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)³+c, (b,c) is the point of inflection. Domain is R and range is R.";
-      if (has(["absolute", "modulus", "|x|", "绝对值"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
-      if (has(["rational", "reciprocal", "1/x", "asymptote", "渐近线"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
-      if (has(["surd", "sqrt", "square root", "根号", "√"])) return "For surd graphs, first make the expression inside the square root non-negative. y=sqrt(x-a) starts at (a,0), domain is [a,infinity), range is [0,infinity).";
-      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "For y=e^{x}, domain is R, range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
-      if (has(["ln", "log", "logarithm", "对数"])) return "For y=ln x, domain is (0,infinity), range is R, and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
-      if (has(["sin", "sine", "正弦"])) return "For y=sin x, domain is R, range is [-1,1], period is 2π, and x-intercepts occur at x=nπ. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
-      if (has(["cos", "cosine", "余弦"])) return "For y=cos x, domain is R, range is [-1,1], period is 2π, and the y-intercept is 1 for the parent graph.";
-      if (has(["tan", "tangent", "正切"])) return "For y=tan x, range is R, period is π, and vertical asymptotes occur at x=π/2+nπ. In y=a tan(bx+c)+d, period is π/|b|.";
-      if (has(["amplitude", "period", "midline", "振幅", "周期"])) return "For sine/cosine y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2π/|b|, midline is y=d. For tangent, period is π/|b|.";
-      if (has(["transform", "shift", "reflect", "stretch", "平移", "反射"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, and +c or +d shifts vertically.";
-      if (has(["desmos", "slider", "adjust", "滑杆", "调整", "graph adjuster"])) return "Open Graph Adjuster, choose a function graph first, then move only the shown parameters. The graph is blank at first so students choose the type intentionally.";
-      if (has(["practice", "quiz", "test me", "练习"])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so the graph starts at x=3 and domain is [3,infinity).";
+      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["ä½ å¥½", "å—¨", "æ—©å®‰", "åˆå®‰", "æ™šä¸Šå¥½", "è°¢è°¢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or upload a graph image and then type what you want me to check.";
+      if (has(["help", "what can you do", "assist", "å¸®æˆ‘", "å¯ä»¥åšä»€ä¹ˆ", "æ€Žä¹ˆç”¨"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
+      if (has(["domain", "å®šä¹‰åŸŸ", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right: surd starts where the square root is valid, ln needs input > 0, reciprocal excludes vertical asymptotes, and polynomial/trigonometric parent graphs usually have domain R.";
+      if (has(["range", "å€¼åŸŸ", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read from bottom to top: constant has one y-value, quadratic starts from its vertex, exponential is above its horizontal asymptote, and sine/cosine stay between their minimum and maximum.";
+      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "For f(x)=k, the graph is a horizontal line. Domain is R and range is {k}.";
+      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "For f(x)=ax+b with a not equal 0, the graph is a straight line. Domain is R and range is R. a controls gradient; b is the y-intercept.";
+      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)Â²+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R; range depends on the vertex and opening direction.";
+      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)Â³+c, (b,c) is the point of inflection. Domain is R and range is R.";
+      if (has(["absolute", "modulus", "|x|", "ç»å¯¹å€¼"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
+      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸è¿‘çº¿"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
+      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "For surd graphs, first make the expression inside the square root non-negative. y=sqrt(x-a) starts at (a,0), domain is [a,infinity), range is [0,infinity).";
+      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "For y=e^{x}, domain is R, range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
+      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "For y=ln x, domain is (0,infinity), range is R, and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
+      if (has(["sin", "sine", "æ­£å¼¦"])) return "For y=sin x, domain is R, range is [-1,1], period is 2Ï€, and x-intercepts occur at x=nÏ€. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
+      if (has(["cos", "cosine", "ä½™å¼¦"])) return "For y=cos x, domain is R, range is [-1,1], period is 2Ï€, and the y-intercept is 1 for the parent graph.";
+      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "For y=tan x, range is R, period is Ï€, and vertical asymptotes occur at x=Ï€/2+nÏ€. In y=a tan(bx+c)+d, period is Ï€/|b|.";
+      if (has(["amplitude", "period", "midline", "æŒ¯å¹…", "å‘¨æœŸ"])) return "For sine/cosine y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2Ï€/|b|, midline is y=d. For tangent, period is Ï€/|b|.";
+      if (has(["transform", "shift", "reflect", "stretch", "å¹³ç§»", "åå°„"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, and +c or +d shifts vertically.";
+      if (has(["desmos", "slider", "adjust", "æ»‘æ†", "è°ƒæ•´", "graph adjuster"])) return "Open Graph Adjuster, choose a function graph first, then move only the shown parameters. The graph is blank at first so students choose the type intentionally.";
+      if (has(["practice", "quiz", "test me", "ç»ƒä¹ "])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so the graph starts at x=3 and domain is [3,infinity).";
       if (functionType) return "This is related to " + functionType + " graphs. Tell me the exact equation or where the graph starts/crosses/asymptotes are, and I will help you find its domain and range.";
       if (slide) return "This page is about " + slide.title + ". " + slide.text + " Focus on these PDF-style graph facts: " + slide.keys.join(" ");
-      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^{x}, y=ln x, y=sin x, or y=a(x-b)²+c. I will help identify the graph type, domain and range.";
+      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^{x}, y=ln x, y=sin x, or y=a(x-b)Â²+c. I will help identify the graph type, domain and range.";
     }
     function plainSpeechText(value) {
       const box = document.createElement("div");
       box.innerHTML = formatMathHTML(value);
       return box.textContent
-        .replace(/∞/g, "infinity")
-        .replace(/π/g, "pi")
-        .replace(/θ/g, "theta")
-        .replace(/²/g, " squared")
-        .replace(/³/g, " cubed")
-        .replace(/ˣ/g, " to the power of x")
-        .replace(/√/g, " square root of ")
-        .replace(/≥/g, " greater than or equal to ")
-        .replace(/≤/g, " less than or equal to ")
-        .replace(/≠/g, " not equal to ")
-        .replace(/∕/g, " over ")
+        .replace(/âˆž/g, "infinity")
+        .replace(/Ï€/g, "pi")
+        .replace(/Î¸/g, "theta")
+        .replace(/Â²/g, " squared")
+        .replace(/Â³/g, " cubed")
+        .replace(/Ë£/g, " to the power of x")
+        .replace(/âˆš/g, " square root of ")
+        .replace(/â‰¥/g, " greater than or equal to ")
+        .replace(/â‰¤/g, " less than or equal to ")
+        .replace(/â‰ /g, " not equal to ")
+        .replace(/âˆ•/g, " over ")
         .replace(/\s+/g, " ")
         .trim();
     }
@@ -4713,85 +4515,31 @@
       speak(slide.title + ". " + slide.text + " " + slide.keys.join(" "));
     }
 
+    function enterGameMode() {
+      document.documentElement.classList.add("game-playing");
+      document.body.classList.add("game-playing");
+    }
 
-    function shuffle(arr) {
-      return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+    function exitGameMode() {
+      document.documentElement.classList.remove("game-playing");
+      document.body.classList.remove("game-playing");
     }
 
     function startGame() {
-      const questions = shuffle([...state.topic.questions]).slice(0, 5);
-      state.game = { index: 0, score: 0, questions, locked: false, scene: Math.random() > 0.5 ? "beach" : "forest" };
+      state.game = { active: true };
       el.gamePanel.style.display = "block";
       el.gameTitle.innerHTML = formatMathHTML(`${state.topic.title} Challenge`);
-      el.pixelScene.classList.toggle("beach", state.game.scene === "beach");
-      el.pixelScene.classList.toggle("forest", state.game.scene === "forest");
-      el.hazard.textContent = state.game.scene === "beach" ? "Wrong route: the shark wins." : "Wrong route: the forest beast wins.";
-      el.gamePanel.scrollIntoView({ behavior: "smooth", block: "start" });
-      renderQuestion();
+      loadPixelGame();
+      enterGameMode();
     }
 
-    function renderQuestion() {
-      const game = state.game;
-      game.locked = false;
-      el.player.style.left = "8%";
-      el.player.style.top = "48%";
-      el.crowd.style.display = "none";
-      el.confetti.innerHTML = "";
-      const item = game.questions[game.index];
-      const choices = shuffle([item.a, ...item.choices]).slice(0, 3);
-      game.correctRoute = choices.indexOf(item.a);
-      el.gameProgress.textContent = `Question ${game.index + 1} of ${game.questions.length}`;
-      el.gameQuestion.innerHTML = formatMathHTML(item.q);
-      el.answers.innerHTML = "";
-      choices.forEach((choice, idx) => {
-        document.getElementById(`route${idx}`).textContent = choice;
-        const btn = document.createElement("button");
-        btn.className = "answer-btn";
-        btn.innerHTML = `Route ${String.fromCharCode(65 + idx)}: ${formatMathHTML(choice)}`;
-        btn.addEventListener("click", () => chooseRoute(idx));
-        el.answers.appendChild(btn);
-      });
-      el.gameStatus.textContent = "Choose the route with the correct answer.";
-    }
-
-    function chooseRoute(idx) {
-      const game = state.game;
-      if (game.locked) return;
-      game.locked = true;
-      const tops = ["26%", "48%", "70%"];
-      el.player.style.left = "82%";
-      el.player.style.top = tops[idx];
-      const correct = idx === game.correctRoute;
-      setTimeout(() => {
-        if (correct) {
-          game.score++;
-          el.gameStatus.textContent = "Correct route. Keep going.";
-          if (game.index === game.questions.length - 1) {
-            el.gameStatus.textContent = `Congratulations. You completed the route with ${game.score}/${game.questions.length} correct answers.`;
-            el.crowd.style.display = "flex";
-            burstConfetti();
-            speak("Congratulations. You completed the route.");
-          } else {
-            game.index++;
-            setTimeout(renderQuestion, 850);
-          }
-        } else {
-          el.player.style.left = "4%";
-          el.player.style.top = game.scene === "beach" ? "44%" : "72%";
-          el.gameStatus.innerHTML = formatMathHTML(`Wrong route. The correct answer was: ${game.questions[game.index].a}. Try a new random game.`);
-        }
-      }, 650);
-    }
-
-    function burstConfetti() {
-      const colors = ["#2077ff", "#00a8a8", "#ff6f61", "#f5b642", "#37a66b"];
-      for (let i = 0; i < 36; i++) {
-        const piece = document.createElement("i");
-        piece.style.left = `${Math.random() * 100}%`;
-        piece.style.setProperty("--c", colors[i % colors.length]);
-        piece.style.animationDelay = `${Math.random() * 0.3}s`;
-        el.confetti.appendChild(piece);
-      }
+    function loadPixelGame() {
+      if (!el.pixelGameFrame || !state.topic) return;
+      const topicId = state.topic.id;
+      const gameUrl = new URL("game.html", window.location.href);
+      gameUrl.searchParams.set("topic", topicId);
+      gameUrl.searchParams.set("s", Date.now().toString());
+      el.pixelGameFrame.src = gameUrl.href;
     }
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -4805,12 +4553,14 @@
     });
 
     function returnHome() {
+      exitGameMode();
       state.topic = null;
       state.slide = 0;
       state.game = null;
       el.topicGrid.innerHTML = "";
       el.lessonShell.style.display = "none";
       el.gamePanel.style.display = "none";
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
       document.body.classList.remove("content-open");
       document.getElementById("subtopics").classList.add("hidden");
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -4818,7 +4568,11 @@
     }
     document.getElementById("jumpTop").addEventListener("click", returnHome);
     document.getElementById("closeLesson").addEventListener("click", () => {
+      exitGameMode();
+      state.game = null;
       el.lessonShell.style.display = "none";
+      el.gamePanel.style.display = "none";
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
       document.getElementById("subtopics").scrollIntoView({ behavior: "smooth" });
     });
     document.getElementById("prevSlide").addEventListener("click", () => {
@@ -4896,3 +4650,5 @@
   </script>
 </body>
 </html>
+
+
