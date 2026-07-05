@@ -4551,7 +4551,10 @@
 
     function startGame() {
       stopLessonSpeech();
-      state.game = { active: true };
+      state.game = {
+        active: true,
+        returnScrollY: window.scrollY
+      };
       el.gamePanel.style.display = "block";
       el.gameTitle.innerHTML = formatMathHTML(`${state.topic.title} Challenge`);
       loadPixelGame();
@@ -4575,6 +4578,21 @@
       requestAnimationFrame(() => {
         try { el.pixelGameFrame.focus(); } catch (err) {}
         try { el.pixelGameFrame.contentWindow?.focus(); } catch (err) {}
+      });
+    }
+
+    function returnFromGame() {
+      const returnScrollY = state.game?.returnScrollY;
+      state.game = { active: false };
+      exitGameMode();
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
+      if (el.gamePanel) el.gamePanel.style.display = "none";
+      requestAnimationFrame(() => {
+        if (Number.isFinite(returnScrollY)) {
+          window.scrollTo({ top: returnScrollY, behavior: "smooth" });
+        } else if (el.lessonShell) {
+          el.lessonShell.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     }
 
@@ -4641,6 +4659,9 @@
       }
     });
     document.getElementById("restartGame").addEventListener("click", startGame);
+    window.addEventListener("message", event => {
+      if (event.data?.type === "fj-game-return") returnFromGame();
+    });
     window.addEventListener("keydown", e => forwardGameKey(e, "fj-game-keydown"));
     window.addEventListener("keyup", e => forwardGameKey(e, "fj-game-keyup"));
     if (el.pixelGameFrame) {
