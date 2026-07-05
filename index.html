@@ -3646,6 +3646,8 @@
       return state.topic.slides[state.slide];
     }
 
+    let slideSpeechTimer = null;
+
     function renderSlide(autoSpeak = false) {
       const slide = currentSlide();
       el.lessonCrumb.innerHTML = formatMathHTML(`${chapters[state.chapter].title} / Page ${state.slide + 1}`);
@@ -3661,7 +3663,14 @@
       document.getElementById("nextSlide").textContent = state.slide === state.topic.slides.length - 1 ? "Start Game" : "Next Page";
       addBot(`Page ${state.slide + 1}: ${slide.text}`);
       drawLesson();
-      if (autoSpeak) setTimeout(speakCurrentSlide, 120);
+      if (slideSpeechTimer) clearTimeout(slideSpeechTimer);
+      slideSpeechTimer = null;
+      if (autoSpeak) {
+        slideSpeechTimer = setTimeout(() => {
+          slideSpeechTimer = null;
+          speakCurrentSlide();
+        }, 120);
+      }
     }
 
     function drawLesson() {
@@ -4507,6 +4516,12 @@
       speechSynthesis.speak(utterance);
     }
 
+    function stopLessonSpeech() {
+      if (slideSpeechTimer) clearTimeout(slideSpeechTimer);
+      slideSpeechTimer = null;
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
+    }
+
     function speakCurrentSlide() {
       if (!state.topic) return;
       const slide = currentSlide();
@@ -4524,6 +4539,7 @@
     }
 
     function startGame() {
+      stopLessonSpeech();
       state.game = { active: true };
       el.gamePanel.style.display = "block";
       el.gameTitle.innerHTML = formatMathHTML(`${state.topic.title} Challenge`);
