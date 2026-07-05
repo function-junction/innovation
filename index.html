@@ -1266,11 +1266,22 @@
     body.game-playing .game-embed-frame-wrap {
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       max-width: calc(100vh * 16 / 9);
       max-height: calc(100vw * 9 / 16);
       border: 0;
       border-radius: 0;
       box-shadow: none;
+    }
+
+    @media (hover: none) and (orientation: portrait), (pointer: coarse) and (orientation: portrait), (max-width: 760px) and (orientation: portrait) {
+      body.game-playing .game-embed-frame-wrap {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+      }
     }
 
     .game-top {
@@ -2082,7 +2093,7 @@
           </div>
           <div class="game-embed">
             <div class="game-embed-frame-wrap">
-              <iframe id="pixelGameFrame" class="game-embed-frame" title="Function Junction Pixel Quiz Battle" allow="autoplay; fullscreen" loading="eager"></iframe>
+              <iframe id="pixelGameFrame" class="game-embed-frame" title="Function Junction Pixel Quiz Battle" allow="autoplay; fullscreen" loading="eager" tabindex="0"></iframe>
             </div>
           </div>
         </article>
@@ -4545,6 +4556,8 @@
       el.gameTitle.innerHTML = formatMathHTML(`${state.topic.title} Challenge`);
       loadPixelGame();
       enterGameMode();
+      focusPixelGame();
+      [120, 360, 800].forEach(delay => setTimeout(focusPixelGame, delay));
     }
 
     function loadPixelGame() {
@@ -4554,6 +4567,30 @@
       gameUrl.searchParams.set("topic", topicId);
       gameUrl.searchParams.set("s", Date.now().toString());
       el.pixelGameFrame.src = gameUrl.href;
+      el.pixelGameFrame.onload = focusPixelGame;
+    }
+
+    function focusPixelGame() {
+      if (!el.pixelGameFrame || !document.body.classList.contains("game-playing")) return;
+      requestAnimationFrame(() => {
+        try { el.pixelGameFrame.focus(); } catch (err) {}
+        try { el.pixelGameFrame.contentWindow?.focus(); } catch (err) {}
+      });
+    }
+
+    function normalizeGameKey(key) {
+      if (key === "Spacebar") return " ";
+      return key && key.length === 1 ? key.toLowerCase() : key;
+    }
+
+    function forwardGameKey(e, type) {
+      if (!document.body.classList.contains("game-playing") || !el.pixelGameFrame?.contentWindow) return;
+      const key = normalizeGameKey(e.key);
+      const gameKeys = ["w", "a", "s", "d", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", " "];
+      if (!gameKeys.includes(key)) return;
+      e.preventDefault();
+      focusPixelGame();
+      el.pixelGameFrame.contentWindow.postMessage({ type, key }, "*");
     }
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -4604,6 +4641,13 @@
       }
     });
     document.getElementById("restartGame").addEventListener("click", startGame);
+    window.addEventListener("keydown", e => forwardGameKey(e, "fj-game-keydown"));
+    window.addEventListener("keyup", e => forwardGameKey(e, "fj-game-keyup"));
+    if (el.pixelGameFrame) {
+      ["pointerdown", "mousedown", "touchstart"].forEach(eventName => {
+        el.pixelGameFrame.addEventListener(eventName, focusPixelGame, { passive: true });
+      });
+    }
     el.aiLauncher.addEventListener("click", openAiPanel);
     el.aiClose.addEventListener("click", closeAiPanel);
     if ("speechSynthesis" in window) {
