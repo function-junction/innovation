@@ -2047,8 +2047,6 @@
               <h2 class="lesson-title" id="lessonTitle">Subtopic</h2>
             </div>
             <div class="lesson-actions">
-              <button class="icon-btn" id="speakBtn" title="Read explanation aloud" aria-label="Read explanation aloud">&#128266;</button>
-              <button class="ghost-btn" id="gameBtn">Start Game</button>
               <button class="ghost-btn" id="closeLesson">All Subtopics</button>
             </div>
           </div>
@@ -4589,9 +4587,7 @@
         startGame();
       }
     });
-    document.getElementById("gameBtn").addEventListener("click", startGame);
     document.getElementById("restartGame").addEventListener("click", startGame);
-    document.getElementById("speakBtn").addEventListener("click", speakCurrentSlide);
     el.aiLauncher.addEventListener("click", openAiPanel);
     el.aiClose.addEventListener("click", closeAiPanel);
     if ("speechSynthesis" in window) {
