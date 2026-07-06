@@ -4162,6 +4162,39 @@
       if (["sin", "cos", "tan"].includes(type) && Math.abs(b) < eps) return false;
       return true;
     }
+
+    function simplifyAdjusterSigns(value) {
+      let text = String(value);
+      for (let i = 0; i < 3; i++) {
+        text = text
+          .replace(/\+\s*\+/g, "+")
+          .replace(/-\s*-/g, "+")
+          .replace(/\+\s*-/g, "-")
+          .replace(/-\s*\+/g, "-");
+      }
+      return text
+        .replace(/\s*\+\s*/g, " + ")
+        .replace(/([^\s(|])\s*-\s*/g, "$1 - ")
+        .replace(/\(\s+/g, "(")
+        .replace(/\s+\)/g, ")")
+        .replace(/\|\s+/g, "|")
+        .replace(/\s+\|/g, "|")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function simplifyAdjusterLatex(value) {
+      let text = String(value);
+      for (let i = 0; i < 3; i++) {
+        text = text
+          .replace(/\+\+/g, "+")
+          .replace(/--/g, "+")
+          .replace(/\+-/g, "-")
+          .replace(/-\+/g, "-");
+      }
+      return text;
+    }
+
     function desmosLatex(type, a, b, c, d) {
       const A = a.toFixed(2), B = b.toFixed(2), C = c.toFixed(2), D = d.toFixed(2);
       const latex = {
@@ -4177,7 +4210,7 @@
         cos: "y=" + A + "\\cos\\left(" + B + "x+" + C + "\\right)+" + D,
         tan: "y=" + A + "\\tan\\left(" + B + "x+" + C + "\\right)+" + D
       };
-      return latex[type];
+      return simplifyAdjusterLatex(latex[type]);
     }
     function updateDesmosModel(lab, type, latex, isValid) {
       const canvas = lab.querySelector("#desmosCanvas");
@@ -4237,7 +4270,8 @@
         cos: "y = " + a.toFixed(1) + "cos(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1),
         tan: "y = " + a.toFixed(1) + "tan(" + b.toFixed(1) + "x + " + c.toFixed(1) + ") + " + d.toFixed(1)
       }[type];
-      lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(eq);
+      const displayEq = simplifyAdjusterSigns(eq);
+      lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(displayEq);
       const isValid = isGraphAdjusterValid(type, a, b, c, d);
       updateDesmosModel(lab, type, desmosLatex(type, a, b, c, d), isValid);
       const { ctx, w, h } = resizeCanvas(canvas);
@@ -4271,14 +4305,14 @@
         ctx.font = "bold 18px Arial";
         ctx.textAlign = "center";
         ctx.fillText("", w / 2, h / 2);
-        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.fillText(eq, pad + 10, pad - 20);
+        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.fillText(displayEq, pad + 10, pad - 20);
         return;
       }
       if (["log", "sqrt"].includes(type)) { ctx.save(); ctx.strokeStyle = "rgba(255,111,97,0.75)"; ctx.lineWidth = 3; ctx.setLineDash([8,7]); ctx.beginPath(); ctx.moveTo(px(b), pad); ctx.lineTo(px(b), h - pad); ctx.stroke(); ctx.restore(); }
       if (type === "exp") { ctx.save(); ctx.strokeStyle = "rgba(255,111,97,0.75)"; ctx.lineWidth = 3; ctx.setLineDash([8,7]); ctx.beginPath(); ctx.moveTo(pad, py(b)); ctx.lineTo(w - pad, py(b)); ctx.stroke(); ctx.restore(); }
       ctx.save(); ctx.beginPath(); ctx.rect(pad, pad, w - pad * 2, h - pad * 2); ctx.clip(); ctx.strokeStyle = "#2077ff"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath(); let started = false;
       for (let x = xMin; x <= xMax; x += 0.025) { const y = fn(x); if (!Number.isFinite(y) || y < yMin || y > yMax) { started = false; continue; } const X = px(x), Y = py(y); if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y); }
-      ctx.stroke(); ctx.restore(); ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.fillText(eq, pad + 10, pad - 20);
+      ctx.stroke(); ctx.restore(); ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.fillText(displayEq, pad + 10, pad - 20);
     }
     function drawTriangle(ctx, w, h, type, t) {
       ctx.save();
