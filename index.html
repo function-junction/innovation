@@ -1050,33 +1050,11 @@
       border: 1px solid rgba(55, 180, 139, 0.24);
     }
 
-    .msg.image-msg {
-      padding: 7px;
-      background: rgba(255, 255, 255, 0.86);
-    }
-
-    .chat-image-preview {
-      display: block;
-      max-width: min(260px, 68vw);
-      max-height: 180px;
-      border-radius: 12px;
-      object-fit: contain;
-      border: 1px solid rgba(6, 154, 166, 0.2);
-      background: #fff;
-    }
-
-    .chat-image-caption {
-      margin-top: 6px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: rgba(17, 54, 78, 0.76);
-    }
-
     .chat-controls {
       margin: 0 16px 16px;
       padding: 10px;
       display: grid;
-      grid-template-columns: 38px 1fr 46px;
+      grid-template-columns: 1fr 46px;
       gap: 8px;
       border-top: 0;
       background: #e3f5f7;
@@ -1099,15 +1077,6 @@
 
     .chat-controls input::placeholder {
       color: rgba(17, 54, 78, 0.55);
-    }
-
-    .attach-btn {
-      display: grid;
-      place-items: center;
-      color: #0c7788;
-      font-size: 1.35rem;
-      background: transparent;
-      font-weight: 950;
     }
 
     #sendChat {
@@ -1982,11 +1951,11 @@
       }
 
       .chat-controls {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr auto;
       }
 
       .chat-controls button {
-        width: 100%;
+        width: 42px;
       }
     }
 
@@ -1994,7 +1963,7 @@
       .ai-launcher { min-width: 74px; min-height: 74px; }
       .ai-launcher-avatar { width: 74px; height: 74px; }
       body.content-open .ai-launcher-avatar { width: 64px; height: 64px; }
-      .attach-btn, #sendChat { min-width: 44px; min-height: 44px; }
+      #sendChat { min-width: 44px; min-height: 44px; }
     }
 
   </style>
@@ -2137,8 +2106,6 @@
       <button data-prompt="How do I find domain and range?">Domain & range</button>
     </div>
     <div class="chat-controls">
-      <button class="attach-btn" id="attachImage" type="button" title="Add graph image" aria-label="Add graph image">+</button>
-      <input id="chatImageInput" type="file" accept="image/*" hidden />
       <input id="chatInput" type="text" placeholder="Type here" aria-label="Type your question" />
       <button class="icon-btn" id="sendChat" title="Send question" aria-label="Send question">&uarr;</button>
     </div>
@@ -2332,8 +2299,6 @@
       aiClose: document.getElementById("aiClose"),
       chatLog: document.getElementById("chatLog"),
       chatInput: document.getElementById("chatInput"),
-      attachImage: document.getElementById("attachImage"),
-      chatImageInput: document.getElementById("chatImageInput"),
       sendChat: document.getElementById("sendChat"),
       gamePanel: document.getElementById("gamePanel"),
       gameTitle: document.getElementById("gameTitle"),
@@ -4454,22 +4419,6 @@
       scrollChatToBottom();
     }
 
-    function addUserImage(src, caption) {
-      const msg = document.createElement("div");
-      msg.className = "msg user image-msg";
-      const img = document.createElement("img");
-      img.className = "chat-image-preview";
-      img.src = src;
-      img.alt = caption || "Uploaded graph image";
-      const note = document.createElement("div");
-      note.className = "chat-image-caption";
-      note.textContent = caption || "Uploaded graph image";
-      msg.appendChild(img);
-      msg.appendChild(note);
-      el.chatLog.appendChild(msg);
-      scrollChatToBottom();
-    }
-
     function openAiPanel() {
       el.aiPanel.classList.add("open");
       el.aiPanel.setAttribute("aria-hidden", "false");
@@ -4501,11 +4450,6 @@
       return "";
     }
 
-    function imageTutorReply(fileName) {
-      const name = fileName ? " (" + fileName + ")" : "";
-      return "I received your image" + name + ". In this one-HTML version, I can display the uploaded graph for reference, but real image recognition needs a secure AI server behind the website. For now, type one clue from the picture, such as parabola, asymptote, sqrt, ln, sin, or the equation, and I will guide you step by step using the PDF graph framework.";
-    }
-
     function tutorReply(input) {
       const raw = input.trim();
       const q = raw.toLowerCase();
@@ -4515,7 +4459,7 @@
       const has = words => words.some(word => q.includes(word) || compact.includes(word.replace(/\s+/g, "")));
       const opener = "Based on the PDF graph framework, ";
       const functionType = detectFunctionWords(q);
-      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["ä½ å¥½", "å—¨", "æ—©å®‰", "åˆå®‰", "æ™šä¸Šå¥½", "è°¢è°¢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or upload a graph image and then type what you want me to check.";
+      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["ä½ å¥½", "å—¨", "æ—©å®‰", "åˆå®‰", "æ™šä¸Šå¥½", "è°¢è°¢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or type an equation for me to check.";
       if (has(["help", "what can you do", "assist", "å¸®æˆ‘", "å¯ä»¥åšä»€ä¹ˆ", "æ€Žä¹ˆç”¨"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
       if (has(["domain", "å®šä¹‰åŸŸ", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right. Square-root graphs start where the value inside the root is at least 0. Log graphs need the input to be greater than 0. Reciprocal graphs exclude the vertical asymptote. Polynomial graphs such as linear, quadratic and cubic usually have domain all real numbers.";
       if (has(["range", "å€¼åŸŸ", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read the graph from bottom to top. A constant graph has only one y-value. A quadratic graph starts from its vertex. An exponential graph stays above its horizontal asymptote. Sine and cosine stay between their minimum and maximum.";
@@ -4746,23 +4690,6 @@
     el.chatInput.addEventListener("keydown", e => {
       if (e.key === "Enter") el.sendChat.click();
     });
-    el.attachImage.addEventListener("click", () => el.chatImageInput.click());
-    el.chatImageInput.addEventListener("change", () => {
-      const file = el.chatImageInput.files && el.chatImageInput.files[0];
-      if (!file) return;
-      if (!file.type.startsWith("image/")) {
-        addBot("Please upload an image file, such as PNG or JPG, so I can keep it beside our discussion.");
-        el.chatImageInput.value = "";
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        addUserImage(reader.result, file.name || "Uploaded graph image");
-        addBot(imageTutorReply(file.name));
-        el.chatImageInput.value = "";
-      };
-      reader.readAsDataURL(file);
-    });
     document.querySelectorAll(".suggestions button").forEach(btn => {
       btn.addEventListener("click", () => {
         el.chatInput.value = btn.dataset.prompt;
@@ -4782,7 +4709,7 @@
       if (state.topic) drawLesson();
     });
 
-    addBot("Hello, I'm Ms. Effie. Ask me about function graphs, domain, range, transformations, asymptotes, amplitude or period. You can also upload a graph image, then type what you want me to check.");
+    addBot("Hello, I'm Ms. Effie. Ask me about function graphs, domain, range, transformations, asymptotes, amplitude, period, or type an equation for me to check.");
     animate();
   </script>
 </body>
