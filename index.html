@@ -892,7 +892,7 @@
       width: clamp(380px, 30vw, 460px);
       max-height: min(780px, calc(100vh - 32px));
       display: grid;
-      grid-template-rows: auto minmax(320px, 1fr) auto auto auto;
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto;
       overflow: hidden;
       border-radius: 24px;
       background: #f7fbff;
@@ -997,10 +997,11 @@
     }
 
     .chat-log {
-      min-height: 390px;
+      min-height: 0;
       height: auto;
       overflow-y: auto;
-      padding: 18px 16px;
+      padding: 18px 16px 28px;
+      scroll-padding-bottom: 28px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -1018,8 +1019,20 @@
       max-width: 92%;
       padding: 11px 13px;
       border-radius: 15px;
-      line-height: 1.45;
+      line-height: 1.55;
       font-size: 0.98rem;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+
+    .msg.bot .math-frac {
+      font-size: 0.96em;
+      line-height: 0.92;
+      vertical-align: middle;
+    }
+
+    .msg.bot .math-sqrt {
+      vertical-align: middle;
     }
 
     .msg.bot {
@@ -1572,7 +1585,7 @@
       }
 
       .chat-log {
-        min-height: 420px;
+        min-height: 0;
       }
     }
 
@@ -1871,11 +1884,11 @@
         inset: auto 8px 8px 8px;
         width: auto;
         max-height: calc(100vh - 16px);
-        grid-template-rows: auto minmax(220px, 1fr) auto auto auto;
+        grid-template-rows: auto minmax(0, 1fr) auto auto auto;
       }
 
       .chat-log {
-        min-height: 240px;
+        min-height: 0;
       }
 
       .chat-controls {
@@ -4364,11 +4377,15 @@
     function formatMathHTML(value) {
       let text = escapeHTML(value);
       text = text.replace(/!=/g, "&ne;").replace(/&gt;=/g, "&ge;").replace(/&lt;=/g, "&le;");
+      text = text.replace(/\binfinity\b/gi, "&infin;");
+      text = text.replace(/\bpi\b/g, "&pi;");
       text = text.replace(/1\/\(([^()]+)\)/g, `<span class="math-frac"><span class="top">1</span><span class="bottom">$1</span></span>`);
+      text = text.replace(/\b([A-Za-z0-9]+)\/\(([^()]+)\)/g, `<span class="math-frac"><span class="top">$1</span><span class="bottom">$2</span></span>`);
       text = text.replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, `<span class="math-frac"><span class="top">$1</span><span class="bottom">$2</span></span>`);
       text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt"><span class="root-symbol">&radic;</span><span class="radicand">$1</span></span>`);
       text = text.replace(/√\(([^()]+)\)/g, `<span class="math-sqrt"><span class="root-symbol">&radic;</span><span class="radicand">$1</span></span>`);
       text = text.replace(/e\^\{([^}]+)\}/g, `<span class="math-inline">e<sup>$1</sup></span>`);
+      text = text.replace(/e\^\(([^()]+)\)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
       text = text.replace(/e\^([a-zA-Z0-9+\-]+)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
       text = text.replace(/([A-Za-zθ]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
       text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)\^\{?(\d+)\}?/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
@@ -4378,12 +4395,21 @@
       return text;
     }
 
+    function scrollChatToBottom() {
+      requestAnimationFrame(() => {
+        el.chatLog.scrollTop = el.chatLog.scrollHeight;
+        setTimeout(() => {
+          el.chatLog.scrollTop = el.chatLog.scrollHeight;
+        }, 80);
+      });
+    }
+
     function addBot(text) {
       const msg = document.createElement("div");
       msg.className = "msg bot";
       msg.innerHTML = formatMathHTML(text);
       el.chatLog.appendChild(msg);
-      el.chatLog.scrollTop = el.chatLog.scrollHeight;
+      scrollChatToBottom();
     }
 
     function addUser(text) {
@@ -4391,7 +4417,7 @@
       msg.className = "msg user";
       msg.textContent = text;
       el.chatLog.appendChild(msg);
-      el.chatLog.scrollTop = el.chatLog.scrollHeight;
+      scrollChatToBottom();
     }
 
     function addUserImage(src, caption) {
@@ -4407,7 +4433,7 @@
       msg.appendChild(img);
       msg.appendChild(note);
       el.chatLog.appendChild(msg);
-      el.chatLog.scrollTop = el.chatLog.scrollHeight;
+      scrollChatToBottom();
     }
 
     function openAiPanel() {
@@ -4457,27 +4483,27 @@
       const functionType = detectFunctionWords(q);
       if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["ä½ å¥½", "å—¨", "æ—©å®‰", "åˆå®‰", "æ™šä¸Šå¥½", "è°¢è°¢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or upload a graph image and then type what you want me to check.";
       if (has(["help", "what can you do", "assist", "å¸®æˆ‘", "å¯ä»¥åšä»€ä¹ˆ", "æ€Žä¹ˆç”¨"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
-      if (has(["domain", "å®šä¹‰åŸŸ", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right: surd starts where the square root is valid, ln needs input > 0, reciprocal excludes vertical asymptotes, and polynomial/trigonometric parent graphs usually have domain R.";
-      if (has(["range", "å€¼åŸŸ", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read from bottom to top: constant has one y-value, quadratic starts from its vertex, exponential is above its horizontal asymptote, and sine/cosine stay between their minimum and maximum.";
-      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "For f(x)=k, the graph is a horizontal line. Domain is R and range is {k}.";
-      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "For f(x)=ax+b with a not equal 0, the graph is a straight line. Domain is R and range is R. a controls gradient; b is the y-intercept.";
-      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)Â²+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R; range depends on the vertex and opening direction.";
-      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)Â³+c, (b,c) is the point of inflection. Domain is R and range is R.";
+      if (has(["domain", "å®šä¹‰åŸŸ", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right. Square-root graphs start where the value inside the root is at least 0. Log graphs need the input to be greater than 0. Reciprocal graphs exclude the vertical asymptote. Polynomial graphs such as linear, quadratic and cubic usually have domain all real numbers.";
+      if (has(["range", "å€¼åŸŸ", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read the graph from bottom to top. A constant graph has only one y-value. A quadratic graph starts from its vertex. An exponential graph stays above its horizontal asymptote. Sine and cosine stay between their minimum and maximum.";
+      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "For f(x)=k, the graph is a horizontal line. Domain: (-infinity, infinity). Range: {k}.";
+      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "For f(x)=ax+b, where a is not 0, the graph is a straight line. Domain: (-infinity, infinity). Range: (-infinity, infinity). a controls the gradient and b is the y-intercept.";
+      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)^2+c, the vertex is (b,c). If a>0, it opens upward. If a<0, it opens downward. Domain: (-infinity, infinity). Range depends on the vertex and opening direction.";
+      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)^3+c, (b,c) is the point of inflection. Domain: (-infinity, infinity). Range: (-infinity, infinity).";
       if (has(["absolute", "modulus", "|x|", "ç»å¯¹å€¼"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
       if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸è¿‘çº¿"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
-      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "For surd graphs, first make the expression inside the square root non-negative. y=sqrt(x-a) starts at (a,0), domain is [a,infinity), range is [0,infinity).";
-      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "For y=e^{x}, domain is R, range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
-      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "For y=ln x, domain is (0,infinity), range is R, and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
-      if (has(["sin", "sine", "æ­£å¼¦"])) return "For y=sin x, domain is R, range is [-1,1], period is 2Ï€, and x-intercepts occur at x=nÏ€. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
-      if (has(["cos", "cosine", "ä½™å¼¦"])) return "For y=cos x, domain is R, range is [-1,1], period is 2Ï€, and the y-intercept is 1 for the parent graph.";
-      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "For y=tan x, range is R, period is Ï€, and vertical asymptotes occur at x=Ï€/2+nÏ€. In y=a tan(bx+c)+d, period is Ï€/|b|.";
-      if (has(["amplitude", "period", "midline", "æŒ¯å¹…", "å‘¨æœŸ"])) return "For sine/cosine y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2Ï€/|b|, midline is y=d. For tangent, period is Ï€/|b|.";
+      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "For square-root graphs, first make the expression inside the root greater than or equal to 0. y=sqrt(x-a) starts at (a,0). Domain: [a,infinity). Range: [0,infinity).";
+      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "For y=e^x, domain is (-infinity, infinity), range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
+      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "For y=ln x, domain is (0,infinity), range is (-infinity, infinity), and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
+      if (has(["sin", "sine", "æ­£å¼¦"])) return "For y=sin x, domain is (-infinity, infinity), range is [-1,1], period is 2pi, and x-intercepts occur at x=npi. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
+      if (has(["cos", "cosine", "ä½™å¼¦"])) return "For y=cos x, domain is (-infinity, infinity), range is [-1,1], period is 2pi, and the y-intercept is 1 for the parent graph.";
+      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "For y=tan x, range is (-infinity, infinity), period is pi, and vertical asymptotes occur at x=pi/2+npi. In y=a tan(bx+c)+d, period is pi/|b|.";
+      if (has(["amplitude", "period", "midline", "æŒ¯å¹…", "å‘¨æœŸ"])) return "For sine or cosine, y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2pi/|b|, and midline is y=d. For tangent, period is pi/|b|.";
       if (has(["transform", "shift", "reflect", "stretch", "å¹³ç§»", "åå°„"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, and +c or +d shifts vertically.";
       if (has(["desmos", "slider", "adjust", "æ»‘æ†", "è°ƒæ•´", "graph adjuster"])) return "Open Graph Adjuster, choose a function graph first, then move only the shown parameters. The graph is blank at first so students choose the type intentionally.";
-      if (has(["practice", "quiz", "test me", "ç»ƒä¹ "])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so the graph starts at x=3 and domain is [3,infinity).";
+      if (has(["practice", "quiz", "test me", "ç»ƒä¹ "])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so x>=3. The graph starts at x=3 and the domain is [3,infinity).";
       if (functionType) return "This is related to " + functionType + " graphs. Tell me the exact equation or where the graph starts/crosses/asymptotes are, and I will help you find its domain and range.";
       if (slide) return "This page is about " + slide.title + ". " + slide.text + " Focus on these PDF-style graph facts: " + slide.keys.join(" ");
-      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^{x}, y=ln x, y=sin x, or y=a(x-b)Â²+c. I will help identify the graph type, domain and range.";
+      return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^x, y=ln x, y=sin x, or y=a(x-b)^2+c. I will help identify the graph type, domain and range.";
     }
     function plainSpeechText(value) {
       const box = document.createElement("div");
