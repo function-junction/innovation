@@ -7,6 +7,10 @@
   <link rel="preload" as="image" href="game-assets/hero.png">
   <link rel="preload" as="image" href="game-assets/tiles.png">
   <link rel="preload" as="image" href="game-assets/effects.png">
+  <link rel="preload" as="image" href="game-assets/chest.png">
+  <link rel="preload" as="image" href="game-assets/winner-mage.png">
+  <link rel="preload" as="image" href="game-assets/winner-knight.png">
+  <link rel="preload" as="image" href="game-assets/winner-elf.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Baloo+2:wght@500;600;700;800&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1620,6 +1624,17 @@
       text-shadow: 2px 2px 0 #000 !important;
     }
 
+    .guide-loading {
+      min-height: 24px !important;
+      margin: -4px 0 12px !important;
+      color: #bfe9ff !important;
+      font-size: clamp(13px, 1.5vw, 16px) !important;
+      font-weight: 800 !important;
+      line-height: 1.25 !important;
+      text-align: center !important;
+      text-shadow: 2px 2px 0 #000 !important;
+    }
+
     .guide-actions {
       display: flex !important;
       justify-content: center !important;
@@ -1627,6 +1642,12 @@
 
     .guide-actions button {
       min-width: 220px !important;
+    }
+
+    .guide-actions button:disabled {
+      cursor: wait !important;
+      filter: grayscale(0.25) brightness(0.82) !important;
+      opacity: 0.9 !important;
     }
 
     .quiz-visual {
@@ -1748,8 +1769,9 @@
           </div>
         </div>
         <p class="guide-rule">Be careful: one wrong quiz answer ends the round.</p>
+        <p id="guideLoadingText" class="guide-loading">Please wait while the game loads. It will be ready shortly.</p>
         <div class="guide-actions">
-          <button id="startGuideBtn" type="button" onclick="if (window.beginGame) window.beginGame();">START GAME</button>
+          <button id="startGuideBtn" type="button" disabled aria-busy="true" onclick="if (window.beginGame) window.beginGame();">LOADING...</button>
         </div>
       </div>
     </div>
@@ -1798,13 +1820,29 @@
     fxImg.src = "game-assets/effects.png";
     let assetsReady = false;
     let pendingGuideStart = false;
-    Promise.all([heroImg, tileImg, fxImg].map(img => new Promise(res => {
+    const extraAssetSources = [
+      "game-assets/chest.png",
+      "game-assets/winner-mage.png",
+      "game-assets/winner-knight.png",
+      "game-assets/winner-elf.png"
+    ];
+    const waitForImage = img => new Promise(res => {
       if (img.complete && img.naturalWidth) return res();
       img.onload = res;
       img.onerror = res;
-    }))).then(() => {
+    });
+    const preloadImage = src => {
+      const img = new Image();
+      img.src = src;
+      return waitForImage(img);
+    };
+    Promise.all([
+      ...[heroImg, tileImg, fxImg].map(waitForImage),
+      ...extraAssetSources.map(preloadImage)
+    ]).then(() => {
       assetsReady = true;
-      if (pendingGuideStart) beginGame();
+      pendingGuideStart = false;
+      updateGuideLoadingState();
     });
 
     // [x, y, w, h] source rects sliced from the sheets
@@ -2057,6 +2095,7 @@
       topicSelect: document.getElementById("topicSelect"),
       restartBtn: document.getElementById("restartBtn"),
       guideModal: document.getElementById("guideModal"),
+      guideLoadingText: document.getElementById("guideLoadingText"),
       startGuideBtn: document.getElementById("startGuideBtn"),
       chestModal: document.getElementById("chestModal"),
       openChestBtn: document.getElementById("openChestBtn"),
@@ -2400,6 +2439,21 @@
     state.pointer = { active: false, x: 480, y: 270 };
     state.joystick = { active: false, pointerId: null, originX: 0, originY: 0, x: 0, y: 0, vx: 0, vy: 0 };
 
+    function updateGuideLoadingState() {
+      if (!ui.startGuideBtn || !ui.guideLoadingText) return;
+      if (assetsReady) {
+        ui.startGuideBtn.disabled = false;
+        ui.startGuideBtn.removeAttribute("aria-busy");
+        ui.startGuideBtn.textContent = "START GAME";
+        ui.guideLoadingText.textContent = "The game is ready. Press Start Game to begin.";
+      } else {
+        ui.startGuideBtn.disabled = true;
+        ui.startGuideBtn.setAttribute("aria-busy", "true");
+        ui.startGuideBtn.textContent = "LOADING...";
+        ui.guideLoadingText.textContent = "Please wait while the game loads. It will be ready shortly.";
+      }
+    }
+
     function resetGame() {
       state.mode = "guide";
       pendingGuideStart = false;
@@ -2426,7 +2480,7 @@
       state.quizIndex = 0;
       state.confetti = [];
       hideAllModals();
-      if (ui.startGuideBtn) ui.startGuideBtn.textContent = "START GAME";
+      updateGuideLoadingState();
       ui.guideModal.classList.add("show");
       ui.guideModal.classList.add("guide-open");
       updateHud();
@@ -2435,7 +2489,7 @@
 
     function completeBeginGame() {
       pendingGuideStart = false;
-      if (ui.startGuideBtn) ui.startGuideBtn.textContent = "START GAME";
+      updateGuideLoadingState();
       state.mode = "playing";
       ui.guideModal.classList.remove("show");
       ui.guideModal.classList.remove("guide-open");
@@ -2450,8 +2504,8 @@
     function beginGame(event) {
       if (event && event.preventDefault) event.preventDefault();
       if (!assetsReady) {
-        pendingGuideStart = true;
-        if (ui.startGuideBtn) ui.startGuideBtn.textContent = "LOADING...";
+        pendingGuideStart = false;
+        updateGuideLoadingState();
         return;
       }
       completeBeginGame();
