@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -369,6 +369,45 @@
       font-size: 0.94em;
       letter-spacing: 0;
       transform: translateY(0.03em);
+    }
+
+    .quiz-math .math-frac {
+      display: inline-grid;
+      grid-template-rows: auto auto;
+      align-items: center;
+      justify-items: center;
+      vertical-align: middle;
+      margin: 0 0.08em;
+      line-height: 1;
+      transform: translateY(-0.05em);
+    }
+
+    .quiz-math .math-num,
+    .quiz-math .math-den {
+      display: block;
+      min-width: 1.25em;
+      padding: 0 0.12em;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .quiz-math .math-num {
+      border-bottom: 0.12em solid currentColor;
+      padding-bottom: 0.05em;
+    }
+
+    .quiz-math .math-den {
+      padding-top: 0.05em;
+    }
+
+    .quiz-visual .svg-math-label {
+      color: #f8f4d7;
+      font-family: var(--font-pixel);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.12;
+      text-shadow: 2px 2px 0 #000;
+      white-space: nowrap;
     }
 
     .end-title {
@@ -1736,7 +1775,7 @@
       <button id="restartBtn">START</button>
     </div>
 
-    <div class="help">Goal: defeat 20 monsters, open the treasure chest, then answer 3 quiz questions correctly. Computer: WASD / Arrow keys and click / Enter / Space. Phone or tablet: joystick and tap.</div>
+    <div class="help">Goal: defeat 20 monsters, open the treasure chest, then answer 5 quiz questions correctly. Computer: WASD / Arrow keys and click / Enter / Space. Phone or tablet: joystick and tap.</div>
 
     <div id="guideModal" class="modal show guide-open">
       <div class="panel guide">
@@ -1761,7 +1800,7 @@
           </div>
           <div class="guide-card">
             <h2>Winning Condition</h2>
-            <p>Defeat 20 monsters, open the chest, and answer all 3 quiz questions correctly.</p>
+            <p>Defeat 20 monsters, open the chest, and answer all 5 quiz questions correctly.</p>
           </div>
           <div class="guide-card">
             <h2>Learning Goal</h2>
@@ -1786,7 +1825,7 @@
 
     <div id="quizModal" class="modal">
       <div class="panel quiz">
-        <h1 id="quizCount">Question 1 / 3</h1>
+        <h1 id="quizCount">Question 1 / 5</h1>
         <div id="quizVisual" class="quiz-visual" aria-hidden="true"></div>
         <h2 id="quizQuestion"></h2>
         <div id="choices" class="choices"></div>
@@ -1915,176 +1954,2252 @@
 
     const topics = {
       "constant-function": {
-        label: "Constant Function",
-        questions: [
-          ["The graph of f(x) = k is a...", ["Horizontal straight line", "Vertical straight line", "Parabola"], 0],
-          ["For f(x) = 4, what is the range?", ["{4}", "All real numbers", "[4, infinity)"], 0],
-          ["Changing f(x) = -2 to g(x) = 3 moves the graph...", ["5 units upwards", "5 units downwards", "3 units right"], 0],
-          ["The graph of y = 0 lies on the...", ["x-axis", "y-axis", "line y = x"], 0],
-          ["Which expression represents a constant function?", ["f(x) = -7", "f(x) = 2x - 7", "f(x) = x^2 - 7"], 0],
-          ["For f(x) = c, which value controls the vertical position?", ["c", "x", "the gradient"], 0],
-          ["The shown graph is a horizontal line through y = -3. The function is...", ["f(x) = -3", "f(x) = x - 3", "f(x) = -3x"], 0, { fn: "constant", k: -3, label: "y = -3", yMin: -5, yMax: 5 }],
-          ["For f(x) = -6, the domain and range are...", ["Domain: all real numbers; range: {-6}", "Domain: {-6}; range: all real numbers", "Domain: x >= -6; range: y >= -6"], 0],
-          ["If f(x) = 2 and g(x) = f(x) - 5, then g(x) = ...", ["-3", "7", "10"], 0],
-          ["Which statement is true for f(x) = k?", ["The domain is all real numbers", "The domain is only {k}", "The graph has a vertical asymptote"], 0],
-          ["A constant graph moves from y = 1 to y = -4. What changed?", ["It translated 5 units downwards", "It translated 5 units upwards", "It reflected in the y-axis"], 0],
-          ["Which function has the same graph shape as f(x) = 8?", ["g(x) = -2", "g(x) = x + 8", "g(x) = 8x"], 0]
-        ]
+            "label": "Constant Function",
+            "questions": [
+                  [
+                        "The graph of f(x) = k is a...",
+                        [
+                              "Horizontal straight line",
+                              "Vertical straight line",
+                              "Parabola"
+                        ],
+                        0
+                  ],
+                  [
+                        "For f(x) = 4, what is the range?",
+                        [
+                              "{4}",
+                              "All real numbers",
+                              "[4, infinity)"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing f(x) = -2 to g(x) = 3 moves the graph...",
+                        [
+                              "5 units upwards",
+                              "5 units downwards",
+                              "3 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "The graph of y = 0 lies on the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line y = x"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression represents a constant function?",
+                        [
+                              "f(x) = -7",
+                              "f(x) = 2x - 7",
+                              "f(x) = x^2 - 7"
+                        ],
+                        0
+                  ],
+                  [
+                        "For f(x) = c, which value controls the vertical position?",
+                        [
+                              "c",
+                              "x",
+                              "the gradient"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph is a horizontal line through y = -3. The function is...",
+                        [
+                              "f(x) = -3",
+                              "f(x) = x - 3",
+                              "f(x) = -3x"
+                        ],
+                        0,
+                        {
+                              "fn": "constant",
+                              "k": -3,
+                              "label": "y = -3",
+                              "yMin": -5,
+                              "yMax": 5
+                        }
+                  ],
+                  [
+                        "For f(x) = -6, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: {-6}",
+                              "Domain: {-6}; range: all real numbers",
+                              "Domain: x >= -6; range: y >= -6"
+                        ],
+                        0
+                  ],
+                  [
+                        "If f(x) = 2 and g(x) = f(x) - 5, then g(x) = ...",
+                        [
+                              "-3",
+                              "7",
+                              "10"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which statement is true for f(x) = k?",
+                        [
+                              "The domain is all real numbers",
+                              "The domain is only {k}",
+                              "The graph has a vertical asymptote"
+                        ],
+                        0
+                  ],
+                  [
+                        "A constant graph moves from y = 1 to y = -4. What changed?",
+                        [
+                              "It translated 5 units downwards",
+                              "It translated 5 units upwards",
+                              "It reflected in the y-axis"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which function has the same graph shape as f(x) = 8?",
+                        [
+                              "g(x) = -2",
+                              "g(x) = x + 8",
+                              "g(x) = 8x"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = 6, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: {6}",
+                              "Domain: {6}; range: all real numbers",
+                              "Domain: x >= 6; range: y >= 6",
+                              "Domain: x = 6; range: y = 0"
+                        ],
+                        0,
+                        {
+                              "fn": "constant",
+                              "k": 6,
+                              "label": "y = 6",
+                              "yMin": -2,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "From f(x) = -1 to g(x) = f(x) + 7, the graph becomes...",
+                        [
+                              "y = 6, shifted 7 units upwards",
+                              "y = -8, shifted 7 units downwards",
+                              "y = -1, shifted 7 units right",
+                              "x = 6, shifted vertically"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which statement is correct for every constant function f(x) = c?",
+                        [
+                              "Its gradient is 0",
+                              "Its range is all real numbers",
+                              "Its graph is vertical",
+                              "Its domain is {c}"
+                        ],
+                        0
+                  ],
+                  [
+                        "For f(x) = 5, changing to g(x) = -5 as a vertical translation means the graph moves...",
+                        [
+                              "10 units downwards",
+                              "10 units upwards",
+                              "5 units right",
+                              "5 units left"
+                        ],
+                        0
+                  ],
+                  [
+                        "If f(x) = c and c is changed from -4 to 2, the new graph is...",
+                        [
+                              "6 units above the original graph",
+                              "6 units below the original graph",
+                              "2 units to the right",
+                              "4 units to the left"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph is y = -5. Which statement is true?",
+                        [
+                              "The graph is below the x-axis",
+                              "The graph crosses the y-axis at 5",
+                              "The range is all real numbers",
+                              "The graph has gradient -5"
+                        ],
+                        0,
+                        {
+                              "fn": "constant",
+                              "k": -5,
+                              "label": "y = -5",
+                              "yMin": -7,
+                              "yMax": 3
+                        }
+                  ],
+                  [
+                        "For f(x) = k with k > 0, reflecting the graph in the x-axis gives...",
+                        [
+                              "g(x) = -k",
+                              "g(x) = k + 1",
+                              "g(x) = kx",
+                              "g(x) = x - k"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which pair of constant functions are 9 units apart vertically?",
+                        [
+                              "f(x) = 4 and g(x) = -5",
+                              "f(x) = -2 and g(x) = 2",
+                              "f(x) = 9 and g(x) = 1",
+                              "f(x) = 0 and g(x) = 0"
+                        ],
+                        0
+                  ]
+            ]
       },
       "linear-function": {
-        label: "Linear Function",
-        questions: [
-          ["What is the standard form used here for a linear function?", ["f(x) = ax + b", "f(x) = ax^2 + b", "f(x) = a/x"], 0],
-          ["In f(x) = ax + b, what does a control?", ["Gradient", "y-intercept", "x-intercept only"], 0],
-          ["In f(x) = ax + b, b is the...", ["y-intercept", "turning point", "period"], 0],
-          ["If a < 0 in f(x) = ax + b, the line...", ["Slopes downwards from left to right", "Opens upwards", "Has two branches"], 0],
-          ["Changing y = 2x + 1 to y = 2x + 4 moves the graph...", ["3 units upwards", "3 units right", "3 units downwards"], 0],
-          ["Changing y = x to y = x - 3 moves the line...", ["3 units downwards", "3 units upwards", "3 units left"], 0],
-          ["Which line is steeper than y = 2x + 1?", ["y = 4x + 1", "y = x + 1", "y = 2x - 5"], 0],
-          ["Which function is parallel to y = -3x + 2?", ["y = -3x - 4", "y = 3x + 2", "y = -2x + 3"], 0],
-          ["For y = 3(x - 2) + 1, compared with y = 3x, the graph is shifted...", ["Right 2 and up 1", "Left 2 and up 1", "Right 1 and up 2"], 0],
-          ["If y = x is changed to y = -x, the graph is...", ["Reflected in the x-axis", "Moved 1 unit up", "Made horizontal"], 0],
-          ["From y = x to y = 3(x - 2) + 1, the graph is steeper and shifted...", ["Right 2 and up 1", "Left 2 and down 1", "Right 1 and up 2"], 0],
-          ["For the shown graph y = -2x + 4, compared with y = -2x, the graph is...", ["Shifted 4 units upwards", "Shifted 4 units right", "Reflected in the y-axis"], 0, { fn: "linear", a: -2, k: 4, label: "y = -2x + 4", yMin: -6, yMax: 6 }]
-        ]
+            "label": "Linear Function",
+            "questions": [
+                  [
+                        "What is the standard form used here for a linear function?",
+                        [
+                              "f(x) = ax + b",
+                              "f(x) = ax^2 + b",
+                              "f(x) = a/x"
+                        ],
+                        0
+                  ],
+                  [
+                        "In f(x) = ax + b, what does a control?",
+                        [
+                              "Gradient",
+                              "y-intercept",
+                              "x-intercept only"
+                        ],
+                        0
+                  ],
+                  [
+                        "In f(x) = ax + b, b is the...",
+                        [
+                              "y-intercept",
+                              "turning point",
+                              "period"
+                        ],
+                        0
+                  ],
+                  [
+                        "If a < 0 in f(x) = ax + b, the line...",
+                        [
+                              "Slopes downwards from left to right",
+                              "Opens upwards",
+                              "Has two branches"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = 2x + 1 to y = 2x + 4 moves the graph...",
+                        [
+                              "3 units upwards",
+                              "3 units right",
+                              "3 units downwards"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x to y = x - 3 moves the line...",
+                        [
+                              "3 units downwards",
+                              "3 units upwards",
+                              "3 units left"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which line is steeper than y = 2x + 1?",
+                        [
+                              "y = 4x + 1",
+                              "y = x + 1",
+                              "y = 2x - 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which function is parallel to y = -3x + 2?",
+                        [
+                              "y = -3x - 4",
+                              "y = 3x + 2",
+                              "y = -2x + 3"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 3(x - 2) + 1, compared with y = 3x, the graph is shifted...",
+                        [
+                              "Right 2 and up 1",
+                              "Left 2 and up 1",
+                              "Right 1 and up 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "If y = x is changed to y = -x, the graph is...",
+                        [
+                              "Reflected in the x-axis",
+                              "Moved 1 unit up",
+                              "Made horizontal"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x to y = 3(x - 2) + 1, the graph is steeper and shifted...",
+                        [
+                              "Right 2 and up 1",
+                              "Left 2 and down 1",
+                              "Right 1 and up 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = -2x + 4, compared with y = -2x, the graph is...",
+                        [
+                              "Shifted 4 units upwards",
+                              "Shifted 4 units right",
+                              "Reflected in the y-axis"
+                        ],
+                        0,
+                        {
+                              "fn": "linear",
+                              "a": -2,
+                              "k": 4,
+                              "label": "y = -2x + 4",
+                              "yMin": -6,
+                              "yMax": 6
+                        }
+                  ],
+                  [
+                        "For y = 2(x - 3) + 5, compared with y = 2x, the graph is shifted...",
+                        [
+                              "Right 3 and up 5",
+                              "Left 3 and up 5",
+                              "Right 5 and up 3",
+                              "Left 5 and down 3"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -1.5x + 3 has gradient and y-intercept...",
+                        [
+                              "Gradient -1.5; y-intercept 3",
+                              "Gradient 3; y-intercept -1.5",
+                              "Gradient 1.5; y-intercept -3",
+                              "Gradient -3; y-intercept 1.5"
+                        ],
+                        0,
+                        {
+                              "fn": "linear",
+                              "a": -1.5,
+                              "k": 3,
+                              "label": "y = -1.5x + 3",
+                              "yMin": -6,
+                              "yMax": 6
+                        }
+                  ],
+                  [
+                        "For y = a(x - h) + k, increasing h while keeping a and k fixed moves the line...",
+                        [
+                              "To the right",
+                              "To the left",
+                              "Upwards only",
+                              "Downwards only"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which line is perpendicular to y = 2x - 1?",
+                        [
+                              "y = -0.5x + 4",
+                              "y = 2x + 4",
+                              "y = -2x + 4",
+                              "y = 0.5x + 4"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -3(x + 2) - 1, compared with y = -3x, the graph is shifted...",
+                        [
+                              "Left 2 and down 1",
+                              "Right 2 and down 1",
+                              "Left 1 and up 2",
+                              "Right 1 and down 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The domain and range of y = -4x + 7 are...",
+                        [
+                              "Domain: all real numbers; range: all real numbers",
+                              "Domain: x >= 7; range: y >= -4",
+                              "Domain: all real numbers; range: {7}",
+                              "Domain: x is not 0; range: all real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x to y = -2(x - 1) + 3, the graph is reflected, steeper, and shifted...",
+                        [
+                              "Right 1 and up 3",
+                              "Left 1 and up 3",
+                              "Right 3 and up 1",
+                              "Left 3 and down 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which graph has the same y-intercept as y = -2x + 6 but a different gradient?",
+                        [
+                              "y = 3x + 6",
+                              "y = -2x - 6",
+                              "y = 6x - 2",
+                              "y = -2x + 3"
+                        ],
+                        0
+                  ]
+            ]
       },
       "quadratic-function": {
-        label: "Quadratic Function",
-        questions: [
-          ["The parent quadratic graph y = x^2 is a...", ["Parabola", "V-shape", "Reciprocal branch"], 0],
-          ["In y = a(x - h)^2 + k, the vertex is...", ["(h, k)", "(a, k)", "(h, a)"], 0],
-          ["If a > 0 in y = a(x - h)^2 + k, the graph opens...", ["Upwards", "Downwards", "Left"], 0],
-          ["If a < 0 in y = a(x - h)^2 + k, the graph opens...", ["Downwards", "Upwards", "Right"], 0],
-          ["Changing y = x^2 to y = (x - 3)^2 moves the graph...", ["3 units right", "3 units left", "3 units up"], 0],
-          ["Changing y = x^2 to y = x^2 - 4 moves the graph...", ["4 units downwards", "4 units upwards", "4 units right"], 0],
-          ["Changing y = x^2 to y = 2x^2 makes the parabola...", ["Narrower", "Wider", "Horizontal"], 0],
-          ["Changing y = x^2 to y = -x^2 causes a reflection in the...", ["x-axis", "y-axis", "line y = x"], 0],
-          ["For y = 3(x + 2)^2 - 5, the vertex is...", ["(-2, -5)", "(2, -5)", "(-2, 5)"], 0],
-          ["For the shown graph y = -2(x - 1)^2 + 3, the maximum point is...", ["(1, 3)", "(-1, 3)", "(1, -3)"], 0, { fn: "quadratic", a: -2, h: 1, k: 3, label: "y = -2(x - 1)^2 + 3", yMin: -6, yMax: 5 }],
-          ["For y = 2(x + 4)^2 - 3, the domain and range are...", ["Domain: all real numbers; range: y >= -3", "Domain: x >= -3; range: all real numbers", "Domain: all real numbers; range: y <= -3"], 0],
-          ["From y = x^2 to y = 0.5(x - 2)^2 + 1, the graph becomes wider and moves...", ["Right 2 and up 1", "Left 2 and down 1", "Right 1 and up 2"], 0]
-        ]
+            "label": "Quadratic Function",
+            "questions": [
+                  [
+                        "The parent quadratic graph y = x^2 is a...",
+                        [
+                              "Parabola",
+                              "V-shape",
+                              "Reciprocal branch"
+                        ],
+                        0
+                  ],
+                  [
+                        "In y = a(x - h)^2 + k, the vertex is...",
+                        [
+                              "(h, k)",
+                              "(a, k)",
+                              "(h, a)"
+                        ],
+                        0
+                  ],
+                  [
+                        "If a > 0 in y = a(x - h)^2 + k, the graph opens...",
+                        [
+                              "Upwards",
+                              "Downwards",
+                              "Left"
+                        ],
+                        0
+                  ],
+                  [
+                        "If a < 0 in y = a(x - h)^2 + k, the graph opens...",
+                        [
+                              "Downwards",
+                              "Upwards",
+                              "Right"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^2 to y = (x - 3)^2 moves the graph...",
+                        [
+                              "3 units right",
+                              "3 units left",
+                              "3 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^2 to y = x^2 - 4 moves the graph...",
+                        [
+                              "4 units downwards",
+                              "4 units upwards",
+                              "4 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^2 to y = 2x^2 makes the parabola...",
+                        [
+                              "Narrower",
+                              "Wider",
+                              "Horizontal"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^2 to y = -x^2 causes a reflection in the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line y = x"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 3(x + 2)^2 - 5, the vertex is...",
+                        [
+                              "(-2, -5)",
+                              "(2, -5)",
+                              "(-2, 5)"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = -2(x - 1)^2 + 3, the maximum point is...",
+                        [
+                              "(1, 3)",
+                              "(-1, 3)",
+                              "(1, -3)"
+                        ],
+                        0,
+                        {
+                              "fn": "quadratic",
+                              "a": -2,
+                              "h": 1,
+                              "k": 3,
+                              "label": "y = -2(x - 1)^2 + 3",
+                              "yMin": -6,
+                              "yMax": 5
+                        }
+                  ],
+                  [
+                        "For y = 2(x + 4)^2 - 3, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y >= -3",
+                              "Domain: x >= -3; range: all real numbers",
+                              "Domain: all real numbers; range: y <= -3"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x^2 to y = 0.5(x - 2)^2 + 1, the graph becomes wider and moves...",
+                        [
+                              "Right 2 and up 1",
+                              "Left 2 and down 1",
+                              "Right 1 and up 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -0.5(x + 3)^2 + 4, the vertex and range are...",
+                        [
+                              "Vertex (-3, 4); range: y <= 4",
+                              "Vertex (3, 4); range: y >= 4",
+                              "Vertex (-3, -4); range: y <= -4",
+                              "Vertex (4, -3); range: y >= -3"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = 0.5(x - 2)^2 - 3 is...",
+                        [
+                              "Wider than y = x^2 and shifted right 2, down 3",
+                              "Narrower than y = x^2 and shifted left 2, down 3",
+                              "Reflected and shifted right 2, up 3",
+                              "A straight line shifted down 3"
+                        ],
+                        0,
+                        {
+                              "fn": "quadratic",
+                              "a": 0.5,
+                              "h": 2,
+                              "k": -3,
+                              "label": "y = 0.5(x - 2)^2 - 3",
+                              "xMin": -4,
+                              "xMax": 8,
+                              "yMin": -5,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "For y = a(x - h)^2 + k, the axis of symmetry is...",
+                        [
+                              "x = h",
+                              "y = h",
+                              "x = k",
+                              "y = a"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression has vertex (4, -2) and opens downwards?",
+                        [
+                              "y = -(x - 4)^2 - 2",
+                              "y = (x + 4)^2 - 2",
+                              "y = -(x + 4)^2 + 2",
+                              "y = (x - 2)^2 + 4"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x^2 to y = -3(x + 1)^2 + 2, the graph is...",
+                        [
+                              "Reflected, narrower, shifted left 1 and up 2",
+                              "Reflected, wider, shifted right 1 and up 2",
+                              "Not reflected, narrower, shifted left 2",
+                              "Reflected, narrower, shifted right 2 and down 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2(x - 5)^2 + 1, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y >= 1",
+                              "Domain: x >= 5; range: all real numbers",
+                              "Domain: all real numbers; range: y <= 1",
+                              "Domain: x <= 5; range: y >= 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -2(x + 1)^2 + 5 has a maximum point at...",
+                        [
+                              "(-1, 5)",
+                              "(1, 5)",
+                              "(-1, -5)",
+                              "(5, -1)"
+                        ],
+                        0,
+                        {
+                              "fn": "quadratic",
+                              "a": -2,
+                              "h": -1,
+                              "k": 5,
+                              "label": "y = -2(x + 1)^2 + 5",
+                              "xMin": -5,
+                              "xMax": 3,
+                              "yMin": -6,
+                              "yMax": 7
+                        }
+                  ],
+                  [
+                        "If |a| becomes smaller in y = a(x - h)^2 + k while h and k stay fixed, the parabola becomes...",
+                        [
+                              "Wider",
+                              "Narrower",
+                              "Horizontal",
+                              "A cubic curve"
+                        ],
+                        0
+                  ]
+            ]
       },
       "cubic-function": {
-        label: "Cubic Function",
-        questions: [
-          ["The parent cubic graph y = x^3 has what shape?", ["S-shape", "Horizontal line", "V-shape"], 0],
-          ["The domain of y = x^3 is...", ["All real numbers", "x > 0", "x is not 0"], 0],
-          ["The range of y = x^3 is...", ["All real numbers", "Only positive values", "{0}"], 0],
-          ["In f(x) = a(x - h)^3 + k, k shifts the graph...", ["Vertically", "Only left", "Into a V-shape"], 0],
-          ["Changing y = x^3 to y = (x - 2)^3 moves the graph...", ["2 units right", "2 units left", "2 units up"], 0],
-          ["Changing y = x^3 to y = x^3 + 4 moves the graph...", ["4 units upwards", "4 units downwards", "4 units right"], 0],
-          ["Changing y = x^3 to y = -x^3 reflects the graph in the...", ["x-axis", "line x = 1", "y-axis only"], 0],
-          ["For the shown graph y = 2(x + 1)^3 - 3, the point of inflection is...", ["(-1, -3)", "(1, -3)", "(-1, 3)"], 0, { fn: "cubic", a: 2, h: -1, k: -3, label: "y = 2(x + 1)^3 - 3", yMin: -7, yMax: 7 }],
-          ["A larger |a| in y = a(x - h)^3 + k makes the cubic graph...", ["Steeper", "Flatter", "Horizontal"], 0],
-          ["From y = x^3 to y = 0.5x^3, the graph becomes...", ["Less steep", "More steep", "A parabola"], 0],
-          ["For y = (x - 3)^3 - 2, the domain and range are...", ["Domain: all real numbers; range: all real numbers", "Domain: x >= 3; range: y >= -2", "Domain: x > 3; range: all real numbers"], 0],
-          ["From y = x^3 to y = -2(x + 1)^3 + 5, the graph is reflected, steeper, and shifted...", ["Left 1 and up 5", "Right 1 and up 5", "Left 5 and down 1"], 0]
-        ]
+            "label": "Cubic Function",
+            "questions": [
+                  [
+                        "The parent cubic graph y = x^3 has what shape?",
+                        [
+                              "S-shape",
+                              "Horizontal line",
+                              "V-shape"
+                        ],
+                        0
+                  ],
+                  [
+                        "The domain of y = x^3 is...",
+                        [
+                              "All real numbers",
+                              "x > 0",
+                              "x is not 0"
+                        ],
+                        0
+                  ],
+                  [
+                        "The range of y = x^3 is...",
+                        [
+                              "All real numbers",
+                              "Only positive values",
+                              "{0}"
+                        ],
+                        0
+                  ],
+                  [
+                        "In f(x) = a(x - h)^3 + k, k shifts the graph...",
+                        [
+                              "Vertically",
+                              "Only left",
+                              "Into a V-shape"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^3 to y = (x - 2)^3 moves the graph...",
+                        [
+                              "2 units right",
+                              "2 units left",
+                              "2 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^3 to y = x^3 + 4 moves the graph...",
+                        [
+                              "4 units upwards",
+                              "4 units downwards",
+                              "4 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = x^3 to y = -x^3 reflects the graph in the...",
+                        [
+                              "x-axis",
+                              "line x = 1",
+                              "y-axis only"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = 2(x + 1)^3 - 3, the point of inflection is...",
+                        [
+                              "(-1, -3)",
+                              "(1, -3)",
+                              "(-1, 3)"
+                        ],
+                        0,
+                        {
+                              "fn": "cubic",
+                              "a": 2,
+                              "h": -1,
+                              "k": -3,
+                              "label": "y = 2(x + 1)^3 - 3",
+                              "yMin": -7,
+                              "yMax": 7
+                        }
+                  ],
+                  [
+                        "A larger |a| in y = a(x - h)^3 + k makes the cubic graph...",
+                        [
+                              "Steeper",
+                              "Flatter",
+                              "Horizontal"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x^3 to y = 0.5x^3, the graph becomes...",
+                        [
+                              "Less steep",
+                              "More steep",
+                              "A parabola"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = (x - 3)^3 - 2, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: all real numbers",
+                              "Domain: x >= 3; range: y >= -2",
+                              "Domain: x > 3; range: all real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x^3 to y = -2(x + 1)^3 + 5, the graph is reflected, steeper, and shifted...",
+                        [
+                              "Left 1 and up 5",
+                              "Right 1 and up 5",
+                              "Left 5 and down 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2(x - 3)^3 - 4, the point of inflection is...",
+                        [
+                              "(3, -4)",
+                              "(-3, -4)",
+                              "(3, 4)",
+                              "(-4, 3)"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -0.5(x + 2)^3 + 1 is...",
+                        [
+                              "Reflected, flatter, shifted left 2 and up 1",
+                              "Reflected, steeper, shifted right 2 and up 1",
+                              "Not reflected, flatter, shifted left 1",
+                              "A parabola shifted left 2"
+                        ],
+                        0,
+                        {
+                              "fn": "cubic",
+                              "a": -0.5,
+                              "h": -2,
+                              "k": 1,
+                              "label": "y = -0.5(x + 2)^3 + 1",
+                              "xMin": -6,
+                              "xMax": 3,
+                              "yMin": -6,
+                              "yMax": 7
+                        }
+                  ],
+                  [
+                        "For y = a(x - h)^3 + k, changing h affects the graph by...",
+                        [
+                              "Horizontal translation",
+                              "Vertical translation only",
+                              "Changing it into a V-shape",
+                              "Creating an asymptote"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression represents y = x^3 reflected in the x-axis and shifted up 6?",
+                        [
+                              "y = -x^3 + 6",
+                              "y = x^3 - 6",
+                              "y = (x - 6)^3",
+                              "y = -x^2 + 6"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -3(x - 1)^3 + 2, the graph is generally...",
+                        [
+                              "Decreasing from left to right",
+                              "Increasing from left to right",
+                              "Horizontal",
+                              "Undefined at x = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "The domain and range of y = 0.25(x + 5)^3 - 7 are...",
+                        [
+                              "Domain: all real numbers; range: all real numbers",
+                              "Domain: x >= -5; range: y >= -7",
+                              "Domain: x is not -5; range: all real numbers",
+                              "Domain: all real numbers; range: y >= -7"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = x^3 to y = 4(x + 2)^3 - 1, the graph is steeper and shifted...",
+                        [
+                              "Left 2 and down 1",
+                              "Right 2 and down 1",
+                              "Left 1 and up 2",
+                              "Right 1 and down 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph has label y = (x - 4)^3 + 3. Its point of inflection is...",
+                        [
+                              "(4, 3)",
+                              "(-4, 3)",
+                              "(4, -3)",
+                              "(3, 4)"
+                        ],
+                        0,
+                        {
+                              "fn": "cubic",
+                              "a": 1,
+                              "h": 4,
+                              "k": 3,
+                              "label": "y = (x - 4)^3 + 3",
+                              "xMin": 0,
+                              "xMax": 8,
+                              "yMin": -6,
+                              "yMax": 8
+                        }
+                  ]
+            ]
       },
       "absolute-function": {
-        label: "Absolute Function",
-        questions: [
-          ["The graph of y = |x| is...", ["V-shaped", "S-shaped", "A wave"], 0],
-          ["The vertex of y = |x - a| is...", ["(a, 0)", "(0, a)", "(a, a)"], 0],
-          ["If p > 0 in y = p|x - a| + q, the V opens...", ["Upwards", "Downwards", "Sideways"], 0],
-          ["For y = p|x - a| + q with p > 0, the range is...", ["[q, infinity)", "(-infinity, q]", "All real numbers"], 0],
-          ["Changing y = |x| to y = |x - 3| moves the graph...", ["3 units right", "3 units left", "3 units up"], 0],
-          ["Changing y = |x| to y = |x| + 2 moves the graph...", ["2 units upwards", "2 units downwards", "2 units right"], 0],
-          ["Changing y = |x| to y = -|x| reflects the graph in the...", ["x-axis", "y-axis", "line x = 1"], 0],
-          ["For the shown graph y = 2|x + 4| - 1, the vertex is...", ["(-4, -1)", "(4, -1)", "(-4, 1)"], 0, { fn: "absolute", a: 2, h: -4, k: -1, label: "y = 2|x + 4| - 1", xMin: -8, xMax: 3, yMin: -3, yMax: 8 }],
-          ["Changing y = |x| to y = 3|x| makes the V...", ["Narrower", "Wider", "Horizontal"], 0],
-          ["Changing y = |x| to y = 0.5|x| makes the V...", ["Wider", "Narrower", "Reflected"], 0],
-          ["For y = -|x - 2| + 5, the domain and range are...", ["Domain: all real numbers; range: y <= 5", "Domain: x >= 2; range: y >= 5", "Domain: all real numbers; range: y >= 5"], 0],
-          ["From y = |x| to y = -2|x + 1| + 3, the graph is reflected, narrower, and shifted...", ["Left 1 and up 3", "Right 1 and up 3", "Left 3 and down 1"], 0]
-        ]
+            "label": "Absolute Function",
+            "questions": [
+                  [
+                        "The graph of y = |x| is...",
+                        [
+                              "V-shaped",
+                              "S-shaped",
+                              "A wave"
+                        ],
+                        0
+                  ],
+                  [
+                        "The vertex of y = |x - a| is...",
+                        [
+                              "(a, 0)",
+                              "(0, a)",
+                              "(a, a)"
+                        ],
+                        0
+                  ],
+                  [
+                        "If p > 0 in y = p|x - a| + q, the V opens...",
+                        [
+                              "Upwards",
+                              "Downwards",
+                              "Sideways"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = p|x - a| + q with p > 0, the range is...",
+                        [
+                              "[q, infinity)",
+                              "(-infinity, q]",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = |x| to y = |x - 3| moves the graph...",
+                        [
+                              "3 units right",
+                              "3 units left",
+                              "3 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = |x| to y = |x| + 2 moves the graph...",
+                        [
+                              "2 units upwards",
+                              "2 units downwards",
+                              "2 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = |x| to y = -|x| reflects the graph in the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line x = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = 2|x + 4| - 1, the vertex is...",
+                        [
+                              "(-4, -1)",
+                              "(4, -1)",
+                              "(-4, 1)"
+                        ],
+                        0,
+                        {
+                              "fn": "absolute",
+                              "a": 2,
+                              "h": -4,
+                              "k": -1,
+                              "label": "y = 2|x + 4| - 1",
+                              "xMin": -8,
+                              "xMax": 3,
+                              "yMin": -3,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "Changing y = |x| to y = 3|x| makes the V...",
+                        [
+                              "Narrower",
+                              "Wider",
+                              "Horizontal"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = |x| to y = 0.5|x| makes the V...",
+                        [
+                              "Wider",
+                              "Narrower",
+                              "Reflected"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -|x - 2| + 5, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y <= 5",
+                              "Domain: x >= 2; range: y >= 5",
+                              "Domain: all real numbers; range: y >= 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = |x| to y = -2|x + 1| + 3, the graph is reflected, narrower, and shifted...",
+                        [
+                              "Left 1 and up 3",
+                              "Right 1 and up 3",
+                              "Left 3 and down 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -2|x - 3| + 4, the vertex and range are...",
+                        [
+                              "Vertex (3, 4); range: y <= 4",
+                              "Vertex (-3, 4); range: y >= 4",
+                              "Vertex (3, -4); range: y >= -4",
+                              "Vertex (4, 3); range: y <= 3"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = 0.5|x + 2| - 3 is...",
+                        [
+                              "Wider than y = |x| and shifted left 2, down 3",
+                              "Narrower than y = |x| and shifted right 2, down 3",
+                              "Reflected and shifted left 2, up 3",
+                              "A straight line with gradient 0.5"
+                        ],
+                        0,
+                        {
+                              "fn": "absolute",
+                              "a": 0.5,
+                              "h": -2,
+                              "k": -3,
+                              "label": "y = 0.5|x + 2| - 3",
+                              "xMin": -8,
+                              "xMax": 4,
+                              "yMin": -5,
+                              "yMax": 5
+                        }
+                  ],
+                  [
+                        "For y = p|x - a| + q, the vertex is...",
+                        [
+                              "(a, q)",
+                              "(p, q)",
+                              "(a, p)",
+                              "(q, a)"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression has vertex (-5, 2) and opens downwards?",
+                        [
+                              "y = -|x + 5| + 2",
+                              "y = |x - 5| + 2",
+                              "y = -|x - 5| - 2",
+                              "y = |x + 2| - 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = |x| to y = -3|x + 1| - 4, the graph is...",
+                        [
+                              "Reflected, narrower, shifted left 1 and down 4",
+                              "Reflected, wider, shifted right 1 and down 4",
+                              "Not reflected, narrower, shifted left 4",
+                              "Reflected, shifted right 4 and up 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 4|x - 2| + 6, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y >= 6",
+                              "Domain: x >= 2; range: all real numbers",
+                              "Domain: all real numbers; range: y <= 6",
+                              "Domain: x is not 2; range: y >= 6"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -|x - 1| + 2 has its highest point at...",
+                        [
+                              "(1, 2)",
+                              "(-1, 2)",
+                              "(1, -2)",
+                              "(2, 1)"
+                        ],
+                        0,
+                        {
+                              "fn": "absolute",
+                              "a": -1,
+                              "h": 1,
+                              "k": 2,
+                              "label": "y = -|x - 1| + 2",
+                              "xMin": -5,
+                              "xMax": 7,
+                              "yMin": -6,
+                              "yMax": 4
+                        }
+                  ],
+                  [
+                        "If |p| increases in y = p|x - a| + q while a and q stay fixed, the V-shape becomes...",
+                        [
+                              "Narrower",
+                              "Wider",
+                              "Horizontal",
+                              "A reciprocal curve"
+                        ],
+                        0
+                  ]
+            ]
       },
       "rational-function": {
-        label: "Rational / Reciprocal Function",
-        questions: [
-          ["The graph of f(x) = 1/x has how many branches?", ["Two", "One", "Four"], 0],
-          ["For f(x) = 1/(ax - b), the vertical asymptote is...", ["x = b/a", "y = 0", "x = a/b"], 0],
-          ["A reciprocal graph usually has...", ["Two separate branches", "One straight line", "One endpoint"], 0],
-          ["The horizontal asymptote of y = 1/x is...", ["y = 0", "x = 0", "y = 1"], 0],
-          ["For y = 1/(x - 2), the vertical asymptote is...", ["x = 2", "x = -2", "y = 2"], 0],
-          ["Changing y = 1/x to y = 1/(x - 3) moves the graph...", ["3 units right", "3 units left", "3 units up"], 0],
-          ["Changing y = 1/x to y = 1/x + 4 moves the horizontal asymptote to...", ["y = 4", "x = 4", "y = 0"], 0],
-          ["For the shown graph y = 2/(x + 1) - 3, the vertical asymptote is...", ["x = -1", "x = 1", "y = -3"], 0, { fn: "rational", a: 2, h: -1, k: -3, label: "y = 2/(x + 1) - 3", vAsym: -1, hAsym: -3, yMin: -8, yMax: 5 }],
-          ["For y = 2/(x + 1) - 3, the horizontal asymptote is...", ["y = -3", "x = -1", "y = 2"], 0],
-          ["Changing y = 1/x to y = -1/x reflects the graph in the...", ["x-axis", "line y = 1", "vertical asymptote only"], 0],
-          ["For y = 1/(x - 3) - 2, the domain excludes...", ["x = 3", "y = -2", "x = -3"], 0],
-          ["From y = 1/x to y = -2/(x + 4) + 1, the graph is reflected, stretched, and shifted...", ["Left 4 and up 1", "Right 4 and up 1", "Left 1 and down 4"], 0]
-        ]
+            "label": "Rational / Reciprocal Function",
+            "questions": [
+                  [
+                        "The graph of f(x) = 1/x has how many branches?",
+                        [
+                              "Two",
+                              "One",
+                              "Four"
+                        ],
+                        0
+                  ],
+                  [
+                        "For f(x) = 1/(ax - b), the vertical asymptote is...",
+                        [
+                              "x = b/a",
+                              "y = 0",
+                              "x = a/b"
+                        ],
+                        0
+                  ],
+                  [
+                        "A reciprocal graph usually has...",
+                        [
+                              "Two separate branches",
+                              "One straight line",
+                              "One endpoint"
+                        ],
+                        0
+                  ],
+                  [
+                        "The horizontal asymptote of y = 1/x is...",
+                        [
+                              "y = 0",
+                              "x = 0",
+                              "y = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 1/(x - 2), the vertical asymptote is...",
+                        [
+                              "x = 2",
+                              "x = -2",
+                              "y = 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = 1/x to y = 1/(x - 3) moves the graph...",
+                        [
+                              "3 units right",
+                              "3 units left",
+                              "3 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = 1/x to y = 1/x + 4 moves the horizontal asymptote to...",
+                        [
+                              "y = 4",
+                              "x = 4",
+                              "y = 0"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = 2/(x + 1) - 3, the vertical asymptote is...",
+                        [
+                              "x = -1",
+                              "x = 1",
+                              "y = -3"
+                        ],
+                        0,
+                        {
+                              "fn": "rational",
+                              "a": 2,
+                              "h": -1,
+                              "k": -3,
+                              "label": "y = 2/(x + 1) - 3",
+                              "vAsym": -1,
+                              "hAsym": -3,
+                              "yMin": -8,
+                              "yMax": 5
+                        }
+                  ],
+                  [
+                        "For y = 2/(x + 1) - 3, the horizontal asymptote is...",
+                        [
+                              "y = -3",
+                              "x = -1",
+                              "y = 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = 1/x to y = -1/x reflects the graph in the...",
+                        [
+                              "x-axis",
+                              "line y = 1",
+                              "vertical asymptote only"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 1/(x - 3) - 2, the domain excludes...",
+                        [
+                              "x = 3",
+                              "y = -2",
+                              "x = -3"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = 1/x to y = -2/(x + 4) + 1, the graph is reflected, stretched, and shifted...",
+                        [
+                              "Left 4 and up 1",
+                              "Right 4 and up 1",
+                              "Left 1 and down 4"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -3/(x - 2) + 5, the vertical and horizontal asymptotes are...",
+                        [
+                              "x = 2 and y = 5",
+                              "x = -2 and y = 5",
+                              "x = 2 and y = -5",
+                              "x = 5 and y = 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = 1/(x - 3) + 2 has asymptotes...",
+                        [
+                              "x = 3 and y = 2",
+                              "x = -3 and y = 2",
+                              "x = 3 and y = -2",
+                              "x = 2 and y = 3"
+                        ],
+                        0,
+                        {
+                              "fn": "rational",
+                              "a": 1,
+                              "h": 3,
+                              "k": 2,
+                              "label": "y = 1/(x - 3) + 2",
+                              "vAsym": 3,
+                              "hAsym": 2,
+                              "xMin": -2,
+                              "xMax": 8,
+                              "yMin": -4,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "For y = a/(x - h) + k with a not equal to 0, the domain excludes...",
+                        [
+                              "x = h",
+                              "y = k",
+                              "x = a",
+                              "y = h"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2/(x + 4) - 1, the domain and range are...",
+                        [
+                              "Domain: x is not -4; range: y is not -1",
+                              "Domain: x is not 4; range: y is not 1",
+                              "Domain: all real numbers; range: y is not -1",
+                              "Domain: x is not -1; range: y is not -4"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = 1/x to y = -2/(x + 3) - 4, the graph is...",
+                        [
+                              "Reflected, stretched, shifted left 3 and down 4",
+                              "Reflected, stretched, shifted right 3 and down 4",
+                              "Not reflected, shifted left 4 and down 3",
+                              "Reflected, compressed, shifted right 4"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression has vertical asymptote x = -5 and horizontal asymptote y = 3?",
+                        [
+                              "y = 4/(x + 5) + 3",
+                              "y = 4/(x - 5) + 3",
+                              "y = 4/(x + 3) + 5",
+                              "y = 4/(x - 3) - 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = 1/x to y = 1/(x - 6) - 2 moves the graph...",
+                        [
+                              "Right 6 and down 2",
+                              "Left 6 and down 2",
+                              "Right 2 and down 6",
+                              "Left 2 and up 6"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -2/(x + 1) - 3 has horizontal asymptote...",
+                        [
+                              "y = -3",
+                              "x = -1",
+                              "y = 3",
+                              "x = 1"
+                        ],
+                        0,
+                        {
+                              "fn": "rational",
+                              "a": -2,
+                              "h": -1,
+                              "k": -3,
+                              "label": "y = -2/(x + 1) - 3",
+                              "vAsym": -1,
+                              "hAsym": -3,
+                              "xMin": -7,
+                              "xMax": 5,
+                              "yMin": -8,
+                              "yMax": 3
+                        }
+                  ]
+            ]
       },
       "surd-function": {
-        label: "Surd Function",
-        questions: [
-          ["The graph y = sqrt(x) starts at...", ["(0, 0)", "(1, 0)", "(0, 1)"], 0],
-          ["The graph y = sqrt(x - a) starts at...", ["(a, 0)", "(0, a)", "(1, 0)"], 0],
-          ["For y = sqrt(x - a), the domain is...", ["x >= a", "x <= a", "All real numbers"], 0],
-          ["For y = sqrt(x - a), the range is...", ["[0, infinity)", "(-infinity, 0]", "All real numbers"], 0],
-          ["Changing y = sqrt(x) to y = sqrt(x - 2) moves the graph...", ["2 units right", "2 units left", "2 units up"], 0],
-          ["Changing y = sqrt(x) to y = sqrt(x) + 3 moves the graph...", ["3 units upwards", "3 units downwards", "3 units right"], 0],
-          ["For the shown graph y = sqrt(x + 4) - 1, the starting point is...", ["(-4, -1)", "(4, -1)", "(-4, 1)"], 0, { fn: "surd", a: 1, h: -4, k: -1, label: "y = sqrt(x + 4) - 1", xMin: -6, xMax: 6, yMin: -3, yMax: 5 }],
-          ["Replacing x with -x in y = sqrt(x) makes the graph face...", ["Left", "Right", "Up only"], 0],
-          ["For y = -sqrt(x), the graph is reflected in the...", ["x-axis", "y-axis", "line y = x"], 0],
-          ["Changing y = sqrt(x) to y = 2sqrt(x) makes the graph...", ["Vertically stretched", "Vertically compressed", "Moved right"], 0],
-          ["For y = sqrt(x - 3) - 2, the domain and range are...", ["Domain: x >= 3; range: y >= -2", "Domain: x <= 3; range: y <= -2", "Domain: all real numbers; range: y >= -2"], 0],
-          ["From y = sqrt(x) to y = -sqrt(x + 1) + 4, the graph is reflected and shifted...", ["Left 1 and up 4", "Right 1 and up 4", "Left 4 and down 1"], 0]
-        ]
+            "label": "Surd Function",
+            "questions": [
+                  [
+                        "The graph y = sqrt(x) starts at...",
+                        [
+                              "(0, 0)",
+                              "(1, 0)",
+                              "(0, 1)"
+                        ],
+                        0
+                  ],
+                  [
+                        "The graph y = sqrt(x - a) starts at...",
+                        [
+                              "(a, 0)",
+                              "(0, a)",
+                              "(1, 0)"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = sqrt(x - a), the domain is...",
+                        [
+                              "x >= a",
+                              "x <= a",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = sqrt(x - a), the range is...",
+                        [
+                              "[0, infinity)",
+                              "(-infinity, 0]",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = sqrt(x) to y = sqrt(x - 2) moves the graph...",
+                        [
+                              "2 units right",
+                              "2 units left",
+                              "2 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = sqrt(x) to y = sqrt(x) + 3 moves the graph...",
+                        [
+                              "3 units upwards",
+                              "3 units downwards",
+                              "3 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = sqrt(x + 4) - 1, the starting point is...",
+                        [
+                              "(-4, -1)",
+                              "(4, -1)",
+                              "(-4, 1)"
+                        ],
+                        0,
+                        {
+                              "fn": "surd",
+                              "a": 1,
+                              "h": -4,
+                              "k": -1,
+                              "label": "y = sqrt(x + 4) - 1",
+                              "xMin": -6,
+                              "xMax": 6,
+                              "yMin": -3,
+                              "yMax": 5
+                        }
+                  ],
+                  [
+                        "Replacing x with -x in y = sqrt(x) makes the graph face...",
+                        [
+                              "Left",
+                              "Right",
+                              "Up only"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -sqrt(x), the graph is reflected in the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line y = x"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = sqrt(x) to y = 2sqrt(x) makes the graph...",
+                        [
+                              "Vertically stretched",
+                              "Vertically compressed",
+                              "Moved right"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = sqrt(x - 3) - 2, the domain and range are...",
+                        [
+                              "Domain: x >= 3; range: y >= -2",
+                              "Domain: x <= 3; range: y <= -2",
+                              "Domain: all real numbers; range: y >= -2"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = sqrt(x) to y = -sqrt(x + 1) + 4, the graph is reflected and shifted...",
+                        [
+                              "Left 1 and up 4",
+                              "Right 1 and up 4",
+                              "Left 4 and down 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 3sqrt(x - 2) + 1, the starting point and range are...",
+                        [
+                              "(2, 1); range: y >= 1",
+                              "(-2, 1); range: y >= 1",
+                              "(2, -1); range: y <= 1",
+                              "(1, 2); range: y >= 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -sqrt(x + 3) + 4 starts at...",
+                        [
+                              "(-3, 4)",
+                              "(3, 4)",
+                              "(-3, -4)",
+                              "(4, -3)"
+                        ],
+                        0,
+                        {
+                              "fn": "surd",
+                              "a": -1,
+                              "h": -3,
+                              "k": 4,
+                              "label": "y = -sqrt(x + 3) + 4",
+                              "xMin": -5,
+                              "xMax": 8,
+                              "yMin": -2,
+                              "yMax": 6
+                        }
+                  ],
+                  [
+                        "For y = a sqrt(x - h) + k with a > 0, the domain is...",
+                        [
+                              "x >= h",
+                              "x <= h",
+                              "y >= h",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression is y = sqrt(x) shifted right 5 and down 2?",
+                        [
+                              "y = sqrt(x - 5) - 2",
+                              "y = sqrt(x + 5) - 2",
+                              "y = sqrt(x - 2) - 5",
+                              "y = -sqrt(x - 5) + 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -2sqrt(x - 4) + 3, the domain and range are...",
+                        [
+                              "Domain: x >= 4; range: y <= 3",
+                              "Domain: x <= 4; range: y >= 3",
+                              "Domain: x >= 3; range: y <= 4",
+                              "Domain: all real numbers; range: y <= 3"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = sqrt(x) to y = 0.5sqrt(x + 1) - 6, the graph is compressed and shifted...",
+                        [
+                              "Left 1 and down 6",
+                              "Right 1 and down 6",
+                              "Left 6 and down 1",
+                              "Right 6 and up 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = 2sqrt(x - 1) - 3 has domain...",
+                        [
+                              "x >= 1",
+                              "x <= 1",
+                              "x > -3",
+                              "All real numbers"
+                        ],
+                        0,
+                        {
+                              "fn": "surd",
+                              "a": 2,
+                              "h": 1,
+                              "k": -3,
+                              "label": "y = 2sqrt(x - 1) - 3",
+                              "xMin": -1,
+                              "xMax": 10,
+                              "yMin": -5,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "Replacing y = sqrt(x) with y = -sqrt(x - 2) + 5 reflects the graph and shifts it...",
+                        [
+                              "Right 2 and up 5",
+                              "Left 2 and up 5",
+                              "Right 5 and up 2",
+                              "Left 5 and down 2"
+                        ],
+                        0
+                  ]
+            ]
       },
       "exponential-function": {
-        label: "Exponential Function",
-        questions: [
-          ["The parent exponential graph is...", ["y = e^x", "y = ln x", "y = x^2"], 0],
-          ["The range of y = e^x is...", ["(0, infinity)", "All real numbers", "(-infinity, 0)"], 0],
-          ["The horizontal asymptote of y = e^x is...", ["y = 0", "x = 0", "y = 1"], 0],
-          ["In f(x) = a e^{b(x - h)} + k, the horizontal asymptote is...", ["y = k", "x = h", "y = 0 always"], 0],
-          ["Changing y = e^x to y = e^{x - 2} moves the graph...", ["2 units right", "2 units left", "2 units up"], 0],
-          ["Changing y = e^x to y = e^x + 3 moves the graph...", ["3 units upwards", "3 units downwards", "3 units right"], 0],
-          ["For the shown graph y = e^{x + 1} - 4, the horizontal asymptote is...", ["y = -4", "x = -1", "y = 0"], 0, { fn: "exponential", a: 1, b: 1, h: -1, k: -4, label: "y = e^{x + 1} - 4", hAsym: -4, xMin: -6, xMax: 3, yMin: -6, yMax: 6 }],
-          ["Changing y = e^x to y = 2e^x makes the graph...", ["Vertically stretched", "Vertically compressed", "Reflected"], 0],
-          ["Changing y = e^x to y = -e^x reflects the graph in the...", ["x-axis", "y-axis", "line y = x"], 0],
-          ["For y = e^{-(x - 2)}, the graph is decreasing and shifted...", ["2 units right", "2 units left", "2 units up"], 0],
-          ["For y = e^{x - 1} + 5, the domain and range are...", ["Domain: all real numbers; range: y > 5", "Domain: x > 1; range: all real numbers", "Domain: all real numbers; range: y < 5"], 0],
-          ["From y = e^x to y = -3e^{x + 2} + 1, the graph is reflected, stretched, and shifted...", ["Left 2 and up 1", "Right 2 and up 1", "Left 1 and down 2"], 0]
-        ]
+            "label": "Exponential Function",
+            "questions": [
+                  [
+                        "The parent exponential graph is...",
+                        [
+                              "y = e^x",
+                              "y = ln x",
+                              "y = x^2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The range of y = e^x is...",
+                        [
+                              "(0, infinity)",
+                              "All real numbers",
+                              "(-infinity, 0)"
+                        ],
+                        0
+                  ],
+                  [
+                        "The horizontal asymptote of y = e^x is...",
+                        [
+                              "y = 0",
+                              "x = 0",
+                              "y = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "In f(x) = a e^{b(x - h)} + k, the horizontal asymptote is...",
+                        [
+                              "y = k",
+                              "x = h",
+                              "y = 0 always"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = e^x to y = e^{x - 2} moves the graph...",
+                        [
+                              "2 units right",
+                              "2 units left",
+                              "2 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = e^x to y = e^x + 3 moves the graph...",
+                        [
+                              "3 units upwards",
+                              "3 units downwards",
+                              "3 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = e^{x + 1} - 4, the horizontal asymptote is...",
+                        [
+                              "y = -4",
+                              "x = -1",
+                              "y = 0"
+                        ],
+                        0,
+                        {
+                              "fn": "exponential",
+                              "a": 1,
+                              "b": 1,
+                              "h": -1,
+                              "k": -4,
+                              "label": "y = e^{x + 1} - 4",
+                              "hAsym": -4,
+                              "xMin": -6,
+                              "xMax": 3,
+                              "yMin": -6,
+                              "yMax": 6
+                        }
+                  ],
+                  [
+                        "Changing y = e^x to y = 2e^x makes the graph...",
+                        [
+                              "Vertically stretched",
+                              "Vertically compressed",
+                              "Reflected"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = e^x to y = -e^x reflects the graph in the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line y = x"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = e^{-(x - 2)}, the graph is decreasing and shifted...",
+                        [
+                              "2 units right",
+                              "2 units left",
+                              "2 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = e^{x - 1} + 5, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y > 5",
+                              "Domain: x > 1; range: all real numbers",
+                              "Domain: all real numbers; range: y < 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = e^x to y = -3e^{x + 2} + 1, the graph is reflected, stretched, and shifted...",
+                        [
+                              "Left 2 and up 1",
+                              "Right 2 and up 1",
+                              "Left 1 and down 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2e^{x - 3} + 4, the horizontal asymptote and range are...",
+                        [
+                              "y = 4; range: y > 4",
+                              "x = 3; range: y > 4",
+                              "y = 3; range: y > 3",
+                              "y = 4; range: y < 4"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -e^{x + 2} + 1 has horizontal asymptote...",
+                        [
+                              "y = 1",
+                              "x = -2",
+                              "y = -1",
+                              "x = 2"
+                        ],
+                        0,
+                        {
+                              "fn": "exponential",
+                              "a": -1,
+                              "b": 1,
+                              "h": -2,
+                              "k": 1,
+                              "label": "y = -e^{x + 2} + 1",
+                              "hAsym": 1,
+                              "xMin": -7,
+                              "xMax": 3,
+                              "yMin": -6,
+                              "yMax": 3
+                        }
+                  ],
+                  [
+                        "For y = a e^{b(x - h)} + k with a > 0, the range is...",
+                        [
+                              "y > k",
+                              "y < k",
+                              "x > h",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression is y = e^x shifted left 2 and down 5?",
+                        [
+                              "y = e^{x + 2} - 5",
+                              "y = e^{x - 2} - 5",
+                              "y = e^{x + 5} - 2",
+                              "y = -e^{x + 2} + 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = e^{-x}, compared with y = e^x, the graph is...",
+                        [
+                              "Reflected in the y-axis",
+                              "Reflected in the x-axis",
+                              "Shifted up 1",
+                              "Shifted right 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -3e^{x - 1} + 2, the domain and range are...",
+                        [
+                              "Domain: all real numbers; range: y < 2",
+                              "Domain: x > 1; range: y > 2",
+                              "Domain: all real numbers; range: y > 2",
+                              "Domain: x is not 1; range: all real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = 3e^{0.5(x - 2)} - 1 is shifted...",
+                        [
+                              "Right 2 and down 1",
+                              "Left 2 and down 1",
+                              "Right 1 and down 2",
+                              "Left 1 and up 2"
+                        ],
+                        0,
+                        {
+                              "fn": "exponential",
+                              "a": 3,
+                              "b": 0.5,
+                              "h": 2,
+                              "k": -1,
+                              "label": "y = 3e^{0.5(x - 2)} - 1",
+                              "hAsym": -1,
+                              "xMin": -4,
+                              "xMax": 6,
+                              "yMin": -3,
+                              "yMax": 8
+                        }
+                  ],
+                  [
+                        "From y = e^x to y = -2e^{x + 4} - 3, the graph is reflected, stretched, and shifted...",
+                        [
+                              "Left 4 and down 3",
+                              "Right 4 and down 3",
+                              "Left 3 and up 4",
+                              "Right 3 and down 4"
+                        ],
+                        0
+                  ]
+            ]
       },
       "logarithmic-function": {
-        label: "Logarithmic Function",
-        questions: [
-          ["The parent logarithmic graph is...", ["y = ln x", "y = e^x", "y = x^2"], 0],
-          ["The domain of y = ln x is...", ["x > 0", "All real numbers", "x < 0"], 0],
-          ["The vertical asymptote of y = ln x is...", ["x = 0", "y = 0", "x = 1"], 0],
-          ["For f(x) = a ln[b(x - h)] + k, the vertical asymptote is...", ["x = h", "y = k", "x = 0 always"], 0],
-          ["Changing y = ln x to y = ln(x - 3) moves the graph...", ["3 units right", "3 units left", "3 units up"], 0],
-          ["Changing y = ln x to y = ln x + 2 moves the graph...", ["2 units upwards", "2 units downwards", "2 units right"], 0],
-          ["For the shown graph y = ln(x + 4) - 1, the vertical asymptote is...", ["x = -4", "x = 4", "y = -1"], 0, { fn: "logarithmic", a: 1, b: 1, h: -4, k: -1, label: "y = ln(x + 4) - 1", vAsym: -4, xMin: -6, xMax: 6, yMin: -5, yMax: 4 }],
-          ["Changing y = ln x to y = -ln x reflects the graph in the...", ["x-axis", "y-axis", "line x = 1"], 0],
-          ["Changing y = ln x to y = 2ln x makes the graph...", ["Vertically stretched", "Vertically compressed", "Moved left"], 0],
-          ["For y = ln(x - 4) + 7, the domain and range are...", ["Domain: x > 4; range: all real numbers", "Domain: all real numbers; range: y > 7", "Domain: x >= 4; range: y >= 7"], 0],
-          ["For y = ln(2(x - 1)) + 3, the domain is...", ["x > 1", "x > 2", "x < 1"], 0],
-          ["From y = ln x to y = -ln(x + 2) + 4, the graph is reflected and shifted...", ["Left 2 and up 4", "Right 2 and up 4", "Left 4 and down 2"], 0]
-        ]
+            "label": "Logarithmic Function",
+            "questions": [
+                  [
+                        "The parent logarithmic graph is...",
+                        [
+                              "y = ln x",
+                              "y = e^x",
+                              "y = x^2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The domain of y = ln x is...",
+                        [
+                              "x > 0",
+                              "All real numbers",
+                              "x < 0"
+                        ],
+                        0
+                  ],
+                  [
+                        "The vertical asymptote of y = ln x is...",
+                        [
+                              "x = 0",
+                              "y = 0",
+                              "x = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For f(x) = a ln[b(x - h)] + k, the vertical asymptote is...",
+                        [
+                              "x = h",
+                              "y = k",
+                              "x = 0 always"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = ln x to y = ln(x - 3) moves the graph...",
+                        [
+                              "3 units right",
+                              "3 units left",
+                              "3 units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = ln x to y = ln x + 2 moves the graph...",
+                        [
+                              "2 units upwards",
+                              "2 units downwards",
+                              "2 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = ln(x + 4) - 1, the vertical asymptote is...",
+                        [
+                              "x = -4",
+                              "x = 4",
+                              "y = -1"
+                        ],
+                        0,
+                        {
+                              "fn": "logarithmic",
+                              "a": 1,
+                              "b": 1,
+                              "h": -4,
+                              "k": -1,
+                              "label": "y = ln(x + 4) - 1",
+                              "vAsym": -4,
+                              "xMin": -6,
+                              "xMax": 6,
+                              "yMin": -5,
+                              "yMax": 4
+                        }
+                  ],
+                  [
+                        "Changing y = ln x to y = -ln x reflects the graph in the...",
+                        [
+                              "x-axis",
+                              "y-axis",
+                              "line x = 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = ln x to y = 2ln x makes the graph...",
+                        [
+                              "Vertically stretched",
+                              "Vertically compressed",
+                              "Moved left"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = ln(x - 4) + 7, the domain and range are...",
+                        [
+                              "Domain: x > 4; range: all real numbers",
+                              "Domain: all real numbers; range: y > 7",
+                              "Domain: x >= 4; range: y >= 7"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = ln(2(x - 1)) + 3, the domain is...",
+                        [
+                              "x > 1",
+                              "x > 2",
+                              "x < 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = ln x to y = -ln(x + 2) + 4, the graph is reflected and shifted...",
+                        [
+                              "Left 2 and up 4",
+                              "Right 2 and up 4",
+                              "Left 4 and down 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = ln(x - 5) + 2, the vertical asymptote and domain are...",
+                        [
+                              "x = 5; domain: x > 5",
+                              "x = -5; domain: x > -5",
+                              "y = 2; domain: all real numbers",
+                              "x = 2; domain: x > 2"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -ln(x + 2) + 3 is...",
+                        [
+                              "Reflected in the x-axis, shifted left 2 and up 3",
+                              "Reflected in the y-axis, shifted right 2 and up 3",
+                              "Not reflected, shifted left 3 and up 2",
+                              "Reflected, shifted right 3 and down 2"
+                        ],
+                        0,
+                        {
+                              "fn": "logarithmic",
+                              "a": -1,
+                              "b": 1,
+                              "h": -2,
+                              "k": 3,
+                              "label": "y = -ln(x + 2) + 3",
+                              "vAsym": -2,
+                              "xMin": -4,
+                              "xMax": 8,
+                              "yMin": -3,
+                              "yMax": 7
+                        }
+                  ],
+                  [
+                        "For y = a ln[b(x - h)] + k with b > 0, the domain is...",
+                        [
+                              "x > h",
+                              "x < h",
+                              "y > k",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression is y = ln x shifted right 4 and down 1?",
+                        [
+                              "y = ln(x - 4) - 1",
+                              "y = ln(x + 4) - 1",
+                              "y = ln(x - 1) - 4",
+                              "y = -ln(x - 4) + 1"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2ln(x - 1) + 5, the range is...",
+                        [
+                              "All real numbers",
+                              "y > 5",
+                              "x > 1",
+                              "y >= 5"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = ln(3(x + 2)) - 6, the vertical asymptote is...",
+                        [
+                              "x = -2",
+                              "x = 2",
+                              "y = -6",
+                              "x = -6"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = ln(2(x - 1)) - 4 has vertical asymptote...",
+                        [
+                              "x = 1",
+                              "x = 2",
+                              "y = -4",
+                              "x = -1"
+                        ],
+                        0,
+                        {
+                              "fn": "logarithmic",
+                              "a": 1,
+                              "b": 2,
+                              "h": 1,
+                              "k": -4,
+                              "label": "y = ln(2(x - 1)) - 4",
+                              "vAsym": 1,
+                              "xMin": -1,
+                              "xMax": 8,
+                              "yMin": -8,
+                              "yMax": 3
+                        }
+                  ],
+                  [
+                        "From y = ln x to y = -3ln(x + 5) + 2, the graph is reflected, stretched, and shifted...",
+                        [
+                              "Left 5 and up 2",
+                              "Right 5 and up 2",
+                              "Left 2 and down 5",
+                              "Right 2 and up 5"
+                        ],
+                        0
+                  ]
+            ]
       },
       "trigonometric-functions": {
-        label: "Trigonometric Functions",
-        questions: [
-          ["The range of y = sin x is...", ["[-1, 1]", "(0, infinity)", "All real numbers"], 0],
-          ["The period of y = sin x is...", ["2pi", "pi", "pi/2"], 0],
-          ["In y = a sin(bx + c) + d, |a| is the...", ["Amplitude", "Period", "Vertical asymptote"], 0],
-          ["The period of y = tan x is...", ["pi", "2pi", "pi/2"], 0],
-          ["Changing y = sin x to y = sin x + 2 moves the graph...", ["2 units upwards", "2 units downwards", "2 units right"], 0],
-          ["Changing y = sin x to y = 3sin x changes the amplitude to...", ["3", "1/3", "2pi"], 0],
-          ["For the shown graph y = 2sin x - 1, the midline is...", ["y = -1", "x = -1", "y = 2"], 0, { fn: "trigonometric", a: 2, b: 1, h: 0, k: -1, label: "y = 2sin x - 1", xMin: -6.28, xMax: 6.28, yMin: -4, yMax: 3 }],
-          ["For y = sin(x - pi/2), the graph shifts...", ["pi/2 units right", "pi/2 units left", "pi units up"], 0],
-          ["For y = sin(2x), the period is...", ["pi", "2pi", "4pi"], 0],
-          ["For y = 2sin(x - pi/2) + 3, the amplitude, midline, and shift are...", ["Amplitude 2; midline y = 3; shift right pi/2", "Amplitude 3; midline y = 2; shift left pi/2", "Amplitude 2; midline y = -3; shift right pi"], 0],
-          ["For y = 4cos(0.5x), the amplitude and period are...", ["Amplitude 4 and period 4pi", "Amplitude 0.5 and period 2pi", "Amplitude 4 and period pi"], 0],
-          ["From y = sin x to y = -2sin(x + pi/2) + 1, the graph is reflected, amplitude 2, and shifted...", ["Left pi/2 and up 1", "Right pi/2 and up 1", "Left 1 and down pi/2"], 0]
-        ]
+            "label": "Trigonometric Functions",
+            "questions": [
+                  [
+                        "The range of y = sin x is...",
+                        [
+                              "[-1, 1]",
+                              "(0, infinity)",
+                              "All real numbers"
+                        ],
+                        0
+                  ],
+                  [
+                        "The period of y = sin x is...",
+                        [
+                              "2pi",
+                              "pi",
+                              "pi/2"
+                        ],
+                        0
+                  ],
+                  [
+                        "In y = a sin(bx + c) + d, |a| is the...",
+                        [
+                              "Amplitude",
+                              "Period",
+                              "Vertical asymptote"
+                        ],
+                        0
+                  ],
+                  [
+                        "The period of y = tan x is...",
+                        [
+                              "pi",
+                              "2pi",
+                              "pi/2"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = sin x to y = sin x + 2 moves the graph...",
+                        [
+                              "2 units upwards",
+                              "2 units downwards",
+                              "2 units right"
+                        ],
+                        0
+                  ],
+                  [
+                        "Changing y = sin x to y = 3sin x changes the amplitude to...",
+                        [
+                              "3",
+                              "1/3",
+                              "2pi"
+                        ],
+                        0
+                  ],
+                  [
+                        "For the shown graph y = 2sin x - 1, the midline is...",
+                        [
+                              "y = -1",
+                              "x = -1",
+                              "y = 2"
+                        ],
+                        0,
+                        {
+                              "fn": "trigonometric",
+                              "a": 2,
+                              "b": 1,
+                              "h": 0,
+                              "k": -1,
+                              "label": "y = 2sin x - 1",
+                              "xMin": -6.28,
+                              "xMax": 6.28,
+                              "yMin": -4,
+                              "yMax": 3
+                        }
+                  ],
+                  [
+                        "For y = sin(x - pi/2), the graph shifts...",
+                        [
+                              "pi/2 units right",
+                              "pi/2 units left",
+                              "pi units up"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = sin(2x), the period is...",
+                        [
+                              "pi",
+                              "2pi",
+                              "4pi"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 2sin(x - pi/2) + 3, the amplitude, midline, and shift are...",
+                        [
+                              "Amplitude 2; midline y = 3; shift right pi/2",
+                              "Amplitude 3; midline y = 2; shift left pi/2",
+                              "Amplitude 2; midline y = -3; shift right pi"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 4cos(0.5x), the amplitude and period are...",
+                        [
+                              "Amplitude 4 and period 4pi",
+                              "Amplitude 0.5 and period 2pi",
+                              "Amplitude 4 and period pi"
+                        ],
+                        0
+                  ],
+                  [
+                        "From y = sin x to y = -2sin(x + pi/2) + 1, the graph is reflected, amplitude 2, and shifted...",
+                        [
+                              "Left pi/2 and up 1",
+                              "Right pi/2 and up 1",
+                              "Left 1 and down pi/2"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = 3sin(2x) - 1, the amplitude, period, and midline are...",
+                        [
+                              "Amplitude 3; period pi; midline y = -1",
+                              "Amplitude 2; period 3pi; midline y = -1",
+                              "Amplitude 3; period 2pi; midline y = 1",
+                              "Amplitude 1; period pi; midline y = 3"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = -2sin(2(x - 1)) + 1 has amplitude and midline...",
+                        [
+                              "Amplitude 2; midline y = 1",
+                              "Amplitude -2; midline y = 1",
+                              "Amplitude 2; midline y = -1",
+                              "Amplitude 1; midline y = 2"
+                        ],
+                        0,
+                        {
+                              "fn": "trigonometric",
+                              "a": -2,
+                              "b": 2,
+                              "h": 1,
+                              "k": 1,
+                              "label": "y = -2sin(2(x - 1)) + 1",
+                              "xMin": -3.14,
+                              "xMax": 6.28,
+                              "yMin": -3,
+                              "yMax": 4
+                        }
+                  ],
+                  [
+                        "For y = a sin(b(x - h)) + k, changing k affects the...",
+                        [
+                              "Midline",
+                              "Period",
+                              "Amplitude only",
+                              "Phase shift only"
+                        ],
+                        0
+                  ],
+                  [
+                        "Which expression has amplitude 4 and midline y = -3?",
+                        [
+                              "y = 4cos x - 3",
+                              "y = -3cos x + 4",
+                              "y = cos(4x) - 3",
+                              "y = 4cos(x - 3)"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = sin(x - pi/3) + 2, the graph is shifted...",
+                        [
+                              "Right pi/3 and up 2",
+                              "Left pi/3 and up 2",
+                              "Right 2 and up pi/3",
+                              "Left 2 and down pi/3"
+                        ],
+                        0
+                  ],
+                  [
+                        "For y = -3sin(0.5(x + pi)) + 2, the amplitude and period are...",
+                        [
+                              "Amplitude 3; period 4pi",
+                              "Amplitude -3; period 0.5pi",
+                              "Amplitude 0.5; period 3pi",
+                              "Amplitude 3; period pi"
+                        ],
+                        0
+                  ],
+                  [
+                        "The shown graph y = sin(0.5x) has period...",
+                        [
+                              "4pi",
+                              "2pi",
+                              "pi",
+                              "0.5pi"
+                        ],
+                        0,
+                        {
+                              "fn": "trigonometric",
+                              "a": 1,
+                              "b": 0.5,
+                              "h": 0,
+                              "k": 0,
+                              "label": "y = sin(0.5x)",
+                              "xMin": -6.28,
+                              "xMax": 12.56,
+                              "yMin": -2,
+                              "yMax": 2
+                        }
+                  ],
+                  [
+                        "From y = sin x to y = -2sin(3(x + pi/6)) - 4, the graph is reflected, amplitude 2, and shifted...",
+                        [
+                              "Left pi/6 and down 4",
+                              "Right pi/6 and down 4",
+                              "Left 4 and down pi/6",
+                              "Right 4 and up pi/6"
+                        ],
+                        0
+                  ]
+            ]
       }
-    };
+};
 
     const ui = {
       hpBar: document.getElementById("hpBar"),
@@ -2132,14 +4247,27 @@
         .replace(/'/g, "&#39;");
     }
 
+    function makeMathFraction(numerator, denominator) {
+      return `<span class="math-frac"><span class="math-num">${numerator}</span><span class="math-den">${denominator.trim()}</span></span>`;
+    }
+
+    function formatMathFractions(html) {
+      const atom = "(?:-?\\d+(?:\\.\\d+)?|[A-Za-z]+|&pi;)";
+      const parenthesised = new RegExp(`(${atom})\\/\\(([^()]+)\\)`, "g");
+      const simple = new RegExp(`(${atom})\\/(${atom})`, "g");
+      return html
+        .replace(parenthesised, (match, numerator, denominator) => makeMathFraction(numerator, denominator))
+        .replace(simple, (match, numerator, denominator) => makeMathFraction(numerator, denominator));
+    }
+
     function formatQuizMath(text) {
-      return escapeHTML(text)
+      return formatMathFractions(escapeHTML(text)
+        .replace(/pi/g, "&pi;")
+        .replace(/infinity/g, "&infin;"))
         .replace(/\bsqrt\(([^)]+)\)/g, "&radic;($1)")
         .replace(/\be\^\{([^}]+)\}/g, '<span class="math-e">e</span><sup>$1</sup>')
         .replace(/\be\^([A-Za-z0-9]+)/g, '<span class="math-e">e</span><sup>$1</sup>')
-        .replace(/\^([0-9A-Za-z]+)/g, "<sup>$1</sup>")
-        .replace(/pi/g, "&pi;")
-        .replace(/infinity/g, "&infin;");
+        .replace(/\^([0-9A-Za-z]+)/g, "<sup>$1</sup>");
     }
 
     function setQuizMathText(el, text) {
@@ -2221,7 +4349,9 @@
         const y = sy(spec.hAsym).toFixed(1);
         asymptotes.push(`<line x1="${pad}" y1="${y}" x2="${w - pad}" y2="${y}" stroke="#ff8f8f" stroke-width="1.4" stroke-dasharray="5 4"/>`);
       }
-      const label = escapeHTML(spec.label || "");
+      const labelText = spec.label || "";
+      const label = escapeHTML(labelText);
+      const labelMath = formatQuizMath(labelText);
       ui.quizVisual.innerHTML = `
         <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">
           <rect x="0" y="0" width="${w}" height="${h}" fill="#09101f"/>
@@ -2233,7 +4363,9 @@
           </g>
           ${xAxis}${yAxis}${asymptotes.join("")}
           <path d="${path}" fill="none" stroke="#65ffdc" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <text x="18" y="24">${label}</text>
+          <foreignObject x="16" y="10" width="190" height="46">
+            <div xmlns="http://www.w3.org/1999/xhtml" class="quiz-math svg-math-label">${labelMath}</div>
+          </foreignObject>
         </svg>`;
       ui.quizVisual.classList.add("show");
     }
@@ -2945,7 +5077,7 @@
     function sampleQuestions() {
       const pool = [...topics[state.topic].questions];
       const picked = [];
-      while (picked.length < 3 && pool.length) {
+      while (picked.length < 5 && pool.length) {
         const index = Math.floor(Math.random() * pool.length);
         picked.push(pool.splice(index, 1)[0]);
       }
@@ -2966,7 +5098,7 @@
 
     function showQuestion() {
       const q = state.quiz[state.quizIndex];
-      setPixelText(ui.quizCount, "Question " + (state.quizIndex + 1) + " / 3");
+      setPixelText(ui.quizCount, "Question " + (state.quizIndex + 1) + " / 5");
       renderQuizVisual(q[3]);
       setQuizMathText(ui.quizQuestion, q[0]);
       ui.choices.innerHTML = "";
@@ -2987,7 +5119,7 @@
         return;
       }
       state.quizIndex++;
-      if (state.quizIndex >= 3) {
+      if (state.quizIndex >= 5) {
         ui.quizModal.classList.remove("show");
         endGame(true);
       } else {
