@@ -3051,6 +3051,7 @@
       el.topicGrid.innerHTML = "";
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.chapter === state.chapter));
       if (state.chapter === "desmos") {
+        showOnlyAdjusterView();
         renderDesmosAdjuster();
         return;
       }
@@ -4516,6 +4517,7 @@
 
     function speak(text) {
       if (!("speechSynthesis" in window)) return;
+      if (state.chapter === "desmos") return;
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(plainSpeechText(text));
       const voice = selectTeacherVoice();
@@ -4601,6 +4603,17 @@
     }
 
     function closeActiveLearningView() {
+      stopLessonSpeech();
+      exitGameMode();
+      state.topic = null;
+      state.slide = 0;
+      state.game = null;
+      if (el.lessonShell) el.lessonShell.style.display = "none";
+      if (el.gamePanel) el.gamePanel.style.display = "none";
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
+    }
+
+    function showOnlyAdjusterView() {
       stopLessonSpeech();
       exitGameMode();
       state.topic = null;
