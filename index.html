@@ -2005,7 +2005,7 @@
             <span class="chapter-kicker">Practice</span>
             <span class="chapter-title">Graph Adjuster</span>
             <span class="chapter-icons" aria-hidden="true">
-              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 45H134M66 74V12" /><path class="mini-mark mini-blue" d="M20 45C33 25 48 25 61 45S89 65 103 45S123 25 134 38" /><text x="92" y="24">y=sin x</text><text x="127" y="59">x</text><text x="72" y="18">y</text><text x="55" y="59">0</text></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 45H134M66 74V12" /><path class="mini-mark mini-coral" d="M20 45C33 65 49 65 66 45S100 25 117 45S137 65 146 54" /><text x="92" y="24">y=sin x</text><text x="127" y="59">x</text><text x="72" y="18">y</text><text x="55" y="59">0</text></svg></span>
               <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 48H134M52 74V12" /><path class="mini-mark mini-teal" d="M57 76C58 62 63 51 72 44C85 34 105 29 128 25" /><path class="mini-mark mini-coral mini-dash" d="M52 74V12" /><text x="96" y="25">y=ln x</text><text x="127" y="62">x</text><text x="58" y="18">y</text><text x="38" y="62">0</text></svg></span>
             </span>
           </button>
@@ -4600,6 +4600,17 @@
       });
     }
 
+    function closeActiveLearningView() {
+      stopLessonSpeech();
+      exitGameMode();
+      state.topic = null;
+      state.slide = 0;
+      state.game = null;
+      if (el.lessonShell) el.lessonShell.style.display = "none";
+      if (el.gamePanel) el.gamePanel.style.display = "none";
+      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
+    }
+
     function normalizeGameKey(key) {
       if (key === "Spacebar") return " ";
       return key && key.length === 1 ? key.toLowerCase() : key;
@@ -4617,6 +4628,7 @@
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
+        closeActiveLearningView();
         state.chapter = btn.dataset.chapter;
         document.body.classList.add("content-open");
         document.getElementById("subtopics").classList.remove("hidden");
@@ -4626,14 +4638,8 @@
     });
 
     function returnHome() {
-      exitGameMode();
-      state.topic = null;
-      state.slide = 0;
-      state.game = null;
+      closeActiveLearningView();
       el.topicGrid.innerHTML = "";
-      el.lessonShell.style.display = "none";
-      el.gamePanel.style.display = "none";
-      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
       document.body.classList.remove("content-open");
       document.getElementById("subtopics").classList.add("hidden");
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
@@ -4641,11 +4647,7 @@
     }
     document.getElementById("jumpTop").addEventListener("click", returnHome);
     document.getElementById("closeLesson").addEventListener("click", () => {
-      exitGameMode();
-      state.game = null;
-      el.lessonShell.style.display = "none";
-      el.gamePanel.style.display = "none";
-      if (el.pixelGameFrame) el.pixelGameFrame.src = "about:blank";
+      closeActiveLearningView();
       document.getElementById("subtopics").scrollIntoView({ behavior: "smooth" });
     });
     document.getElementById("prevSlide").addEventListener("click", () => {
