@@ -2276,7 +2276,8 @@
       topic: null,
       slide: 0,
       game: null,
-      frame: 0
+      frame: 0,
+      desmosAdjuster: { type: "", a: 1, b: 1, c: 0, d: 0 }
     };
 
     const el = {
@@ -3100,10 +3101,21 @@
         if (hint) hint.textContent = config?.hints?.[name] || "";
       });
     }
+    function saveDesmosAdjusterState(lab) {
+      if (!lab) return;
+      const typeEl = lab.querySelector("#desmosType");
+      if (!typeEl) return;
+      state.desmosAdjuster.type = typeEl.value || "";
+      ["a", "b", "c", "d"].forEach(name => {
+        const slider = lab.querySelector("#" + name + "Slider");
+        if (slider) state.desmosAdjuster[name] = Number(slider.value);
+      });
+    }
     function renderDesmosAdjuster() {
       const lab = document.createElement("article");
       lab.className = "desmos-lab-card";
-      const sliderData = [["a", "1"], ["b", "1"], ["c", "0"], ["d", "0"]];
+      const saved = state.desmosAdjuster || { type: "", a: 1, b: 1, c: 0, d: 0 };
+      const sliderData = [["a", saved.a ?? 1], ["b", saved.b ?? 1], ["c", saved.c ?? 0], ["d", saved.d ?? 0]];
       const sliders = sliderData.map(([name, value]) => `<label data-param="${name}">${name}: <span id="${name}Val">${Number(value).toFixed(1)}</span><small></small><input id="${name}Slider" type="range" min="-4" max="4" step="0.1" value="${value}"></label>`).join("");
       lab.innerHTML = `
         <div class="desmos-canvas-wrap">
@@ -3132,8 +3144,15 @@
         </div>
       `;
       el.topicGrid.appendChild(lab);
-      ["aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => drawDesmosAdjuster(lab)));
-      lab.querySelector("#desmosType").addEventListener("change", () => drawDesmosAdjuster(lab));
+      if (saved.type) lab.querySelector("#desmosType").value = saved.type;
+      ["aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => {
+        saveDesmosAdjusterState(lab);
+        drawDesmosAdjuster(lab);
+      }));
+      lab.querySelector("#desmosType").addEventListener("change", () => {
+        saveDesmosAdjusterState(lab);
+        drawDesmosAdjuster(lab);
+      });
       updateVisibleGraphParams(lab);
       requestAnimationFrame(() => drawDesmosAdjuster(lab));
     }
@@ -4208,6 +4227,7 @@
       const b = Number(lab.querySelector("#bSlider").value);
       const c = Number(lab.querySelector("#cSlider").value);
       const d = Number(lab.querySelector("#dSlider").value);
+      state.desmosAdjuster = { type, a, b, c, d };
       ["a","b","c","d"].forEach(name => lab.querySelector("#" + name + "Val").textContent = Number(lab.querySelector("#" + name + "Slider").value).toFixed(1));
       updateVisibleGraphParams(lab);
       if (!type) {
@@ -4724,7 +4744,18 @@
     }
 
     window.addEventListener("resize", () => {
-      if (!document.getElementById("subtopics").classList.contains("hidden")) renderTopics();
+      if (!document.getElementById("subtopics").classList.contains("hidden")) {
+        if (state.chapter === "desmos") {
+          const lab = el.topicGrid.querySelector(".desmos-lab-card");
+          if (lab) {
+            requestAnimationFrame(() => drawDesmosAdjuster(lab));
+          } else {
+            renderTopics();
+          }
+        } else {
+          renderTopics();
+        }
+      }
       if (state.topic) drawLesson();
     });
 
