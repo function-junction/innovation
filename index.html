@@ -436,22 +436,43 @@
     .math-frac {
       display: inline-flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
+      position: relative;
       margin: 0 0.1em;
       vertical-align: middle;
       line-height: 0.9;
+      text-align: center;
+    }
+
+    .math-frac::after {
+      content: "";
+      position: absolute;
+      left: 0.08em;
+      right: 0.08em;
+      top: 50%;
+      border-top: 2px solid currentColor;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .math-frac .top,
+    .math-frac .bottom {
+      box-sizing: border-box;
+      min-width: 1.2em;
+      padding-left: 0.26em;
+      padding-right: 0.26em;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .math-frac .top {
-      min-width: 1.2em;
-      padding: 0 0.18em 0.06em;
-      border-bottom: 2px solid currentColor;
+      padding-bottom: 0.08em;
+      border-bottom: 0;
     }
 
     .math-frac .bottom {
-      min-width: 1.2em;
-      padding: 0.06em 0.18em 0;
+      padding-top: 0.08em;
     }
 
     .math-sqrt {
@@ -2405,6 +2426,38 @@
       ctx.restore();
     }
 
+    function drawCanvasFraction(ctx, numerator, denominator, x, y, options = {}) {
+      const size = options.size || 22;
+      const color = options.color || "#102033";
+      const weight = options.weight || 900;
+      const family = options.family || "Georgia, 'Times New Roman', serif";
+      const align = options.align || "left";
+      const gap = options.gap ?? Math.max(3, size * 0.14);
+      const padding = options.padding ?? Math.max(5, size * 0.18);
+      const lineWidth = options.lineWidth || Math.max(2, size * 0.08);
+      const num = canvasMathText(numerator);
+      const den = canvasMathText(denominator);
+      ctx.save();
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = "round";
+      const width = Math.max(ctx.measureText(num).width, ctx.measureText(den).width) + padding * 2;
+      const left = align === "center" ? x - width / 2 : align === "right" ? x - width : x;
+      const center = left + width / 2;
+      ctx.fillText(num, center, y - size * 0.38 - gap * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(left, y);
+      ctx.lineTo(left + width, y);
+      ctx.stroke();
+      ctx.fillText(den, center, y + size * 0.38 + gap * 0.5);
+      ctx.restore();
+      return { left, right: left + width, width };
+    }
+
     function drawFittedText(ctx, text, x, y, maxWidth, size, weight, color, family = "Georgia, serif") {
       let fittedSize = size;
       const fittedText = canvasMathText(text);
@@ -3271,7 +3324,8 @@
       } else if (type === "rationalGraph") {
         const m = makeMap(0.49, 0.62, -3.2, 3.2, -2.5, 2.8);
         miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#e11d48", 5, 0.018);
-        write("y = 1/x", m.x0 + 92, m.py(2.15), "#e11d48");
+        write("y =", m.x0 + 76, m.py(2.15), "#e11d48");
+        drawCanvasFraction(ctx, "1", "x", m.x0 + 126, m.py(2.15), { color: "#e11d48", size: 22 });
       } else if (type === "surdRightUp" || type === "surdFour") {
         const m = makeMap(0.5, 0.56, -3.2, 3.2, -2.1, 2.2);
         miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 5, 0.018);
@@ -4077,7 +4131,8 @@
       } else if (type === "rationalGraph") {
         const m = makeMap(0.5, 0.62, -4, 4, -4, 4);
         miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#1d64ff", 7, 0.014);
-        write("y = 1/x", m.x0 + 108, m.py(2.42), "#1d64ff", 34);
+        write("y =", m.x0 + 92, m.py(2.42), "#1d64ff", 34);
+        drawCanvasFraction(ctx, "1", "x", m.x0 + 172, m.py(2.42), { color: "#1d64ff", size: 34, lineWidth: 3 });
       } else if (type === "surdRightUp" || type === "surdRightDown" || type === "surdLeftUp" || type === "surdFour") {
         const m = makeMap(0.5, 0.52, -4, 4, -2.6, 2.6);
         if (type === "surdRightUp") {
