@@ -2458,6 +2458,75 @@
       return { left, right: left + width, width };
     }
 
+    function drawCanvasSqrtLabel(ctx, radicand, x, y, options = {}) {
+      const size = options.size || 20;
+      const color = options.color || "#102033";
+      const weight = options.weight || 900;
+      const family = options.family || "Georgia, 'Times New Roman', serif";
+      const prefix = options.prefix ?? "y = ";
+      const align = options.align || "left";
+      const value = canvasMathText(radicand);
+      ctx.save();
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.textBaseline = "middle";
+      const prefixWidth = ctx.measureText(prefix).width;
+      const rootWidth = ctx.measureText("√").width;
+      const valueWidth = ctx.measureText(value).width;
+      const totalWidth = prefixWidth + rootWidth + valueWidth + size * 0.18;
+      const left = align === "center" ? x - totalWidth / 2 : align === "right" ? x - totalWidth : x;
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "rgba(255,255,255,0.86)";
+      ctx.lineWidth = Math.max(3, size * 0.16);
+      ctx.textAlign = "left";
+      ctx.strokeText(prefix, left, y);
+      ctx.fillText(prefix, left, y);
+      const rootX = left + prefixWidth;
+      const valueX = rootX + rootWidth * 0.92;
+      ctx.strokeText("√", rootX, y + size * 0.02);
+      ctx.fillText("√", rootX, y + size * 0.02);
+      ctx.strokeText(value, valueX, y);
+      ctx.fillText(value, valueX, y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1.7, size * 0.09);
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(valueX - size * 0.04, y - size * 0.58);
+      ctx.lineTo(valueX + valueWidth + size * 0.16, y - size * 0.58);
+      ctx.stroke();
+      ctx.restore();
+      return { left, right: left + totalWidth, width: totalWidth };
+    }
+
+    function drawCanvasExpLabel(ctx, x, y, options = {}) {
+      const size = options.size || 22;
+      const color = options.color || "#102033";
+      const weight = options.weight || 900;
+      const family = options.family || "Georgia, 'Times New Roman', serif";
+      const align = options.align || "left";
+      const base = options.base || "y = e";
+      const exponent = options.exponent || "x";
+      ctx.save();
+      ctx.font = `${weight} ${size}px ${family}`;
+      const baseWidth = ctx.measureText(base).width;
+      ctx.font = `${weight} ${size * 0.68}px ${family}`;
+      const expWidth = ctx.measureText(exponent).width;
+      const totalWidth = baseWidth + expWidth + size * 0.06;
+      const left = align === "center" ? x - totalWidth / 2 : align === "right" ? x - totalWidth : x;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "left";
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "rgba(255,255,255,0.86)";
+      ctx.lineWidth = Math.max(3, size * 0.16);
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.strokeText(base, left, y);
+      ctx.fillText(base, left, y);
+      ctx.font = `${weight} ${size * 0.68}px ${family}`;
+      ctx.strokeText(exponent, left + baseWidth + size * 0.02, y - size * 0.43);
+      ctx.fillText(exponent, left + baseWidth + size * 0.02, y - size * 0.43);
+      ctx.restore();
+      return { left, right: left + totalWidth, width: totalWidth };
+    }
+
     function drawFittedText(ctx, text, x, y, maxWidth, size, weight, color, family = "Georgia, serif") {
       let fittedSize = size;
       const fittedText = canvasMathText(text);
@@ -3332,14 +3401,14 @@
         miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#f2b300", 5, 0.018);
         miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#087f5b", 5, 0.018);
         miniPlot(ctx, m, x => x <= 0 ? -Math.sqrt(-x) : Infinity, "#6d28d9", 5, 0.018);
-        write("y = sqrt(x)", m.right - 30, m.top + 18, "#1d64ff", 18, "right");
-        write("y = -sqrt(x)", m.right - 28, m.bottom - 18, "#f2b300", 18, "right");
-        write("y = sqrt(-x)", m.left + 28, m.top + 18, "#087f5b", 18, "left");
-        write("y = -sqrt(-x)", m.left + 26, m.bottom - 18, "#6d28d9", 18, "left");
+        drawCanvasSqrtLabel(ctx, "x", m.right - 98, m.top + 6, { color: "#1d64ff", size: 17 });
+        drawCanvasSqrtLabel(ctx, "x", m.right - 100, m.bottom - 7, { prefix: "y = -", color: "#f2b300", size: 17 });
+        drawCanvasSqrtLabel(ctx, "-x", m.left + 10, m.top + 6, { color: "#087f5b", size: 17 });
+        drawCanvasSqrtLabel(ctx, "-x", m.left + 10, m.bottom - 7, { prefix: "y = -", color: "#6d28d9", size: 17 });
       } else if (type === "expPdf") {
         const m = makeMap(0.45, 0.64, -3.4, 2.4, -0.9, 4.8);
         miniPlot(ctx, m, x => Math.exp(x), "#e11d48", 5, 0.018);
-        write("y = e^{x}", m.right - 26, m.top + 24, "#e11d48", 22, "right");
+        drawCanvasExpLabel(ctx, m.left + 24, m.top + 22, { color: "#e11d48", size: 22 });
       } else if (type === "logPdf") {
         const m = makeMap(0.4, 0.62, -0.9, 4.6, -2.2, 2.8);
         miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#e11d48", 5, 0.018);
@@ -4137,27 +4206,27 @@
         const m = makeMap(0.5, 0.52, -4, 4, -2.6, 2.6);
         if (type === "surdRightUp") {
           miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 7, 0.016);
-          write("y = sqrt(x)", m.right - 34, m.top + 44, "#1d64ff", 30, "right");
+          drawCanvasSqrtLabel(ctx, "x", m.left + 34, m.top + 42, { color: "#1d64ff", size: 28 });
         } else if (type === "surdRightDown") {
           miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#1d64ff", 7, 0.016);
-          write("y = -sqrt(x)", m.right - 34, m.bottom - 44, "#1d64ff", 30, "right");
+          drawCanvasSqrtLabel(ctx, "x", m.left + 34, m.bottom - 42, { prefix: "y = -", color: "#1d64ff", size: 28 });
         } else if (type === "surdLeftUp") {
           miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#1d64ff", 7, 0.016);
-          write("y = sqrt(-x)", m.left + 34, m.top + 44, "#1d64ff", 30, "left");
+          drawCanvasSqrtLabel(ctx, "-x", m.right - 154, m.top + 42, { color: "#1d64ff", size: 28 });
         } else {
           miniPlot(ctx, m, x => x >= 0 ? Math.sqrt(x) : Infinity, "#1d64ff", 6, 0.016);
           miniPlot(ctx, m, x => x >= 0 ? -Math.sqrt(x) : Infinity, "#f2b300", 6, 0.016);
           miniPlot(ctx, m, x => x <= 0 ? Math.sqrt(-x) : Infinity, "#087f5b", 6, 0.016);
           miniPlot(ctx, m, x => x <= 0 ? -Math.sqrt(-x) : Infinity, "#6d28d9", 6, 0.016);
-          write("y = sqrt(x)", m.right - 28, m.top + 34, "#1d64ff", 24, "right");
-          write("y = -sqrt(x)", m.right - 28, m.bottom - 34, "#f2b300", 24, "right");
-          write("y = sqrt(-x)", m.left + 28, m.top + 34, "#087f5b", 24, "left");
-          write("y = -sqrt(-x)", m.left + 28, m.bottom - 34, "#6d28d9", 24, "left");
+          drawCanvasSqrtLabel(ctx, "x", m.right - 122, m.top + 20, { color: "#1d64ff", size: 22 });
+          drawCanvasSqrtLabel(ctx, "x", m.right - 126, m.bottom - 22, { prefix: "y = -", color: "#f2b300", size: 22 });
+          drawCanvasSqrtLabel(ctx, "-x", m.left + 24, m.top + 20, { color: "#087f5b", size: 22 });
+          drawCanvasSqrtLabel(ctx, "-x", m.left + 24, m.bottom - 22, { prefix: "y = -", color: "#6d28d9", size: 22 });
         }
       } else if (type === "expPdf") {
         const m = makeMap(0.47, 0.68, -4, 3, -0.8, 6);
         miniPlot(ctx, m, x => Math.exp(x), "#1d64ff", 7, 0.014);
-        write("y = e^{x}", m.right - 40, m.top + 46, "#1d64ff", 34, "right");
+        drawCanvasExpLabel(ctx, m.left + 42, m.top + 46, { color: "#1d64ff", size: 34 });
       } else if (type === "logPdf") {
         const m = makeMap(0.43, 0.58, -0.8, 5, -3.2, 3.2);
         miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#1d64ff", 7, 0.014);
