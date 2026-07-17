@@ -433,6 +433,21 @@
       white-space: nowrap;
     }
 
+    .makers-showcase {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(10px, 2vh, 22px) 0 clamp(30px, 5vh, 58px);
+    }
+
+    .makers-showcase img {
+      width: min(1040px, 94vw);
+      max-height: clamp(190px, 25vw, 340px);
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 12px 26px rgba(32, 70, 110, 0.14));
+    }
+
     .math-frac {
       display: inline-flex;
       flex-direction: column;
@@ -1621,6 +1636,16 @@
         height: auto;
       }
 
+      .makers-showcase {
+        padding-top: 8px;
+        padding-bottom: 34px;
+      }
+
+      .makers-showcase img {
+        width: min(760px, 96vw);
+        max-height: 250px;
+      }
+
       .ai-panel {
         right: 14px;
         bottom: 14px;
@@ -2039,6 +2064,10 @@
           <div class="hero-function-name" id="heroFunctionName"></div>
         </div>
       </div>
+    </section>
+
+    <section class="makers-showcase" aria-label="Website creators and advisor">
+      <img src="assets/site-makers-cutout.png" alt="Advisor Madam Lim Hwee Cheng and students Nur Dhiya Nasuha, Tan Xiang Kai, Lim Kai Xi, Nur Syafawati Suhaili, and Alya Irdina">
     </section>
 
     <section id="subtopics" class="hidden">
