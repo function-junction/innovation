@@ -2018,8 +2018,8 @@
             <span class="chapter-kicker">Chapter</span>
             <span class="chapter-title">Function Graph Types</span>
             <span class="chapter-icons" aria-hidden="true">
-              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M74 74V12" /><path class="mini-mark mini-coral" d="M32 26L74 64L116 26" /><circle cx="74" cy="64" r="3.2" class="mini-fill" /><text x="88" y="33">y=|x|</text><text x="127" y="78">x</text><text x="80" y="18">y</text><text x="63" y="78">0</text></svg></span>
-              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M52 74V12" /><path class="mini-mark mini-blue" d="M24 61C42 61 57 58 72 50C89 41 102 25 116 12" /><path class="mini-mark mini-coral mini-dash" d="M22 64H130" /><text x="90" y="25">y=e^{x}</text><text x="127" y="78">x</text><text x="58" y="18">y</text><text x="41" y="78">0</text></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M74 74V12" /><path class="mini-mark mini-coral" d="M32 26L74 64L116 26" /><circle cx="74" cy="64" r="3.2" class="mini-fill" /><text x="92" y="57">y=|x|</text><text x="127" y="78">x</text><text x="80" y="18">y</text><text x="63" y="78">0</text></svg></span>
+              <span class="chapter-mini"><svg viewBox="0 0 150 86"><path class="mini-axis" d="M18 64H134M52 74V12" /><path class="mini-mark mini-blue" d="M24 61C42 61 57 58 72 50C89 41 102 25 116 12" /><path class="mini-mark mini-coral mini-dash" d="M22 64H130" /><text x="68" y="37">y=e<tspan baseline-shift="super" font-size="8">x</tspan></text><text x="127" y="78">x</text><text x="58" y="18">y</text><text x="41" y="78">0</text></svg></span>
             </span>
           </button>
           <button class="tab-btn" data-chapter="desmos" aria-label="Open Graph Adjuster">
@@ -3389,7 +3389,7 @@
       } else if (type === "absoluteGraph") {
         const m = makeMap(0.49, 0.62, -3.2, 3.2, -1.8, 3.1);
         miniPlot(ctx, m, x => Math.abs(x), "#e11d48", 5, 0.025);
-        write("y = |x|", m.x0 + 76, m.py(1.92), "#e11d48");
+        write("y = |x|", m.x0 + 94, m.py(1.08), "#e11d48");
       } else if (type === "rationalGraph") {
         const m = makeMap(0.49, 0.62, -3.2, 3.2, -2.5, 2.8);
         miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#e11d48", 5, 0.018);
@@ -3408,7 +3408,7 @@
       } else if (type === "expPdf") {
         const m = makeMap(0.45, 0.64, -3.4, 2.4, -0.9, 4.8);
         miniPlot(ctx, m, x => Math.exp(x), "#e11d48", 5, 0.018);
-        drawCanvasExpLabel(ctx, m.left + 24, m.top + 22, { color: "#e11d48", size: 22 });
+        drawCanvasExpLabel(ctx, m.x0 + 38, m.py(1.55), { color: "#e11d48", size: 22 });
       } else if (type === "logPdf") {
         const m = makeMap(0.4, 0.62, -0.9, 4.6, -2.2, 2.8);
         miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#e11d48", 5, 0.018);
@@ -4196,7 +4196,7 @@
       } else if (type === "absoluteGraph") {
         const m = makeMap(0.5, 0.62, -4, 4, -1.8, 4.8);
         miniPlot(ctx, m, x => Math.abs(x), "#1d64ff", 7, 0.02);
-        write("y = |x|", m.x0 + 130, m.py(2.68), "#1d64ff", 34);
+        write("y = |x|", m.x0 + 132, m.py(1.36), "#1d64ff", 34);
       } else if (type === "rationalGraph") {
         const m = makeMap(0.5, 0.62, -4, 4, -4, 4);
         miniPlot(ctx, m, x => Math.abs(x) < 0.08 ? Infinity : 1 / x, "#1d64ff", 7, 0.014);
@@ -4226,7 +4226,7 @@
       } else if (type === "expPdf") {
         const m = makeMap(0.47, 0.68, -4, 3, -0.8, 6);
         miniPlot(ctx, m, x => Math.exp(x), "#1d64ff", 7, 0.014);
-        drawCanvasExpLabel(ctx, m.left + 42, m.top + 46, { color: "#1d64ff", size: 34 });
+        drawCanvasExpLabel(ctx, m.right - 180, m.top + 54, { color: "#1d64ff", size: 34 });
       } else if (type === "logPdf") {
         const m = makeMap(0.43, 0.58, -0.8, 5, -3.2, 3.2);
         miniPlot(ctx, m, x => x > 0 ? Math.log(x) : Infinity, "#1d64ff", 7, 0.014);
