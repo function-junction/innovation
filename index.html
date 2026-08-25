@@ -63,7 +63,7 @@
     }
 
     body::after {
-      content: "f(x)   y=sin x   Df   Rf   y=x   ln x   e^{x}   x^{2}   tan x   Ï€   Î£";
+      content: "f(x)   y=sin x   Df   Rf   y=x   ln x   e^{x}   x^{2}   tan x   π   Σ";
       position: fixed;
       top: 18%;
       left: -4%;
@@ -2022,15 +2022,15 @@
 <body>
   <div class="math-bg" aria-hidden="true">
     <span class="doodle-big doodle-outline" style="top: 7%; left: 6%; --rot:-8deg; --dur:15s;">ALGEBRA</span>
-    <span class="doodle-mid" style="top: 17%; left: 38%; --rot:10deg; --dur:12s; --delay:-2s;">xÂ² + yÂ²</span>
-    <span class="doodle-big" style="top: 22%; right: 8%; --rot:-6deg; --dur:16s; --delay:-5s;">Ï€</span>
-    <span class="doodle-small" style="top: 33%; left: 3%; --rot:7deg; --dur:11s; --delay:-1s;">âˆšx</span>
+    <span class="doodle-mid" style="top: 17%; left: 38%; --rot:10deg; --dur:12s; --delay:-2s;">x² + y²</span>
+    <span class="doodle-big" style="top: 22%; right: 8%; --rot:-6deg; --dur:16s; --delay:-5s;">π</span>
+    <span class="doodle-small" style="top: 33%; left: 3%; --rot:7deg; --dur:11s; --delay:-1s;">√x</span>
     <span class="doodle-mid doodle-outline" style="top: 42%; left: 18%; --rot:-13deg; --dur:14s; --delay:-4s;">y = cos x</span>
     <span class="doodle-small" style="top: 50%; right: 19%; --rot:9deg; --dur:13s; --delay:-6s;">log<sub>a</sub>x</span>
-    <span class="doodle-big doodle-outline" style="top: 58%; right: 5%; --rot:5deg; --dur:17s; --delay:-3s;">Î£</span>
-    <span class="doodle-mid" style="bottom: 15%; left: 7%; --rot:-4deg; --dur:12s; --delay:-7s;">aÂ² + bÂ²</span>
-    <span class="doodle-small doodle-outline" style="bottom: 8%; left: 45%; --rot:11deg; --dur:15s; --delay:-2.5s;">f(x) = axÂ² + bx + c</span>
-    <span class="doodle-mid" style="bottom: 12%; right: 12%; --rot:-10deg; --dur:13s; --delay:-8s;">âˆž</span>
+    <span class="doodle-big doodle-outline" style="top: 58%; right: 5%; --rot:5deg; --dur:17s; --delay:-3s;">Σ</span>
+    <span class="doodle-mid" style="bottom: 15%; left: 7%; --rot:-4deg; --dur:12s; --delay:-7s;">a² + b²</span>
+    <span class="doodle-small doodle-outline" style="bottom: 8%; left: 45%; --rot:11deg; --dur:15s; --delay:-2.5s;">f(x) = ax² + bx + c</span>
+    <span class="doodle-mid" style="bottom: 12%; right: 12%; --rot:-10deg; --dur:13s; --delay:-8s;">∞</span>
   </div>
   <main class="app">
     <section class="hero" id="home">
@@ -4538,19 +4538,19 @@
 
     function formatMathHTML(value) {
       let text = escapeHTML(value);
-      text = text.replace(/!=/g, "â‰ ").replace(/&gt;=/g, "â‰¥").replace(/&lt;=/g, "â‰¤");
+      text = text.replace(/!=/g, "≠").replace(/&gt;=/g, "≥").replace(/&lt;=/g, "≤");
       text = text.replace(/\b([0-9A-Za-z]+)pi\b/g, "$1π");
       text = text.replace(/\bpi\b/g, "π");
       text = text.replace(/1\/\(([^()]+)\)/g, `<span class="math-frac"><span>1</span><span class="den">$1</span></span>`);
       text = text.replace(/\b([a-zA-Z0-9]+)\/([a-zA-Z0-9]+)\b/g, `<span class="math-frac"><span>$1</span><span class="den">$2</span></span>`);
-      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt">âˆš<span class="radicand">$1</span></span>`);
-      text = text.replace(/âˆš\(([^()]+)\)/g, `<span class="math-sqrt">âˆš<span class="radicand">$1</span></span>`);
+      text = text.replace(/sqrt\(([^()]+)\)/gi, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
+      text = text.replace(/√\(([^()]+)\)/g, `<span class="math-sqrt">√<span class="radicand">$1</span></span>`);
       text = text.replace(/e\^\{([^}]+)\}/g, `<span class="math-inline">e<sup>$1</sup></span>`);
       text = text.replace(/e\^([a-zA-Z0-9+\-]+)/g, `<span class="math-inline">e<sup>$1</sup></span>`);
-      text = text.replace(/([A-Za-zÎ¸]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
-      text = text.replace(/\b([A-Za-zÎ¸]+)\^(\d+)/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
-      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)Â²/g, `<span class="math-inline">$1<sup>2</sup></span>`);
-      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)Â³/g, `<span class="math-inline">$1<sup>3</sup></span>`);
+      text = text.replace(/([A-Za-zθ]+)\^\{([^}]+)\}/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/\b([A-Za-zθ]+)\^(\d+)/g, `<span class="math-inline">$1<sup>$2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)²/g, `<span class="math-inline">$1<sup>2</sup></span>`);
+      text = text.replace(/([A-Za-z]\([^)]*\)|\([^)]*\)|[A-Za-z]+)³/g, `<span class="math-inline">$1<sup>3</sup></span>`);
       return text;
     }
 
@@ -4617,18 +4617,18 @@
     function detectFunctionWords(q) {
       const compact = q.replace(/\s+/g, "");
       const has = words => words.some(word => q.includes(word) || compact.includes(word.replace(/\s+/g, "")));
-      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "quadratic";
-      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "cubic";
-      if (has(["absolute", "modulus", "|x|", "ç»å¯¹å€¼"])) return "absolute";
-      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸è¿‘çº¿"])) return "reciprocal";
-      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "surd";
-      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "exponential";
-      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "logarithmic";
-      if (has(["sin", "sine", "æ­£å¼¦"])) return "sine";
-      if (has(["cos", "cosine", "ä½™å¼¦"])) return "cosine";
-      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "tangent";
-      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "linear";
-      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "constant";
+      if (has(["quadratic", "parabola", "x^{2}", "x^2", "二次"])) return "quadratic";
+      if (has(["cubic", "x^{3}", "x^3", "三次"])) return "cubic";
+      if (has(["absolute", "modulus", "|x|", "绝对值"])) return "absolute";
+      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸近线"])) return "reciprocal";
+      if (has(["surd", "sqrt", "square root", "根号", "√"])) return "surd";
+      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "exponential";
+      if (has(["ln", "log", "logarithm", "对数"])) return "logarithmic";
+      if (has(["sin", "sine", "正弦"])) return "sine";
+      if (has(["cos", "cosine", "余弦"])) return "cosine";
+      if (has(["tan", "tangent", "正切"])) return "tangent";
+      if (has(["linear", "straight", "slope", "gradient", "直线"])) return "linear";
+      if (has(["constant", "y=k", "水平线"])) return "constant";
       return "";
     }
 
@@ -4641,26 +4641,26 @@
       const has = words => words.some(word => q.includes(word) || compact.includes(word.replace(/\s+/g, "")));
       const opener = "Based on the PDF graph framework, ";
       const functionType = detectFunctionWords(q);
-      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["ä½ å¥½", "å—¨", "æ—©å®‰", "åˆå®‰", "æ™šä¸Šå¥½", "è°¢è°¢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or type an equation for me to check.";
-      if (has(["help", "what can you do", "assist", "å¸®æˆ‘", "å¯ä»¥åšä»€ä¹ˆ", "æ€Žä¹ˆç”¨"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
-      if (has(["domain", "å®šä¹‰åŸŸ", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right. Square-root graphs start where the value inside the root is at least 0. Log graphs need the input to be greater than 0. Reciprocal graphs exclude the vertical asymptote. Polynomial graphs such as linear, quadratic and cubic usually have domain all real numbers.";
-      if (has(["range", "å€¼åŸŸ", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read the graph from bottom to top. A constant graph has only one y-value. A quadratic graph starts from its vertex. An exponential graph stays above its horizontal asymptote. Sine and cosine stay between their minimum and maximum.";
-      if (has(["constant", "y=k", "æ°´å¹³çº¿"])) return "For f(x)=k, the graph is a horizontal line. Domain: (-infinity, infinity). Range: {k}.";
-      if (has(["linear", "straight", "slope", "gradient", "ç›´çº¿"])) return "For f(x)=ax+b, where a is not 0, the graph is a straight line. Domain: (-infinity, infinity). Range: (-infinity, infinity). a controls the gradient and b is the y-intercept.";
-      if (has(["quadratic", "parabola", "x^{2}", "x^2", "äºŒæ¬¡"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)^2+c, the vertex is (b,c). If a>0, it opens upward. If a<0, it opens downward. Domain: (-infinity, infinity). Range depends on the vertex and opening direction.";
-      if (has(["cubic", "x^{3}", "x^3", "ä¸‰æ¬¡"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)^3+c, (b,c) is the point of inflection. Domain: (-infinity, infinity). Range: (-infinity, infinity).";
-      if (has(["absolute", "modulus", "|x|", "ç»å¯¹å€¼"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
-      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸è¿‘çº¿"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
-      if (has(["surd", "sqrt", "square root", "æ ¹å·", "âˆš"])) return "For square-root graphs, first make the expression inside the root greater than or equal to 0. y=sqrt(x-a) starts at (a,0). Domain: [a,infinity). Range: [0,infinity).";
-      if (has(["exponential", "e^{x}", "e^x", "æŒ‡æ•°"])) return "For y=e^x, domain is (-infinity, infinity), range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
-      if (has(["ln", "log", "logarithm", "å¯¹æ•°"])) return "For y=ln x, domain is (0,infinity), range is (-infinity, infinity), and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
-      if (has(["sin", "sine", "æ­£å¼¦"])) return "For y=sin x, domain is (-infinity, infinity), range is [-1,1], period is 2π, and x-intercepts occur at x=nπ. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
-      if (has(["cos", "cosine", "ä½™å¼¦"])) return "For y=cos x, domain is (-infinity, infinity), range is [-1,1], period is 2π, and the y-intercept is 1 for the parent graph.";
-      if (has(["tan", "tangent", "æ­£åˆ‡"])) return "For y=tan x, range is (-infinity, infinity), period is π, and vertical asymptotes occur at x=π/2+nπ. In y=a tan(bx+c)+d, period is π/|b|.";
-      if (has(["amplitude", "period", "midline", "æŒ¯å¹…", "å‘¨æœŸ"])) return "For sine or cosine, y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2π/|b|, and midline is y=d. For tangent, period is π/|b|.";
-      if (has(["transform", "shift", "reflect", "stretch", "å¹³ç§»", "åå°„"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, and +c or +d shifts vertically.";
-      if (has(["desmos", "slider", "adjust", "æ»‘æ†", "è°ƒæ•´", "graph adjuster"])) return "Open Graph Adjuster, choose a function graph first, then move only the shown parameters. The graph is blank at first so students choose the type intentionally.";
-      if (has(["practice", "quiz", "test me", "ç»ƒä¹ "])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so x>=3. The graph starts at x=3 and the domain is [3,infinity).";
+      if (/\b(hi|hello|hey|hai|good morning|good afternoon|good evening)\b/.test(q) || has(["你好", "嗨", "早安", "午安", "晚上好", "谢谢", "thank you"])) return "Hello! I am Ms. Effie. You can ask me about graph types, domain, range, transformations, asymptotes, amplitude, period, or type an equation for me to check.";
+      if (has(["help", "what can you do", "assist", "帮我", "可以做什么", "怎么用"])) return "I can help you identify a function graph, explain the parent shape, check domain and range, compare transformations, and guide you through Graph Adjuster examples. Try asking: How to find the domain of ln(x-2)?";
+      if (has(["domain", "定义域", "x-value", "x value"])) return opener + "domain means all allowed x-values. Read the graph from left to right. Square-root graphs start where the value inside the root is at least 0. Log graphs need the input to be greater than 0. Reciprocal graphs exclude the vertical asymptote. Polynomial graphs such as linear, quadratic and cubic usually have domain all real numbers.";
+      if (has(["range", "值域", "y-value", "y value"])) return opener + "range means all y-values reached by the graph. Read the graph from bottom to top. A constant graph has only one y-value. A quadratic graph starts from its vertex. An exponential graph stays above its horizontal asymptote. Sine and cosine stay between their minimum and maximum.";
+      if (has(["constant", "y=k", "水平线"])) return "For f(x)=k, the graph is a horizontal line. Domain: (-infinity, infinity). Range: {k}.";
+      if (has(["linear", "straight", "slope", "gradient", "直线"])) return "For f(x)=ax+b, where a is not 0, the graph is a straight line. Domain: (-infinity, infinity). Range: (-infinity, infinity). a controls the gradient and b is the y-intercept.";
+      if (has(["quadratic", "parabola", "x^{2}", "x^2", "二次"])) return "For a quadratic graph, sketch a parabola. In y=a(x-b)^2+c, the vertex is (b,c). If a>0, it opens upward. If a<0, it opens downward. Domain: (-infinity, infinity). Range depends on the vertex and opening direction.";
+      if (has(["cubic", "x^{3}", "x^3", "三次"])) return "A cubic parent graph has an S-like shape. For y=a(x-b)^3+c, (b,c) is the point of inflection. Domain: (-infinity, infinity). Range: (-infinity, infinity).";
+      if (has(["absolute", "modulus", "|x|", "绝对值"])) return "An absolute graph is V-shaped. For y=a|x-b|+c, the vertex is (b,c). If a>0 it opens upward; if a<0 it opens downward. Domain is R and range starts from the vertex level.";
+      if (has(["rational", "reciprocal", "1/x", "asymptote", "æ¸近线"])) return "For a reciprocal graph like y=a/(x-b)+c, the vertical asymptote is x=b and the horizontal asymptote is y=c. Domain excludes x=b; range excludes y=c.";
+      if (has(["surd", "sqrt", "square root", "根号", "√"])) return "For square-root graphs, first make the expression inside the root greater than or equal to 0. y=sqrt(x-a) starts at (a,0). Domain: [a,infinity). Range: [0,infinity).";
+      if (has(["exponential", "e^{x}", "e^x", "指数"])) return "For y=e^x, domain is (-infinity, infinity), range is (0,infinity), and the horizontal asymptote is y=0. With y=a e^(x-b)+c, the horizontal asymptote becomes y=c.";
+      if (has(["ln", "log", "logarithm", "对数"])) return "For y=ln x, domain is (0,infinity), range is (-infinity, infinity), and x=0 is a vertical asymptote. For y=a ln(x-b)+c, the vertical asymptote is x=b.";
+      if (has(["sin", "sine", "正弦"])) return "For y=sin x, domain is (-infinity, infinity), range is [-1,1], period is 2π, and x-intercepts occur at x=nπ. In y=a sin(bx+c)+d, amplitude is |a| and midline is y=d.";
+      if (has(["cos", "cosine", "余弦"])) return "For y=cos x, domain is (-infinity, infinity), range is [-1,1], period is 2π, and the y-intercept is 1 for the parent graph.";
+      if (has(["tan", "tangent", "正切"])) return "For y=tan x, range is (-infinity, infinity), period is π, and vertical asymptotes occur at x=π/2+nπ. In y=a tan(bx+c)+d, period is π/|b|.";
+      if (has(["amplitude", "period", "midline", "振幅", "周期"])) return "For sine or cosine, y=a sin(bx+c)+d or y=a cos(bx+c)+d: amplitude is |a|, period is 2π/|b|, and midline is y=d. For tangent, period is π/|b|.";
+      if (has(["transform", "shift", "reflect", "stretch", "平移", "反射"])) return "Use the parent graph first. A negative outside reflects in the x-axis, a negative inside reflects in the y-axis, and +c or +d shifts vertically.";
+      if (has(["desmos", "slider", "adjust", "æ»‘æ†", "è°ƒ整", "graph adjuster"])) return "Open Graph Adjuster, choose a function graph first, then move only the shown parameters. The graph is blank at first so students choose the type intentionally.";
+      if (has(["practice", "quiz", "test me", "练习"])) return "Practice question: Identify the function type and domain for y=sqrt(x-3). The key is x-3>=0, so x>=3. The graph starts at x=3 and the domain is [3,infinity).";
       if (functionType) return "This is related to " + functionType + " graphs. Tell me the exact equation or where the graph starts/crosses/asymptotes are, and I will help you find its domain and range.";
       if (slide) return "This page is about " + slide.title + ". " + slide.text + " Focus on these PDF-style graph facts: " + slide.keys.join(" ");
       return "Send me a function or graph feature, for example y=1/(x-2), y=sqrt(5-x), y=e^x, y=ln x, y=sin x, or y=a(x-b)^2+c. I will help identify the graph type, domain and range.";
@@ -4669,18 +4669,18 @@
       const box = document.createElement("div");
       box.innerHTML = formatMathHTML(value);
       return box.textContent
-        .replace(/âˆž/g, "infinity")
+        .replace(/∞/g, "infinity")
         .replace(/π/g, "pi")
-        .replace(/Ï€/g, "pi")
-        .replace(/Î¸/g, "theta")
-        .replace(/Â²/g, " squared")
-        .replace(/Â³/g, " cubed")
-        .replace(/Ë£/g, " to the power of x")
-        .replace(/âˆš/g, " square root of ")
-        .replace(/â‰¥/g, " greater than or equal to ")
-        .replace(/â‰¤/g, " less than or equal to ")
-        .replace(/â‰ /g, " not equal to ")
-        .replace(/âˆ•/g, " over ")
+        .replace(/π/g, "pi")
+        .replace(/θ/g, "theta")
+        .replace(/²/g, " squared")
+        .replace(/³/g, " cubed")
+        .replace(/ˣ/g, " to the power of x")
+        .replace(/√/g, " square root of ")
+        .replace(/≥/g, " greater than or equal to ")
+        .replace(/≤/g, " less than or equal to ")
+        .replace(/≠/g, " not equal to ")
+        .replace(/∕/g, " over ")
         .replace(/\s+/g, " ")
         .trim();
     }
@@ -4923,3 +4923,6 @@
   <script src="ai-assistant.js"></script>
 </body>
 </html>
+
+
+
