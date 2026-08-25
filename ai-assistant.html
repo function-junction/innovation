@@ -25,11 +25,17 @@ a{color:#0d6571}
 .page-head a{font-weight:800;text-decoration:none;background:rgba(255,255,255,0.9);border:1px solid rgba(16,32,51,0.12);padding:8px 12px;border-radius:10px}
 .page-head span{font-weight:700;color:#304a63;background:rgba(255,255,255,0.86);padding:8px 12px;border-radius:10px;border:1px solid rgba(16,32,51,0.08)}
 
-/* --- AI PANEL (standalone: centered, not fixed) --- */
-.ai-launcher{display:none}
+/* --- AI PANEL (open via launcher button) --- */
+.ai-launcher{
+  position:fixed;right:max(18px, env(safe-area-inset-right));bottom:max(18px, env(safe-area-inset-bottom));
+  z-index:20;display:flex;align-items:end;gap:10px;min-width:78px;min-height:78px;background:transparent;border:0;cursor:pointer;
+}
+.ai-launcher.hidden{opacity:0;transform:translateY(12px);pointer-events:none}
+.ai-launcher-bubble{padding:11px 14px;border-radius:18px 18px 4px 18px;background:rgba(255,255,255,0.94);color:#354052;box-shadow:0 12px 30px rgba(74,21,51,0.18);font-weight:800;border:1px solid rgba(140,16,75,0.12)}
+.ai-launcher-avatar{width:clamp(76px,5.2vw,94px);height:clamp(76px,5.2vw,94px);border-radius:50%;overflow:hidden;background:#ffe2ef;border:6px solid rgba(255,224,237,0.9);box-shadow:0 16px 36px rgba(74,21,51,0.26)}
+.ai-launcher-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .ai-panel{
-  position:relative;
-  right:auto;bottom:auto;
+  position:fixed;right:22px;bottom:22px;z-index:21;
   width:min(480px, 96vw);
   max-height:min(820px, 92vh);
   display:grid;
@@ -39,8 +45,9 @@ a{color:#0d6571}
   background:#f7fbff;
   border:1px solid rgba(0,120,160,0.22);
   box-shadow:0 24px 60px rgba(16,47,74,0.26);
-  opacity:1;pointer-events:auto;transform:none;
+  opacity:0;pointer-events:none;transform:translateY(18px) scale(0.98);transition:opacity 0.22s ease, transform 0.22s ease;
 }
+.ai-panel.open{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
 .ai-panel::before{
   content:"y=e^{x}   f(x)   sin x   log_a x   x^{2}";
   position:absolute;inset:102px 0 auto;height:64px;pointer-events:none;
@@ -56,7 +63,7 @@ a{color:#0d6571}
 .ai-header h3{margin:0;font-size:1.16rem;line-height:1.05;font-weight:950}
 .ai-header p{margin:4px 0 0;color:rgba(255,255,255,0.92);font-size:0.9rem;font-weight:700}
 .ai-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;margin-left:5px;padding:0 6px;border-radius:7px;background:rgba(255,211,105,0.26);font-size:0.78rem;font-weight:950}
-.ai-close{display:none}
+.ai-close{position:absolute;top:14px;right:14px;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.88);color:#0d4265;font-size:1.8rem;line-height:1;font-weight:700;border:0;cursor:pointer}
 .chat-log{
   min-height:260px;overflow-y:auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:12px;
   background:linear-gradient(rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(180deg, #f7fbff, #effcff);
@@ -103,7 +110,8 @@ a{color:#0d6571}
   <span>Standalone Marking AI — works with or without index.html</span>
 </div>
 
-<aside class="ai-panel open" id="aiPanel" aria-label="AI math teacher chatbox">
+<button class="ai-launcher" id="aiLauncher" aria-label="Open AI chatbox"><span class="ai-launcher-bubble">Hi! How can I assist you?</span><span class="ai-launcher-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffe2ef' stroke='%23ff6f91' stroke-width='4'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='42' font-family='Georgia'%3Eff%3C/text%3E%3C/svg%3E" alt="open chat" /></span></button>
+<aside class="ai-panel" id="aiPanel" aria-label="AI math teacher chatbox" aria-hidden="true">
   <div class="ai-header">
     <div class="ai-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23eefcff'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='42' font-family='Georgia'%3Eff%3C/text%3E%3C/svg%3E" alt="Ms Effie" /></div>
     <div>
@@ -138,12 +146,16 @@ window.tutorReply = window.tutorReply || function(input){
 window.speak = window.speak || function(){};
 window.el = {
   aiPanel: document.getElementById('aiPanel'),
-  aiLauncher: document.getElementById('aiLauncher') || {classList:{add:function(){},remove:function(){}}},
+  aiLauncher: document.getElementById('aiLauncher'),
   aiClose: document.getElementById('aiClose'),
   chatLog: document.getElementById('chatLog'),
   chatInput: document.getElementById('chatInput'),
   sendChat: document.getElementById('sendChat')
 };
+function openAiPanel(){ el.aiPanel.classList.add('open'); el.aiPanel.setAttribute('aria-hidden','false'); el.aiLauncher.classList.add('hidden'); setTimeout(function(){ el.chatInput.focus(); },120); }
+function closeAiPanel(){ el.aiPanel.classList.remove('open'); el.aiPanel.setAttribute('aria-hidden','true'); el.aiLauncher.classList.remove('hidden'); }
+document.getElementById('aiLauncher').addEventListener('click', openAiPanel);
+document.getElementById('aiClose').addEventListener('click', closeAiPanel);
 </script>
 <script>
 // ===== ai-assistant.js — embedded (marking scheme a–o + vision + hint-only) =====
