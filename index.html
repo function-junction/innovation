@@ -4940,6 +4940,135 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 })
 </script>
+<!-- ===== AI Assistant Floating Popup (new) ===== -->
+<style>
+  /* Hide old ai-panel chat component */
+  .ai-panel {
+    display: none !important;
+  }
+
+  /* Overlay backdrop */
+  #ai-popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9998;
+  }
+
+  /* Floating popup window */
+  #ai-popup-window {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 420px;
+    height: 600px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 110px);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.22);
+    z-index: 9999;
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  /* Close button bar */
+  #ai-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 6px 10px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+  }
+
+  #ai-popup-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: #555;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+
+  #ai-popup-close:hover {
+    background: #e0e0e0;
+    color: #222;
+  }
+
+  /* iframe fills remaining space */
+  #ai-popup-iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+  }
+</style>
+
+<!-- Popup markup -->
+<div id="ai-popup-overlay"></div>
+<div id="ai-popup-window" role="dialog" aria-modal="true" aria-label="Ms.Effie AI Assistant">
+  <div id="ai-popup-header">
+    <button id="ai-popup-close" aria-label="Close">&times;</button>
+  </div>
+  <iframe
+    id="ai-popup-iframe"
+    src=""
+    title="Ms.Effie AI Assistant"
+    allow="microphone"
+  ></iframe>
+</div>
+
+<script>
+  (function () {
+    var popup    = document.getElementById('ai-popup-window');
+    var overlay  = document.getElementById('ai-popup-overlay');
+    var iframe   = document.getElementById('ai-popup-iframe');
+    var closeBtn = document.getElementById('ai-popup-close');
+    var isOpen   = false;
+
+    function openPopup() {
+      if (!isOpen) {
+        // Load iframe only on first open
+        if (!iframe.getAttribute('src')) {
+          iframe.src = './ai-assistant.html';
+        }
+        popup.style.display   = 'flex';
+        overlay.style.display = 'block';
+        isOpen = true;
+      }
+    }
+
+    function closePopup() {
+      popup.style.display   = 'none';
+      overlay.style.display = 'none';
+      isOpen = false;
+    }
+
+    // Attach click to all .ai-launcher-avatar elements
+    document.querySelectorAll('.ai-launcher-avatar').forEach(function (el) {
+      el.addEventListener('click', openPopup);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', closePopup);
+
+    // Click overlay to close
+    overlay.addEventListener('click', closePopup);
+
+    // ESC key to close
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen) closePopup();
+    });
+  })();
+</script>
+<!-- ===== End AI Assistant Floating Popup ===== -->
+
 </body>
 </html>
 
