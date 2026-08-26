@@ -102,9 +102,65 @@ a{color:#0d6571}
 .msg .badge-ok{color:#0a7a42;font-weight:800}.msg .badge-wrong{color:#c0392b;font-weight:800}.msg .badge-partial{color:#b7791f;font-weight:800}
 .chat-log.drag-over{outline:2px dashed #05a8a8;outline-offset:-6px;background-color:rgba(5,168,168,0.06)}
 @media(max-width:560px){.page-head{position:static;margin-bottom:12px} body{place-items:start center}}
+
+  #settingsBtn{position:fixed;left:max(14px, env(safe-area-inset-left));top:max(14px, env(safe-area-inset-top));z-index:23;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,0.92);border:1px solid rgba(16,32,51,0.14);box-shadow:0 10px 24px rgba(20,38,65,0.12);font-size:1.25rem;cursor:pointer}
+  #settingsPanel{position:fixed;left:max(14px, env(safe-area-inset-left));top:68px;z-index:23;width:min(360px, calc(100vw - 28px));background:rgba(255,255,255,0.96);border:1px solid rgba(16,32,51,0.12);border-radius:16px;box-shadow:0 20px 50px rgba(20,38,65,0.18);padding:14px;display:none;gap:12px;backdrop-filter:blur(8px)}
+  #settingsPanel.open{display:grid}
+  #settingsPanel h4{margin:0;font-size:0.95rem;font-weight:900;color:#102033}
+  .setting-row{display:grid;gap:8px} .setting-row label{font-size:0.82rem;font-weight:800;color:#304a63}
+  .size-options{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .size-options button{height:36px;border-radius:10px;border:1px solid rgba(16,32,51,0.14);background:#fff;font-weight:800;color:#173754;cursor:pointer}
+  .size-options button.active{color:#fff;background:linear-gradient(135deg, #2077ff, #00a8a8);border-color:transparent}
+  .sound-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f7fbff;border:1px solid rgba(16,32,51,0.08);border-radius:12px;padding:10px 12px} .sound-toggle-row .hint{font-size:0.76rem;color:#557084}
+  .switch{position:relative;width:52px;height:30px;background:rgba(16,32,51,0.14);border-radius:999px;border:0;cursor:pointer;flex:0 0 auto} .switch.on{background:linear-gradient(135deg, #2077ff, #00a8a8)} .switch i{position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.18);transition:transform 0.2s ease} .switch.on i{transform:translateX(22px)}
+  html.text-small{font-size:14px} html.text-medium{font-size:16px} html.text-big{font-size:19px} html.text-large{font-size:22px}
+
+
+  /* Embed mode: when loaded inside index.html iframe (?embed=1) */
+  body.embed{background:transparent;padding:0;display:block}
+  body.embed .page-head{display:none}
+  body.embed .ai-launcher{display:none !important}
+  body.embed .ai-panel{position:relative;right:auto;bottom:auto;width:100%;max-width:100%;max-height:100vh;height:100vh;height:100dvh;border-radius:16px;box-shadow:none;margin:0}
+  body.embed #settingsBtn{left:12px;top:10px}
+  body.embed #settingsPanel{left:12px;top:58px}
+
 </style>
 </head>
 <body>
+<script>
+// Embed mode: if ?embed=1, hide outer chrome and make panel always open, close posts to parent
+(function(){
+  try{
+    const params = new URLSearchParams(location.search);
+    if(params.get("embed")==="1"){
+      document.body.classList.add("embed");
+      document.documentElement.classList.add("embed");
+      // Ensure panel is open inside iframe (launcher hidden)
+      document.addEventListener("DOMContentLoaded", ()=>{
+        const panel=document.getElementById("aiPanel");
+        if(panel){ panel.classList.add("open"); panel.setAttribute("aria-hidden","false"); }
+      });
+      // Override close to notify parent
+      document.addEventListener("DOMContentLoaded", ()=>{
+        const closeBtn=document.getElementById("aiClose");
+        if(closeBtn){
+          closeBtn.addEventListener("click", ()=>{
+            try{ parent.postMessage({type:"fj-close-ai"}, "*"); }catch(e){}
+          });
+        }
+      });
+    }
+  }catch(e){}
+})();
+</script>
+
+<button id="settingsBtn" aria-label="Open settings" title="Settings">⚙️</button>
+<div id="settingsPanel" aria-hidden="true" role="dialog" aria-label="Settings">
+  <h4>⚙️ Settings</h4>
+  <div class="setting-row"><label>Text size</label><div class="size-options" role="group" aria-label="Text size"><button type="button" data-size="small">Small</button><button type="button" data-size="medium" class="active">Medium</button><button type="button" data-size="big">Big</button><button type="button" data-size="large">Large</button></div></div>
+  <div class="setting-row"><label>Auto sound</label><div class="sound-toggle-row"><span class="hint">Auto read slides aloud</span><button type="button" class="switch on" id="soundToggle" aria-label="Toggle auto sound" aria-pressed="true"><i></i></button></div></div>
+</div>
+
 <div class="page-head">
   <a href="index.html">← Back to Function Junction</a>
   <span>Standalone Marking AI — works with or without index.html</span>
@@ -133,6 +189,26 @@ a{color:#0d6571}
   <div class="ai-tabs"><button class="ai-tab active" type="button"><span class="chat-icon"></span><span>Chat</span></button></div>
   <div class="ai-powered">Powered by FUNCTION JUNCTION · Hint-only marking (a–o)</div>
 </aside>
+
+
+<script>
+(function(){
+  const KEY_SIZE="fj_text_size", KEY_SOUND="fj_sound_open";
+  const btn=document.getElementById("settingsBtn"), panel=document.getElementById("settingsPanel"), soundBtn=document.getElementById("soundToggle");
+  const sizeBtns=Array.from(panel.querySelectorAll(".size-options button"));
+  let textSize=localStorage.getItem(KEY_SIZE)||"medium";
+  let soundOpen=localStorage.getItem(KEY_SOUND); soundOpen=soundOpen===null?true:soundOpen==="true";
+  function applyTextSize(s){ document.documentElement.classList.remove("text-small","text-medium","text-big","text-large"); document.documentElement.classList.add("text-"+s); sizeBtns.forEach(b=>b.classList.toggle("active",b.dataset.size===s)); localStorage.setItem(KEY_SIZE,s); }
+  function applySound(open){ soundOpen=open; soundBtn.classList.toggle("on",open); soundBtn.setAttribute("aria-pressed",String(open)); localStorage.setItem(KEY_SOUND,String(open)); if(!open&&window.speechSynthesis) speechSynthesis.cancel(); }
+  const _origSpeak=window.speak; window.speak=function(text){ if(!soundOpen) return; if(typeof _origSpeak==="function") return _origSpeak(text); };
+  applyTextSize(textSize); applySound(soundOpen);
+  sizeBtns.forEach(b=>b.addEventListener("click",()=>applyTextSize(b.dataset.size)));
+  soundBtn.addEventListener("click",()=>applySound(!soundOpen));
+  btn.addEventListener("click",()=>{ const open=panel.classList.toggle("open"); panel.setAttribute("aria-hidden",String(!open)); });
+  document.addEventListener("click",(e)=>{ if(!panel.classList.contains("open")) return; if(panel.contains(e.target)||btn.contains(e.target)) return; panel.classList.remove("open"); panel.setAttribute("aria-hidden","true"); });
+  document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ panel.classList.remove("open"); panel.setAttribute("aria-hidden","true"); }});
+})();
+</script>
 
 <script>
 // Minimal shims so ai-assistant logic works standalone (no index.html main script)
