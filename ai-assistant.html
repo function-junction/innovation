@@ -258,6 +258,40 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
     scrollBottom();
   }
 
+  // ===== TEXT-TO-SPEECH (read AI replies aloud, controlled by parent settings) =====
+  var ttsEnabled = (function () {
+    try { var v = localStorage.getItem('fj_tts'); return v === null ? true : v === '1'; }
+    catch (e) { return true; }
+  })();
+
+  // Receive live settings (read-aloud toggle) from the parent page
+  window.addEventListener('message', function (e) {
+    var d = e.data;
+    if (d && d.source === 'function-junction' && d.type === 'fj-settings') {
+      if (typeof d.tts === 'boolean') {
+        ttsEnabled = d.tts;
+        try { localStorage.setItem('fj_tts', d.tts ? '1' : '0'); } catch (err) {}
+      }
+    }
+  });
+
+  function speakText(text) {
+    if (!ttsEnabled || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      var clean = String(text)
+        .replace(/\[\[OK\]\]|\[\[\/OK\]\]|\[\[WRONG\]\]|\[\[\/WRONG\]\]|\[\[HINT\]\]|\[\[\/HINT\]\]/g, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/[*_`#]/g, '')
+        .trim();
+      if (!clean) return;
+      var u = new SpeechSynthesisUtterance(clean);
+      u.lang = 'en-US';
+      u.rate = 1.0;
+      window.speechSynthesis.speak(u);
+    } catch (err) {}
+  }
+
   // ===== OPEN / CLOSE =====
   function openPanel() {
     panel.classList.add('open');
@@ -435,6 +469,7 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
           return;
         }
         addBotMessage(renderMarked(reply));
+        if (ttsEnabled) speakText(reply);
       })
       .catch(function (err) {
         typing.remove();
