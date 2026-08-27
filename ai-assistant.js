@@ -1,15 +1,20 @@
-/* ai-assistant.js - Updated Light Version
-NO HARDCODED marking scheme! Marking logic handled by Render Gemini backend
-Backend: https://functionjunction.onrender.com/api/gemini
-Function: Send student text + uploaded image to backend for dynamic marking & feedback
+/* ai‑assistant.js 
+Light‑weight chat module for Function Junction
+No hard‑coded marking‑scheme. All AI logic handled by Render backend.
+Backend endpoint: https://functionjunction.onrender.com/api/gemini
+Dependencies: main.js must define window.el, chatLog, chatInput, sendChat in advance
+DO NOT clone/replace original page DOM elements, reuse existing ones.
 */
 (function () {
     let pendingImages = [];
     let pendingFiles = [];
 
     function ready(fn) {
-        if (window.el && window.el.chatLog) fn();
-        else setTimeout(() => ready(fn), 100);
+        if (window.el && window.el.chatLog) {
+            fn();
+        } else {
+            setTimeout(() => ready(fn), 100);
+        }
     }
 
     ready(initAIChat);
@@ -18,28 +23,28 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
         const chatLogEl = document.getElementById("chatLog");
         const chatInputEl = document.getElementById("chatInput");
         const sendBtnEl = document.getElementById("sendChat");
-        const chatControlsEl = document.querySelector(".chat-controls");
+        const chatControlsEl = document.querySelector(".chat‑controls");
 
-        // Add photo & file attach button
+        // Inject attach photo / file buttons ONLY if they do NOT already exist
         if (chatControlsEl && !document.getElementById("attachPhotoBtn")) {
             const photoBtn = document.createElement("button");
             photoBtn.id = "attachPhotoBtn";
             photoBtn.type = "button";
-            photoBtn.className = "icon-btn-attach";
+            photoBtn.className = "icon‑btn‑attach";
             photoBtn.title = "Upload student answer photo";
             photoBtn.textContent = "📷";
 
             const fileBtn = document.createElement("button");
             fileBtn.id = "attachFileBtn";
             fileBtn.type = "button";
-            fileBtn.className = "icon-btn-attach";
+            fileBtn.className = "icon‑btn‑attach";
             fileBtn.title = "Upload marking scheme / worksheet";
             fileBtn.textContent = "📄";
 
             chatControlsEl.prepend(fileBtn, photoBtn);
         }
 
-        // Hidden file input
+        // Hidden file input elements
         let photoInput = document.getElementById("photoInput");
         if (!photoInput) {
             photoInput = document.createElement("input");
@@ -62,12 +67,12 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
             document.body.appendChild(fileInput);
         }
 
-        // Preview area
+        // Attachment preview area
         let previewArea = document.getElementById("attachPreview");
         if (!previewArea) {
             previewArea = document.createElement("div");
             previewArea.id = "attachPreview";
-            previewArea.className = "attach-preview";
+            previewArea.className = "attach‑preview";
             chatLogEl.parentNode.insertBefore(previewArea, chatLogEl.nextSibling);
         }
 
@@ -82,8 +87,8 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
             previewArea.innerHTML = "";
             pendingImages.forEach((img, idx) => {
                 const chip = document.createElement("span");
-                chip.className = "attach-chip";
-                chip.innerHTML = `<img src="${img.dataUrl}" alt="preview"><span>${escapeHTML(img.name)}</span>`;
+                chip.className = "attach‑chip";
+                chip.innerHTML = <img src="${img.dataUrl}" alt="preview"><span>${escapeHTML(img.name)}</span>;
                 const removeBtn = document.createElement("button");
                 removeBtn.textContent = "×";
                 removeBtn.onclick = () => {
@@ -93,10 +98,10 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
                 chip.appendChild(removeBtn);
                 previewArea.appendChild(chip);
             });
-            pendingFiles.forEach((file, idx) => {
+        pendingFiles.forEach((file, idx) => {
                 const chip = document.createElement("span");
-                chip.className = "attach-chip";
-                chip.innerHTML = `<span>📄 ${escapeHTML(file.name)}</span>`;
+                chip.className = "attach‑chip";
+                chip.innerHTML = <span>📄 ${escapeHTML(file.name)}</span>;
                 const removeBtn = document.createElement("button");
                 removeBtn.textContent = "×";
                 removeBtn.onclick = () => {
@@ -126,7 +131,7 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
             });
         }
 
-        // Trigger upload
+        // Trigger file pick dialog
         document.getElementById("attachPhotoBtn").onclick = () => photoInput.click();
         document.getElementById("attachFileBtn").onclick = () => fileInput.click();
 
@@ -166,15 +171,15 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
             renderPreview();
         };
 
-        // Drag & drop
+        // Drag‑and‑drop support
         chatLogEl.addEventListener("dragover", e => {
             e.preventDefault();
-            chatLogEl.classList.add("drag-over");
+            chatLogEl.classList.add("drag‑over");
         });
-        chatLogEl.addEventListener("dragleave", () => chatLogEl.classList.remove("drag-over"));
+        chatLogEl.addEventListener("dragleave", () => chatLogEl.classList.remove("drag‑over"));
         chatLogEl.addEventListener("drop", async e => {
             e.preventDefault();
-            chatLogEl.classList.remove("drag-over");
+            chatLogEl.classList.remove("drag‑over");
             const files = Array.from(e.dataTransfer.files);
             for (const f of files) {
                 if (f.type.startsWith("image/")) {
@@ -195,80 +200,101 @@ Function: Send student text + uploaded image to backend for dynamic marking & fe
             renderPreview();
         });
 
-        // Send message to Render Backend
-        async function sendMessage() {
+        // Remove old listeners safely WITHOUT destroying original DOM elements
+        sendBtnEl.onclick = null;
+        const newSendHandler = async function() {
             const userText = chatInputEl.value.trim();
             if (!userText && pendingImages.length === 0) return;
+            const snapshotImages = pendingImages.slice();
+            const snapshotFiles = pendingFiles.slice();
+            addUserMessage(userText);
 
-            // Render user message on chat
-            const userMsgDiv = document.createElement("div");
-            userMsgDiv.className = "msg user";
-            let msgHTML = userText ? `<div>${escapeHTML(userText).replaceAll("\n", "<br>")}</div>` : "";
-            pendingImages.forEach(img => {
-                msgHTML += `<div style="margin-top:8px"><img src="${img.dataUrl}" style="max-width:100%;max-height:200px;border-radius:6px"></div>`;
-            });
-            pendingFiles.forEach(f => {
-                msgHTML += `<div style="margin-top:6px;opacity:0.85;font-size:0.85rem">📄 ${escapeHTML(f.name)}</div>`;
-            });
-            userMsgDiv.innerHTML = msgHTML || "<em>Only image/file submitted</em>";
-            chatLogEl.appendChild(userMsgDiv);
-            chatLogEl.scrollTop = chatLogEl.scrollHeight;
             chatInputEl.value = "";
+            pendingImages = [];
+            pendingFiles = [];
+            renderPreview();
 
-            // Loading indicator
+            // Typing indicator
             const loadingDiv = document.createElement("div");
             loadingDiv.className = "msg bot loading";
             loadingDiv.textContent = "Checking answer...";
-            chatLogEl.appendChild(loadingDiv);
-            chatLogEl.scrollTop = chatLogEl.scrollHeight;
+            window.el.chatLog.appendChild(loadingDiv);
+            scrollChatToBottom();
 
             try {
                 const payload = {
                     text: userText,
-                    images: pendingImages,
-                    files: pendingFiles
+                    images: snapshotImages,
+                    files: snapshotFiles
                 };
+
                 const res = await fetch("https://functionjunction.onrender.com/api/gemini", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content‑Type": "application/json"
                     },
                     body: JSON.stringify(payload)
                 });
 
                 loadingDiv.remove();
-                if (!res.ok) throw new Error("Backend error");
+                if (!res.ok) throw new Error("Backend service error");
                 const data = await res.json();
-                const botMsgDiv = document.createElement("div");
-                botMsgDiv.className = "msg bot";
-                if (window.formatMathHTML) {
-                    botMsgDiv.innerHTML = window.formatMathHTML(data.reply);
-                } else {
-                    botMsgDiv.textContent = data.reply;
-                }
-                chatLogEl.appendChild(botMsgDiv);
+                addBotHTML(data.reply);
             } catch (err) {
                 loadingDiv.remove();
-                const errorDiv = document.createElement("div");
-                errorDiv.className = "msg bot";
-                errorDiv.textContent = "Connection error. Please try again later.";
-                chatLogEl.appendChild(errorDiv);
-            }
-            chatLogEl.scrollTop = chatLogEl.scrollHeight;
-
-            // Clear attachments after send
-            pendingImages = [];
-            pendingFiles = [];
-            renderPreview();
-        }
-
-        // Bind send button and enter key
-        sendBtnEl.onclick = sendMessage;
-        chatInputEl.onkeydown = e => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+                addBotHTML("Connection error. Please try again later. " + err.message);
             }
         };
+
+        sendBtnEl.addEventListener("click", newSendHandler);
+
+        // Enter key send
+        chatInputEl.onkeydown = null;
+        chatInputEl.addEventListener("keydown", e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                newSendHandler();
+            }
+        });
+
+        function addUserMessage(text) {
+            const wrap = document.createElement("div");
+            wrap.className = "msg user";
+            let html = text ? <div>${escapeHTML(text).replaceAll("\n", "<br>")}</div> : "";
+            pendingImages.forEach(img => {
+                html += <div style="margin‑top:8px"><img src="${img.dataUrl}" style="max‑width:100%;max‑height:200px;border‑radius:6px"></div>;
+            });
+            pendingFiles.forEach(f => {
+                html += <div style="margin‑top:6px;opacity:0.85;font‑size:0.85rem">📄 ${escapeHTML(f.name)}</div>;
+            });
+            if (!html) html = "<em>(Only image / file submitted)</em>";
+            wrap.innerHTML = html;
+            window.el.chatLog.appendChild(wrap);
+            scrollChatToBottom();
+        }
+
+        function scrollChatToBottom() {
+            requestAnimationFrame(() => {
+                window.el.chatLog.scrollTop = window.el.chatLog.scrollHeight;
+                setTimeout(() => { window.el.chatLog.scrollTop = window.el.chatLog.scrollHeight; }, 80);
+            });
+        }
+
+        function addBotHTML(htmlContent) {
+            const msg = document.createElement("div");
+            msg.className = "msg bot";
+            if (window.formatMathHTML) {
+                msg.innerHTML = window.formatMathHTML(htmlContent);
+            } else {
+                msg.textContent = htmlContent;
+            }
+            window.el.chatLog.appendChild(msg);
+            scrollChatToBottom();
+            if (window.speak) {
+                try {
+                    window.speak(msg.textContent.slice(0, 400));
+                } catch (err) { /* ignore */ }
+            }
+        }
     }
 })();
