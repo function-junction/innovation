@@ -5018,7 +5018,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <iframe
     id="ai-popup-iframe"
-    src=""
+    src="about:blank"
     title="Ms.Effie AI Assistant"
     allow="microphone"
   ></iframe>
@@ -5048,11 +5048,21 @@ document.addEventListener('DOMContentLoaded', function() {
       popup.style.display   = 'none';
       overlay.style.display = 'none';
       isOpen = false;
+      // Defensive fix: make sure the launcher avatar is visible again
+      var launcher = document.getElementById('aiLauncher');
+      if (launcher) launcher.classList.remove('hidden');
     }
 
     // Attach click to all .ai-launcher-avatar elements
     document.querySelectorAll('.ai-launcher-avatar').forEach(function (el) {
-      el.addEventListener('click', openPopup);
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();   // prevent the old openAiPanel() from hiding the launcher
+        e.preventDefault();
+        // Defensive fix: keep the launcher avatar visible
+        var launcher = document.getElementById('aiLauncher');
+        if (launcher) launcher.classList.remove('hidden');
+        openPopup();
+      });
     });
 
     // Close button
@@ -5071,5 +5081,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-
 
