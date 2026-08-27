@@ -45,15 +45,15 @@ body{
 
 .ai-header{
   display:flex;align-items:center;gap:12px;padding:12px 14px;flex:0 0 auto;
-  background:radial-gradient(circle at 88% 18%, rgba(255,211,105,0.42), transparent 22%), linear-gradient(135deg, #0d4265, #069aa6 58%, #37b48b);
-  color:#fff;
+  background:linear-gradient(135deg, #eef1fa, #e5eaf6);
+  color:#0d4265;
 }
-.ai-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#eefcff;border:2px solid rgba(255,255,255,0.72);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.18)}
+.ai-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#fff;border:2px solid rgba(13,66,101,0.18);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.12)}
 .ai-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .ai-header-text{flex:1;min-width:0}
-.ai-header h3{margin:0;font-size:1.1rem;line-height:1.1;font-weight:950}
-.ai-header p{margin:3px 0 0;color:rgba(255,255,255,0.92);font-size:0.82rem;font-weight:700}
-.ai-close{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.88);color:#0d4265;font-size:1.6rem;line-height:1;font-weight:700;border:0;cursor:pointer;flex:0 0 auto}
+.ai-header h3{margin:0;font-size:1.15rem;line-height:1.1;font-weight:950;color:#0d4265}
+.ai-header p{margin:3px 0 0;color:#557084;font-size:0.82rem;font-weight:700}
+.ai-close{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:#fff;color:#0d4265;font-size:1.6rem;line-height:1;font-weight:700;border:1px solid rgba(13,66,101,0.15);cursor:pointer;flex:0 0 auto}
 
 /* Messages */
 .chat-log{
@@ -61,7 +61,7 @@ body{
   background:linear-gradient(rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(180deg, #f7fbff, #effcff);
   background-size:22px 22px,22px 22px,auto;color:#11364e;
 }
-.msg{max-width:94%;padding:10px 12px;border-radius:14px;line-height:1.5;font-size:0.95rem;overflow-wrap:anywhere}
+.msg{max-width:94%;padding:10px 12px;border-radius:14px;line-height:1.55;font-size:1rem;overflow-wrap:anywhere}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg, #d9f6ef, #c8ecff);color:#0e3c58;border:1px solid rgba(55,180,139,0.24)}
 .msg.bot{align-self:flex-start;background:rgba(255,255,255,0.86);border:1px solid rgba(6,154,166,0.14);color:#123852;box-shadow:0 6px 14px rgba(17,54,78,0.05)}
 
@@ -81,14 +81,9 @@ body{
 .chat-controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(6,154,166,0.16);background:#fff;flex:0 0 auto}
 .chat-controls .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(6,154,166,0.2);background:#fff;font-size:1.15rem;cursor:pointer;flex:0 0 auto;color:#0d6571}
 .chat-controls .icon-btn:hover{background:#eefcff}
-.chat-controls input{flex:1;min-width:0;border:1px solid rgba(6,154,166,0.2);border-radius:10px;padding:0 12px;height:38px;font-size:0.95rem;outline:none;color:#11364e}
+.chat-controls input{flex:1;min-width:0;border:1px solid rgba(6,154,166,0.2);border-radius:10px;padding:0 12px;height:38px;font-size:1rem;outline:none;color:#11364e}
 .chat-controls input::placeholder{color:rgba(17,54,78,0.55)}
-#sendBtn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;font-size:1.2rem;border:0;cursor:pointer;flex:0 0 auto}
-
-/* Quick suggestion chips */
-.suggestions{padding:0 14px 10px;display:flex;gap:7px;flex-wrap:wrap;background:#fff;flex:0 0 auto}
-.suggestions button{background:rgba(230,250,247,0.86);color:#0d6571;border:1px solid rgba(6,154,166,0.18);border-radius:999px;padding:7px 9px;font-size:0.76rem;font-weight:800;cursor:pointer}
-.suggestions button:hover{background:#d8f3f0}
+#sendBtn{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;border:0;cursor:pointer;flex:0 0 auto;display:grid;place-items:center}
 
 /* When embedded inside the parent popup iframe, fill it and hide the launcher + close button */
 body.embedded{margin:0;padding:0;background:#f7fbff;display:block;overflow:hidden}
@@ -120,17 +115,13 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
   <div class="chat-log" id="chatLog"></div>
   <div class="attach-preview" id="attachPreview"></div>
 
-  <div class="suggestions" id="suggestions">
-    <button data-prompt="Explain how to sketch f(x)=sqrt(3x-2) and state its domain and range.">Sketch sqrt graph</button>
-    <button data-prompt="How do I find the domain and range of f(x)=5/(2-x)?">Domain &amp; range</button>
-    <button data-prompt="Check my graph: I drew f(x)=x^2-4 opening downward.">Check my graph</button>
-  </div>
-
   <div class="chat-controls">
     <button class="icon-btn" id="photoBtn" type="button" title="Upload photo / handwriting" aria-label="Upload photo">📷</button>
     <button class="icon-btn" id="fileBtn" type="button" title="Upload file" aria-label="Upload file">📄</button>
     <input id="chatInput" type="text" placeholder="Type your question…" aria-label="Type your question" />
-    <button id="sendBtn" type="button" title="Send">↑</button>
+    <button id="sendBtn" type="button" title="Send" aria-label="Send">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
   </div>
 </aside>
 
@@ -169,41 +160,19 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
   var pendingImages = []; // { dataUrl, mime, name }
   var pendingFiles = [];  // { name, text }
 
-  // ===== SYSTEM PROMPT (flexible Matric tutor, anchored to the a-o scheme) =====
+  // ===== SYSTEM PROMPT (flexible Matric tutor, hint-only, concise) =====
   var SYSTEM_PROMPT =
-    'You are Ms. Effie, a friendly and flexible Malaysian Matriculation (Matric) Mathematics tutor and marker, ' +
-    'specialising in Functions (Topic 5): graph sketching, domain and range, transformations, asymptotes, amplitude and period.\n\n' +
-    'YOUR STYLE\n' +
-    '- Be natural, warm and conversational. NEVER use rigid templates or fixed scripts.\n' +
-    '- Always use second person ("you"). Keep answers concise.\n' +
-    '- Use simple English and mix in Malay terms when the student does (e.g. "domain", "julat", "lakar graf", "pintasan").\n\n' +
-    'GRADING RULES\n' +
-    '- Mark against the marking scheme below (TEST ME a-o) as your ANCHOR, but stay flexible: adapt to whatever the student actually wrote, typed, or photographed.\n' +
-    '- Award a mark only when the student\'s step matches the scheme. Name the error type (concept / procedure / algebra slip / carelessness / not answered) and explain WHY it is wrong.\n' +
-    '- If a photo or handwriting is unclear, ask for a clearer photo. Do NOT guess marks.\n' +
-    '- NEVER give the full final answer or a complete step-by-step solution. Give hints, clues and guiding questions so the student self-corrects.\n\n' +
-    'OUTPUT FORMAT (always follow this)\n' +
-    '- Put every CORRECT point inside [[OK]] ... [[/OK]].\n' +
-    '- Put every WRONG point inside [[WRONG]] ... [[/WRONG]].\n' +
-    '- Right after a [[WRONG]] block, add a short [[HINT]] ... [[/HINT]] block: explain the error and give ONE directional clue (not the answer).\n' +
-    '- End with one short line of encouragement.\n' +
-    '- Render maths in plain text: Df, Rf, -infinity, sqrt(x), x^2, e^x, ln x, |x|.\n\n' +
-    'MARKING SCHEME (TEST ME a-o)\n' +
-    '(a) f(x)=-6 : horizontal line y=-6; Df=(-inf,+inf); Rf={-6} [3 marks: graph, Df, Rf]\n' +
-    '(b) f(x)=-3x+4 : decreasing line, y-intercept 4, x-intercept 4/3; Df=(-inf,+inf); Rf=(-inf,+inf) [3 marks]\n' +
-    '(c) f(x)=x^2-4 : upward parabola, vertex (0,-4); Df=(-inf,+inf); Rf=[-4,+inf) [3 marks]\n' +
-    '(d) f(x)=9-x^2 : downward parabola, max (0,9); Df=(-inf,+inf); Rf=(-inf,9] [3 marks]\n' +
-    '(e) f(x)=x^3-3 : cubic S-shape, inflection (0,-3); Df=(-inf,+inf); Rf=(-inf,+inf) [2 marks]\n' +
-    '(f) f(x)=|2x+1| : V-shape, vertex (-1/2,0); Df=(-inf,+inf); Rf=[0,+inf) [3 marks]\n' +
-    '(g) f(x)=|2x-1|+1 : V-shape, vertex (1/2,1), y-intercept 2; Df=(-inf,+inf); Rf=[1,+inf) [3 marks]\n' +
-    '(h) f(x)=sqrt(3x-2) : root curve from (2/3,0); Df=[2/3,+inf); Rf=[0,+inf) [3 marks]\n' +
-    '(i) f(x)=sqrt(2-3x) : decreasing root curve ending (2/3,0); Df=(-inf,2/3]; Rf=[0,+inf) [3 marks]\n' +
-    '(j) f(x)=5/(2+x) : hyperbola, VA x=-2, HA y=0; Df=all x except -2; Rf=all y except 0 [4 marks]\n' +
-    '(k) f(x)=5/(2-x) : hyperbola, VA x=2, HA y=0; Df=all x except 2; Rf=all y except 0 [4 marks]\n' +
-    '(l) f(x)=e^(2x)+1 : rising exponential, HA y=1, through (0,2); Df=(-inf,+inf); Rf=(1,+inf) [3 marks]\n' +
-    '(m) f(x)=e^(-x)-2 : decreasing exponential, HA y=-2, through (0,-1); Df=(-inf,+inf); Rf=(-2,+inf) [3 marks]\n' +
-    '(n) f(x)=ln(x-3) : log curve, VA x=3, through (4,0); Df=(3,+inf); Rf=(-inf,+inf) [3 marks]\n' +
-    '(o) f(x)=ln(3-x) : reflected log, VA x=3, through (2,0), decreasing; Df=(-inf,3); Rf=(-inf,+inf) [3 marks]';
+    'You are Ms. Effie, a friendly and flexible Malaysian Matriculation (Matric) Mathematics tutor for Functions ' +
+    '(graph sketching, domain and range, transformations, asymptotes, amplitude, period).\n' +
+    'RULES:\n' +
+    '- Be short and natural: usually 1-4 sentences. Never long essays, tables or rigid templates.\n' +
+    '- Use "you" and plain English; mix in Malay terms the student uses (julat, lakar graf, pintasan).\n' +
+    '- Casual chat (hi, good morning, thanks): reply briefly and warmly.\n' +
+    '- Maths: never give the full final answer or full solution. Give hints and guiding questions so the student self-corrects; name the error type and why it is wrong.\n' +
+    '- The marking scheme (a-o) is INTERNAL reference only: never list question letters like (a), (b) to the student. Stay flexible for any question.\n' +
+    '- If a photo or handwriting is unclear, ask for a clearer one; do not guess.\n' +
+    '- Grading format ONLY when checking actual work: correct points in [[OK]]...[[/OK]], wrong points in [[WRONG]]...[[/WRONG]], then one short [[HINT]]...[[/HINT]]. Otherwise answer in plain text.\n' +
+    '- Maths in plain text: Df, Rf, -infinity, sqrt(x), x^2, e^x, ln x, |x|.';
 
   // ===== HELPERS =====
   function escHtml(s) {
@@ -402,7 +371,8 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ parts: parts }]
+        contents: [{ parts: parts }],
+        generationConfig: { maxOutputTokens: 400, temperature: 0.6 }
       })
     })
       .then(function (res) { return res.json(); })
@@ -427,14 +397,6 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
   sendBtn.addEventListener('click', handleSend);
   chatInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
-  });
-
-  // Quick suggestion chips
-  document.querySelectorAll('#suggestions button').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      chatInput.value = btn.getAttribute('data-prompt');
-      handleSend();
-    });
   });
 
   // Welcome message
