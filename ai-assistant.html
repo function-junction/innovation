@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mr. Effie — AI Math Tutor</title>
+<title>Ms. Effie — AI Math Tutor</title>
 <style>
-/* ai-assistant core styles - English only comments */
+/* Clean, minimal chat UI. No fancy styles. */
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100vh}
+html,body{height:100%;margin:0}
 body{
   color:#102033;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -20,343 +20,430 @@ body{
   place-items:center;
   padding:18px;
 }
-a{color:#0d6571}
-.box-ok{
-  border:2px solid #27ae60;
-  border-radius:12px;
-  padding:10px 12px;
-  background-color:rgba(39,174,96,0.06);
-  margin:8px 0;
-}
-.box-wrong{
-  border:2px solid #e74c3c;
-  border-radius:12px;
-  padding:10px 12px;
-  background-color:rgba(231,76,60,0.06);
-  margin:8px 0;
-}
-.hint-panel{
-  border:1.5px solid #05a8a8;
-  border-radius:10px;
-  padding:9px 11px;
-  background:rgba(5,168,168,0.07);
-  margin:6px 0 14px 12px;
-}
-.hint-panel strong{
-  color:#0d6571;
-}
-/* Launcher and panel - original layout preserved */
+
+/* Launcher avatar (only used when this page is opened on its own, not in an iframe) */
 .ai-launcher{
   position:fixed;right:max(18px, env(safe-area-inset-right));bottom:max(18px, env(safe-area-inset-bottom));
-  z-index:20;display:flex;align-items:end;gap:10px;min-width:78px;min-height:78px;background:transparent;border:0;cursor:pointer;
+  z-index:20;display:flex;align-items:end;gap:10px;min-width:78px;min-height:78px;background:transparent;border:0;cursor:pointer;padding:0;
 }
 .ai-launcher.hidden{opacity:0;transform:translateY(12px);pointer-events:none}
 .ai-launcher-bubble{padding:11px 14px;border-radius:18px 18px 4px 18px;background:rgba(255,255,255,0.94);color:#354052;box-shadow:0 12px 30px rgba(74,21,51,0.18);font-weight:800;border:1px solid rgba(140,16,75,0.12)}
 .ai-launcher-avatar{width:clamp(76px,5.2vw,94px);height:clamp(76px,5.2vw,94px);border-radius:50%;overflow:hidden;background:#ffe2ef;border:6px solid rgba(224,224,237,0.9);box-shadow:0 16px 36px rgba(74,21,51,0.26)}
 .ai-launcher-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Chat panel card */
 .ai-panel{
   position:fixed;right:22px;bottom:22px;z-index:21;
-  width:min(480px, 96vw);
-  max-height:min(820px, 92vh);
-  display:grid;
-  grid-template-rows:auto minmax(0,1fr) auto auto auto auto;
-  overflow:hidden;
-  border-radius:24px;
-  background:#f7fbff;
-  border:1px solid rgba(0,120,160,0.22);
-  box-shadow:0 24px 60px rgba(16,47,74,0.26);
-  opacity:0;pointer-events:none;transform:translateY(18px) scale(0.98);transition:opacity 0.22s ease, transform 0.22s ease;
+  width:min(460px,96vw);height:min(700px,calc(100vh - 32px));
+  display:flex;flex-direction:column;
+  overflow:hidden;border-radius:20px;background:#f7fbff;
+  border:1px solid rgba(0,120,160,0.22);box-shadow:0 24px 60px rgba(16,47,74,0.26);
+  opacity:0;pointer-events:none;transform:translateY(18px) scale(0.98);
+  transition:opacity 0.2s ease, transform 0.2s ease;
 }
 .ai-panel.open{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
-.ai-panel::before{
-  content:"y=e^{x}   f(x)   sin x   log_a x   x^{2}";
-  position:absolute;inset:102px 0 auto;height:64px;pointer-events:none;
-  color:rgba(17,78,110,0.07);font-family:Georgia,serif;font-size:1.28rem;font-weight:900;letter-spacing:0.04em;transform:rotate(-6deg);white-space:nowrap;z-index:0;
-}
+
 .ai-header{
-  min-height:90px;padding:12px 14px;display:flex;align-items:center;gap:12px;
+  display:flex;align-items:center;gap:12px;padding:12px 14px;flex:0 0 auto;
   background:radial-gradient(circle at 88% 18%, rgba(255,211,105,0.42), transparent 22%), linear-gradient(135deg, #0d4265, #069aa6 58%, #37b48b);
-  color:#fff;position:relative;z-index:1;
+  color:#fff;
 }
-.ai-avatar{width:68px;height:68px;border-radius:16px;overflow:hidden;background:#eefcff;border:2px solid rgba(255,255,255,0.72);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.18);position:absolute;top:14px;left:14px;z-index:2}
+.ai-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#eefcff;border:2px solid rgba(255,255,255,0.72);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.18)}
 .ai-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.ai-header-content{margin-left:84px;flex:1;padding-right:50px}
-.ai-header h3{margin:0;font-size:1.16rem;line-height:1.05;font-weight:950}
-.ai-header p{margin:4px 0 0;color:rgba(255,255,255,0.92);font-size:0.9rem;font-weight:700}
-  .ai-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;margin-left:5px;padding:0 6px;border-radius:7px;background:rgba(255,211,105,0.26);font-size:0.78rem;font-weight:950}
-.ai-close{position:absolute;top:14px;right:14px;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.88);color:#0d4265;font-size:1.8rem;line-height:1;font-weight:700;border:0;cursor:pointer;z-index:3}
+.ai-header-text{flex:1;min-width:0}
+.ai-header h3{margin:0;font-size:1.1rem;line-height:1.1;font-weight:950}
+.ai-header p{margin:3px 0 0;color:rgba(255,255,255,0.92);font-size:0.82rem;font-weight:700}
+.ai-close{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.88);color:#0d4265;font-size:1.6rem;line-height:1;font-weight:700;border:0;cursor:pointer;flex:0 0 auto}
+
+/* Messages */
 .chat-log{
-  min-height:260px;overflow-y:auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:12px;
+  flex:1;overflow-y:auto;padding:16px 14px 20px;display:flex;flex-direction:column;gap:11px;
   background:linear-gradient(rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(9,92,128,0.045) 1px, transparent 1px), linear-gradient(180deg, #f7fbff, #effcff);
-  background-size:22px 22px,22px 22px,auto;color:#11364e;position:relative;z-index:1;
+  background-size:22px 22px,22px 22px,auto;color:#11364e;
 }
-.msg{max-width:92%;padding:11px 13px;border-radius:15px;line-height:1.55;font-size:0.98rem;overflow-wrap:anywhere}
-.msg.bot{align-self:flex-start;background:rgba(255,255,255,0.76);border:1px solid rgba(6,154,166,0.14);color:#123852;box-shadow:0 8px 18px rgba(17,54,78,0.06)}
+.msg{max-width:94%;padding:10px 12px;border-radius:14px;line-height:1.5;font-size:0.95rem;overflow-wrap:anywhere}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg, #d9f6ef, #c8ecff);color:#0e3c58;border:1px solid rgba(55,180,139,0.24)}
-.chat-controls{margin:0 16px 16px;padding:10px;display:grid;grid-template-columns:auto 1fr 46px;gap:8px;background:#e3f5f7;border-radius:14px;border:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
-.chat-controls input{min-width:0;border:0;border-radius:10px;padding:0 12px;color:#11364e;background:transparent;font-size:1rem;outline:none}
-.chat-controls input::placeholder{color:rgba(17,54,78,0.55)}
-#sendChat{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;font-size:1.3rem;border:0;cursor:pointer}
-/* plus button + upload dropdown menu */
-.attach-plus-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#fff;border:1px solid rgba(6,154,166,0.18);color:#0d6571;font-size:1.4rem;font-weight:bold;cursor:pointer;position:relative;}
-.attach-menu{position:absolute;bottom:44px;left:0;background:#ffffff;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,0.15);min-width:140px;overflow:hidden;display:none;z-index:100;}
-.attach-menu.show{display:block;}
-.attach-menu button{width:100%;text-align:left;padding:10px 12px;background:#fff;border:none;font-size:0.9rem;cursor:pointer;color:#102033;}
-.attach-menu button:hover{background:#e8f7f8;}
-.suggestions{padding:0 16px 12px;display:flex;gap:7px;flex-wrap:wrap;background:#f7fbff;position:relative;z-index:1}
-.suggestions button{background:rgba(230,250,247,0.86);color:#0d6571;border:1px solid rgba(6,154,166,0.18);border-radius:999px;padding:7px 9px;font-size:0.78rem;font-weight:800;cursor:pointer}
-.ai-tabs{display:grid;grid-template-columns:1fr;min-height:48px;background:#f7fbff;border-top:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
-.ai-tab{display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(17,54,78,0.64);font-weight:800;background:transparent;border:0;border-top:2px solid transparent}
-.ai-tab.active{color:#0d6571;border-top-color:#05a8a8}
-.chat-icon{width:24px;height:20px;display:inline-block;position:relative;border:2px solid currentColor;border-radius:7px;background:rgba(255,255,255,0.66)}
-.chat-icon::after{content:"";position:absolute;left:5px;bottom:-7px;width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;background:#f7fbff;transform:skew(-18deg)}
-.chat-icon::before{content:"fx";position:absolute;inset:0;display:grid;place-items:center;font-size:0.58rem;line-height:1;font-weight:950}
-.ai-powered{min-height:34px;display:grid;place-items:center;background:linear-gradient(90deg, #eefcff, #f8fbff);color:#557084;font-size:0.78rem;font-weight:800;position:relative;z-index:1}
-  .attach-preview{padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;background:#f7fbff;position:relative;z-index:1}
+.msg.bot{align-self:flex-start;background:rgba(255,255,255,0.86);border:1px solid rgba(6,154,166,0.14);color:#123852;box-shadow:0 6px 14px rgba(17,54,78,0.05)}
+
+/* Grading boxes: green = correct, red = wrong, teal = hint */
+.box-ok{border:2px solid #2ecc71;border-radius:10px;padding:8px 10px;background:rgba(46,204,113,0.07);margin:6px 0}
+.box-wrong{border:2px solid #e74c3c;border-radius:10px;padding:8px 10px;background:rgba(231,76,60,0.06);margin:6px 0}
+.hint-panel{border:1.5px solid #05a8a8;border-radius:10px;padding:8px 10px;background:rgba(5,168,168,0.07);margin:4px 0 12px}
+.hint-panel strong{color:#0d6571}
+
+/* Attachment preview chips */
+.attach-preview{padding:0 14px 8px;display:flex;flex-wrap:wrap;gap:8px;background:#f7fbff;flex:0 0 auto}
 .attach-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:#e3f5f7;border:1px solid rgba(6,154,166,0.18);font-size:0.74rem;font-weight:700;color:#0d4265;max-width:180px;overflow:hidden}
 .attach-chip img{width:28px;height:28px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.08)}
 .attach-chip button{width:18px;height:18px;border-radius:50%;background:#0d4265;color:#fff;font-size:0.7rem;display:grid;place-items:center;border:0;flex:0 0 auto;cursor:pointer}
-.msg .mark-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.86rem}
-.msg .mark-table th,.msg .mark-table td{border:1px solid rgba(6,154,166,0.18);padding:6px 7px;text-align:left}
-.msg .mark-table th{background:#e3f5f7;color:#0d4265;font-weight:800}
-.msg .badge-ok{color:#0a7a42;font-weight:800}.msg .badge-wrong{color:#c0392b;font-weight:800}.msg .badge-partial{color:#b7791f;font-weight:800}
-.chat-log.drag-over{outline:2px dashed #05a8a8;outline-offset:-6px;background-color:rgba(5,168,168,0.06)}
-@media(max-width:560px){body{place-items:start center}}
+
+/* Bottom input bar: text + image + file + send */
+.chat-controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(6,154,166,0.16);background:#fff;flex:0 0 auto}
+.chat-controls .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(6,154,166,0.2);background:#fff;font-size:1.15rem;cursor:pointer;flex:0 0 auto;color:#0d6571}
+.chat-controls .icon-btn:hover{background:#eefcff}
+.chat-controls input{flex:1;min-width:0;border:1px solid rgba(6,154,166,0.2);border-radius:10px;padding:0 12px;height:38px;font-size:0.95rem;outline:none;color:#11364e}
+.chat-controls input::placeholder{color:rgba(17,54,78,0.55)}
+#sendBtn{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;font-size:1.2rem;border:0;cursor:pointer;flex:0 0 auto}
+
+/* Quick suggestion chips */
+.suggestions{padding:0 14px 10px;display:flex;gap:7px;flex-wrap:wrap;background:#fff;flex:0 0 auto}
+.suggestions button{background:rgba(230,250,247,0.86);color:#0d6571;border:1px solid rgba(6,154,166,0.18);border-radius:999px;padding:7px 9px;font-size:0.76rem;font-weight:800;cursor:pointer}
+.suggestions button:hover{background:#d8f3f0}
+
+/* When embedded inside the parent popup iframe, fill it and hide the launcher + close button */
+body.embedded{margin:0;padding:0;background:#f7fbff;display:block;overflow:hidden}
+body.embedded .ai-launcher{display:none}
+body.embedded .ai-close{display:none}
+body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-radius:0;border:0;box-shadow:none;opacity:1;pointer-events:auto;transform:none}
 </style>
 </head>
 <body>
-<button class="ai-launcher" id="aiLauncher" aria-label="Open AI chatbox">
+<button class="ai-launcher" id="aiLauncher" aria-label="Open AI math tutor chatbox">
   <span class="ai-launcher-bubble">Hi! How can I assist you?</span>
   <span class="ai-launcher-avatar">
-    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffe2ef' stroke='%23ff6f91' stroke-width='4'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='42' font-family='Georgia'%3EMr%3C/text%3E%3C/svg%3E" alt="open chat" />
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffe2ef' stroke='%23ff6f91' stroke-width='4'/%3E%3Ctext x='50' y='63' text-anchor='middle' font-size='42' font-family='Georgia'%3EMs%3C/text%3E%3C/svg%3E" alt="open chat" />
   </span>
 </button>
+
 <aside class="ai-panel" id="aiPanel" aria-label="AI math teacher chatbox" aria-hidden="true">
   <div class="ai-header">
     <div class="ai-avatar">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23eefcff'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='42' font-family='Georgia'%3EMr%3C/text%3E%3C/svg%3E" alt="Mr Effie" />
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23eefcff'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='40' font-family='Georgia'%3EMs%3C/text%3E%3C/svg%3E" alt="Ms. Effie" />
     </div>
-    <div class="ai-header-content">
-      <h3>Mr. Effie <span class="ai-badge">AI</span></h3>
-      <p>Mathematics Learning Assistant</p>
+    <div class="ai-header-text">
+      <h3>Ms. Effie</h3>
+      <p>Matric Functions · Marking &amp; Hints</p>
     </div>
     <button class="ai-close" id="aiClose" aria-label="Close">×</button>
   </div>
+
   <div class="chat-log" id="chatLog"></div>
   <div class="attach-preview" id="attachPreview"></div>
-  <div class="chat-controls">
-    <div class="attach-plus-btn" id="attachPlusBtn">
-      +
-      <div class="attach-menu" id="attachMenu">
-        <button id="menuPhoto">📷 Upload Photo</button>
-        <button id="menuFile">📄 Upload File</button>
-      </div>
-    </div>
-    <input id="chatInput" type="text" placeholder="Type here — or attach photo/file" aria-label="Type your question" />
-    <button id="sendChat" title="Send">↑</button>
-  </div>
-  <div class="suggestions">
-    <button data-prompt="Explain this slide simply.">Explain simply</button>
-    <button data-prompt="Give me an example.">Example</button>
-    <button data-prompt="How do I find domain and range?">Domain &amp; range</button>
-  </div>
-  <div class="ai-tabs"><button class="ai-tab active" type="button"><span class="chat-icon"></span><span>Chat</span></button></div>
-  <div class="ai-powered">Powered by FUNCTION JUNCTION</div>
-</aside>
-<input type="file" id="photoInput" accept="image/*" hidden />
-<input type="file" id="fileInput" accept=".pdf,.txt,.docx,image/*" hidden />
-<script>
-// ===================== LOCAL TEST ONLY =====================
-const API_URL = '/api/gemini';
-// System Instruction
-const SYSTEM_PROMPT = `You are Mr. Effie, friendly mathematics tutor for students.
-Strict rules:
-1. NEVER give full final answers, NEVER write complete step‑by‑step solutions.
-2. Provide only guiding hints, point out mistakes, explain why something is wrong, use guiding questions to push student to think on their own.
-3. Handle text questions, hand‑written homework photos, function graph sketching, domain and range tasks.
-4. Keep replies natural and flexible, avoid rigid template tables.
-5. When you receive uploaded image of student work: analyze their work, identify errors, provide correction hints.
-6. Use simple plain English, speak using second‑person "you".
-7. Do NOT output raw internal marking scheme data to chat output. Use marking knowledge internally for reasoning.;
 
-window.el = {
-  aiPanel: document.getElementById('aiPanel'),
-  aiLauncher: document.getElementById('aiLauncher'),
-  aiClose: document.getElementById('aiClose'),
-  chatLog: document.getElementById('chatLog'),
-  chatInput: document.getElementById('chatInput'),
-  sendChat: document.getElementById('sendChat'),
-  attachPreview: document.getElementById('attachPreview')
-};
-// file inputs
-const photoInput = document.getElementById("photoInput");
-const fileInput = document.getElementById("fileInput");
-const attachPlusBtn = document.getElementById("attachPlusBtn");
-const attachMenu = document.getElementById("attachMenu");
-const menuPhoto = document.getElementById("menuPhoto");
-const menuFile = document.getElementById("menuFile");
-let pendingImages = [];
-let pendingFiles = [];
-// open / close chat panel
-function openAiPanel(){
-  el.aiPanel.classList.add('open');
-  el.aiPanel.setAttribute('aria-hidden','false');
-  el.aiLauncher.classList.add('hidden');
-  setTimeout(()=>{ el.chatInput.focus(); },120);
-}
-function closeAiPanel(){
-  el.aiPanel.classList.remove('open');
-  el.aiPanel.setAttribute('aria-hidden','true');
-  el.aiLauncher.classList.remove('hidden');
-}
-el.aiLauncher.addEventListener('click', openAiPanel);
-el.aiClose.addEventListener('click', closeAiPanel);
-// plus button dropdown menu toggle
-attachPlusBtn.addEventListener("click", (e)=>{
-  e.stopPropagation();
-  attachMenu.classList.toggle("show");
-});
-// click outside close menu
-document.addEventListener("click", ()=>{ attachMenu.classList.remove("show"); });
-menuPhoto.addEventListener("click",(e)=>{
-  e.stopPropagation(); attachMenu.classList.remove("show"); photoInput.click();
-});
-menuFile.addEventListener("click",(e)=>{
-  e.stopPropagation(); attachMenu.classList.remove("show"); fileInput.click();
-});
-function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function renderAttachPreview(){
-  el.attachPreview.innerHTML = "";
-  pendingImages.forEach((img,idx)=>{
-    const chip = document.createElement("span"); chip.className="attach-chip";
-    chip.innerHTML = <img src="${img.dataUrl}" alt="preview" /><span>${escHtml(img.name)}</span>;
-    const rmBtn = document.createElement("button"); rmBtn.textContent="×";
-    rmBtn.onclick = ()=>{ pendingImages.splice(idx,1); renderAttachPreview(); };
-    chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
-  });
-  pendingFiles.forEach((f,idx)=>{
-    const chip = document.createElement("span"); chip.className="attach-chip";
-    chip.innerHTML = <span>📄 ${escHtml(f.name)}</span>`;
-    const rmBtn = document.createElement("button"); rmBtn.textContent="×";
-    rmBtn.onclick = ()=>{ pendingFiles.splice(idx,1); renderAttachPreview(); };
-    chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
-  });
-}
-async function readFileAsDataUrl(file){
-  return new Promise((resolve,reject)=>{
-    const r = new FileReader();
-    r.onload = ()=> resolve(r.result);
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
-photoInput.onchange = async function(){
-  const files = Array.from(this.files||[]);
-  for(let f of files){
-    if(!f.type.startsWith("image/")) continue;
-    const dataUrl = await readFileAsDataUrl(f);
-    pendingImages.push({dataUrl:dataUrl,name:f.name,mime:f.type});
+  <div class="suggestions" id="suggestions">
+    <button data-prompt="Explain how to sketch f(x)=sqrt(3x-2) and state its domain and range.">Sketch sqrt graph</button>
+    <button data-prompt="How do I find the domain and range of f(x)=5/(2-x)?">Domain &amp; range</button>
+    <button data-prompt="Check my graph: I drew f(x)=x^2-4 opening downward.">Check my graph</button>
+  </div>
+
+  <div class="chat-controls">
+    <button class="icon-btn" id="photoBtn" type="button" title="Upload photo / handwriting" aria-label="Upload photo">📷</button>
+    <button class="icon-btn" id="fileBtn" type="button" title="Upload file" aria-label="Upload file">📄</button>
+    <input id="chatInput" type="text" placeholder="Type your question…" aria-label="Type your question" />
+    <button id="sendBtn" type="button" title="Send">↑</button>
+  </div>
+</aside>
+
+<input type="file" id="photoInput" accept="image/*" multiple hidden />
+<input type="file" id="fileInput" accept=".pdf,.txt,.docx,.md,image/*" multiple hidden />
+
+<script>
+(function () {
+  'use strict';
+
+  // ===== CONFIG =====
+  // Local dev (node server.js) uses the local proxy at /api/gemini.
+  // The live GitHub Pages site must use your deployed Cloudflare Worker URL.
+  var GEMINI_PROXY_URL =
+    (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? '/api/gemini'
+      : 'https://fj-gemini-proxy.fj-gemini-proxy.workers.dev/api/gemini'; // <-- PASTE YOUR WORKER URL HERE
+
+  // Detect when this page is embedded in the parent popup iframe
+  var IS_EMBEDDED = (window.self !== window.top) ||
+    (new URLSearchParams(location.search).has('embed'));
+
+  // ===== ELEMENTS =====
+  var panel = document.getElementById('aiPanel');
+  var launcher = document.getElementById('aiLauncher');
+  var closeBtn = document.getElementById('aiClose');
+  var chatLog = document.getElementById('chatLog');
+  var chatInput = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('sendBtn');
+  var photoBtn = document.getElementById('photoBtn');
+  var fileBtn = document.getElementById('fileBtn');
+  var photoInput = document.getElementById('photoInput');
+  var fileInput = document.getElementById('fileInput');
+  var attachPreview = document.getElementById('attachPreview');
+
+  var pendingImages = []; // { dataUrl, mime, name }
+  var pendingFiles = [];  // { name, text }
+
+  // ===== SYSTEM PROMPT (flexible Matric tutor, anchored to the a-o scheme) =====
+  var SYSTEM_PROMPT =
+    'You are Ms. Effie, a friendly and flexible Malaysian Matriculation (Matric) Mathematics tutor and marker, ' +
+    'specialising in Functions (Topic 5): graph sketching, domain and range, transformations, asymptotes, amplitude and period.\n\n' +
+    'YOUR STYLE\n' +
+    '- Be natural, warm and conversational. NEVER use rigid templates or fixed scripts.\n' +
+    '- Always use second person ("you"). Keep answers concise.\n' +
+    '- Use simple English and mix in Malay terms when the student does (e.g. "domain", "julat", "lakar graf", "pintasan").\n\n' +
+    'GRADING RULES\n' +
+    '- Mark against the marking scheme below (TEST ME a-o) as your ANCHOR, but stay flexible: adapt to whatever the student actually wrote, typed, or photographed.\n' +
+    '- Award a mark only when the student\'s step matches the scheme. Name the error type (concept / procedure / algebra slip / carelessness / not answered) and explain WHY it is wrong.\n' +
+    '- If a photo or handwriting is unclear, ask for a clearer photo. Do NOT guess marks.\n' +
+    '- NEVER give the full final answer or a complete step-by-step solution. Give hints, clues and guiding questions so the student self-corrects.\n\n' +
+    'OUTPUT FORMAT (always follow this)\n' +
+    '- Put every CORRECT point inside [[OK]] ... [[/OK]].\n' +
+    '- Put every WRONG point inside [[WRONG]] ... [[/WRONG]].\n' +
+    '- Right after a [[WRONG]] block, add a short [[HINT]] ... [[/HINT]] block: explain the error and give ONE directional clue (not the answer).\n' +
+    '- End with one short line of encouragement.\n' +
+    '- Render maths in plain text: Df, Rf, -infinity, sqrt(x), x^2, e^x, ln x, |x|.\n\n' +
+    'MARKING SCHEME (TEST ME a-o)\n' +
+    '(a) f(x)=-6 : horizontal line y=-6; Df=(-inf,+inf); Rf={-6} [3 marks: graph, Df, Rf]\n' +
+    '(b) f(x)=-3x+4 : decreasing line, y-intercept 4, x-intercept 4/3; Df=(-inf,+inf); Rf=(-inf,+inf) [3 marks]\n' +
+    '(c) f(x)=x^2-4 : upward parabola, vertex (0,-4); Df=(-inf,+inf); Rf=[-4,+inf) [3 marks]\n' +
+    '(d) f(x)=9-x^2 : downward parabola, max (0,9); Df=(-inf,+inf); Rf=(-inf,9] [3 marks]\n' +
+    '(e) f(x)=x^3-3 : cubic S-shape, inflection (0,-3); Df=(-inf,+inf); Rf=(-inf,+inf) [2 marks]\n' +
+    '(f) f(x)=|2x+1| : V-shape, vertex (-1/2,0); Df=(-inf,+inf); Rf=[0,+inf) [3 marks]\n' +
+    '(g) f(x)=|2x-1|+1 : V-shape, vertex (1/2,1), y-intercept 2; Df=(-inf,+inf); Rf=[1,+inf) [3 marks]\n' +
+    '(h) f(x)=sqrt(3x-2) : root curve from (2/3,0); Df=[2/3,+inf); Rf=[0,+inf) [3 marks]\n' +
+    '(i) f(x)=sqrt(2-3x) : decreasing root curve ending (2/3,0); Df=(-inf,2/3]; Rf=[0,+inf) [3 marks]\n' +
+    '(j) f(x)=5/(2+x) : hyperbola, VA x=-2, HA y=0; Df=all x except -2; Rf=all y except 0 [4 marks]\n' +
+    '(k) f(x)=5/(2-x) : hyperbola, VA x=2, HA y=0; Df=all x except 2; Rf=all y except 0 [4 marks]\n' +
+    '(l) f(x)=e^(2x)+1 : rising exponential, HA y=1, through (0,2); Df=(-inf,+inf); Rf=(1,+inf) [3 marks]\n' +
+    '(m) f(x)=e^(-x)-2 : decreasing exponential, HA y=-2, through (0,-1); Df=(-inf,+inf); Rf=(-2,+inf) [3 marks]\n' +
+    '(n) f(x)=ln(x-3) : log curve, VA x=3, through (4,0); Df=(3,+inf); Rf=(-inf,+inf) [3 marks]\n' +
+    '(o) f(x)=ln(3-x) : reflected log, VA x=3, through (2,0), decreasing; Df=(-inf,3); Rf=(-inf,+inf) [3 marks]';
+
+  // ===== HELPERS =====
+  function escHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
-  this.value = ""; renderAttachPreview();
-};
-fileInput.onchange = async function(){
-  const files = Array.from(this.files||[]);
-  for(let f of files){
-    if(f.type.startsWith("image/")){
-      const dataUrl = await readFileAsDataUrl(f);
-      pendingImages.push({dataUrl:dataUrl,name:f.name,mime:f.type});
-    }else{
-      pendingFiles.push({name:f.name});
-    }
+
+  // Convert [[OK]] / [[WRONG]] / [[HINT]] markers into styled boxes
+  function renderMarked(text) {
+    var s = escHtml(text);
+    s = s.replace(/\[\[OK\]\]([\s\S]*?)\[\[\/OK\]\]/g, '<div class="box-ok">$1</div>');
+    s = s.replace(/\[\[WRONG\]\]([\s\S]*?)\[\[\/WRONG\]\]/g, '<div class="box-wrong">$1</div>');
+    s = s.replace(/\[\[HINT\]\]([\s\S]*?)\[\[\/HINT\]\]/g, '<div class="hint-panel"><strong>Hint:</strong> $1</div>');
+    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\n/g, '<br>');
+    return s;
   }
-  this.value = ""; renderAttachPreview();
-};
-function scrollChatBottom(){
-  requestAnimationFrame(()=>{
-    el.chatLog.scrollTop = el.chatLog.scrollHeight;
-    setTimeout(()=>{ el.chatLog.scrollTop = el.chatLog.scrollHeight; },80);
-  });
-}
-function addUserMessage(text){
-  const wrap = document.createElement("div"); wrap.className="msg user";
-  let html = "";
-  if(text) html += <div>${escHtml(text).replace(/\n/g,"<br>")}</div>;
-  pendingImages.forEach(img=>{
-    html += <div style="margin-top:8px"><img src="${img.dataUrl}" style="max‑width:100%;max‑height:180px;border‑radius:8px;border:1px solid #00000012" /></div>;
-  });
-  pendingFiles.forEach(f=>{
-    html += <div style="margin‑top:6px;font‑size:0.82rem;opacity:0.8">📄 ${escHtml(f.name)}</div>;
-  });
-  if(!html) html = "<em>(image / file only)</em>";
-  wrap.innerHTML = html;
-  el.chatLog.appendChild(wrap);
-  scrollChatBottom();
-}
-function addBotMessage(text){
-  const wrap = document.createElement("div"); wrap.className="msg bot";
-  wrap.innerHTML = escHtml(text).replace(/\n/g,"<br>");
-  el.chatLog.appendChild(wrap);
-  scrollChatBottom();
-}
-async function handleSend(){
-  const userText = el.chatInput.value.trim();
-  if(!userText && pendingImages.length===0 && pendingFiles.length===0) return;
-  const snapImages = [...pendingImages];
-  const snapFiles = [...pendingFiles];
-  addUserMessage(userText);
-  el.chatInput.value = "";
-  pendingImages = []; pendingFiles = [];
-  renderAttachPreview();
-  // typing indicator
-  const typing = document.createElement("div");
-  typing.className="msg bot";
-  typing.textContent = "Mr. Effie is thinking...";
-  typing.style.opacity = "0.7";
-  el.chatLog.appendChild(typing);
-  scrollChatBottom();
-  try{
-    const parts = [];
-    parts.push({text: SYSTEM_PROMPT + "\nStudent input: " + userText});
-    for(const img of snapImages){
-      const b64 = img.dataUrl.split(",")[1];
-      parts.push({ inline_data: { mime_type: img.mime, data:b64 }});
-    }
-    const payload = { contents:[ { parts: parts } ] };
-    const res = await fetch(API_URL,{
-      method:"POST",
-      headers:{"Content‑Type":"application/json"},
-      body: JSON.stringify(payload)
+
+  function scrollBottom() {
+    requestAnimationFrame(function () {
+      chatLog.scrollTop = chatLog.scrollHeight;
+      setTimeout(function () { chatLog.scrollTop = chatLog.scrollHeight; }, 60);
     });
-    const json = await res.json();
-    typing.remove();
-    const reply = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if(!reply){
-      addBotMessage("Sorry, I could not generate a reply. Check API‑key, Generative‑Language‑API permission and CORS browser restrictions.");
-    }else{
-      addBotMessage(reply);
-    }
-  }catch(err){
-    typing.remove();
-    addBotMessage(Request error: ${err.message}\nMost‑likely‑cause: browser CORS blocks Gemini request when opening local html file.);
   }
-}
-// bind events
-el.sendChat.onclick = handleSend;
-el.chatInput.addEventListener("keydown",(e)=>{ if(e.key==="Enter") handleSend(); });
-// suggestion quick buttons
-document.querySelectorAll(".suggestions button").forEach(btn=>{
-  const clone = btn.cloneNode(true);
-  btn.parentNode.replaceChild(clone,btn);
-  clone.addEventListener("click",()=>{
-    el.chatInput.value = clone.dataset.prompt;
-    handleSend();
+
+  function addUserMessage(text) {
+    var wrap = document.createElement('div');
+    wrap.className = 'msg user';
+    var html = '';
+    if (text) html += '<div>' + escHtml(text).replace(/\n/g, '<br>') + '</div>';
+    pendingImages.forEach(function (img) {
+      html += '<div style="margin-top:8px"><img src="' + img.dataUrl + '" alt="upload" style="max-width:100%;max-height:180px;border-radius:8px" /></div>';
+    });
+    pendingFiles.forEach(function (f) {
+      html += '<div style="margin-top:6px;font-size:0.82rem;opacity:0.8">📄 ' + escHtml(f.name) + '</div>';
+    });
+    if (!html) html = '<em>(attachment only)</em>';
+    wrap.innerHTML = html;
+    chatLog.appendChild(wrap);
+    scrollBottom();
+  }
+
+  function addBotMessage(html) {
+    var wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = html;
+    chatLog.appendChild(wrap);
+    scrollBottom();
+  }
+
+  // ===== OPEN / CLOSE =====
+  function openPanel() {
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    if (launcher) launcher.classList.add('hidden');
+    setTimeout(function () { chatInput.focus(); }, 100);
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    if (launcher) launcher.classList.remove('hidden');
+  }
+
+  if (IS_EMBEDDED) {
+    document.body.classList.add('embedded');
+    openPanel();
+    if (launcher) launcher.style.display = 'none';
+  } else {
+    if (launcher) launcher.addEventListener('click', openPanel);
+  }
+  if (closeBtn) closeBtn.addEventListener('click', closePanel);
+
+  // ===== UPLOADS =====
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(r.result); };
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function readFileAsText(file) {
+    return new Promise(function (resolve) {
+      if (file.type && file.type.indexOf('text') === 0) {
+        var r = new FileReader();
+        r.onload = function () { resolve(String(r.result).slice(0, 4000)); };
+        r.onerror = function () { resolve(''); };
+        r.readAsText(file);
+      } else {
+        resolve('');
+      }
+    });
+  }
+
+  function renderPreview() {
+    attachPreview.innerHTML = '';
+    pendingImages.forEach(function (img, idx) {
+      var chip = document.createElement('span');
+      chip.className = 'attach-chip';
+      chip.innerHTML = '<img src="' + img.dataUrl + '" alt="preview" /><span>' + escHtml(img.name) + '</span>';
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.textContent = '×';
+      rm.addEventListener('click', function () { pendingImages.splice(idx, 1); renderPreview(); });
+      chip.appendChild(rm);
+      attachPreview.appendChild(chip);
+    });
+    pendingFiles.forEach(function (f, idx) {
+      var chip = document.createElement('span');
+      chip.className = 'attach-chip';
+      chip.innerHTML = '<span>📄 ' + escHtml(f.name) + '</span>';
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.textContent = '×';
+      rm.addEventListener('click', function () { pendingFiles.splice(idx, 1); renderPreview(); });
+      chip.appendChild(rm);
+      attachPreview.appendChild(chip);
+    });
+  }
+
+  photoBtn.addEventListener('click', function () { photoInput.click(); });
+  fileBtn.addEventListener('click', function () { fileInput.click(); });
+
+  photoInput.addEventListener('change', function () {
+    var files = Array.prototype.slice.call(photoInput.files || []);
+    files.forEach(function (f) {
+      if (!f.type || f.type.indexOf('image/') !== 0) return;
+      readFileAsDataUrl(f).then(function (dataUrl) {
+        pendingImages.push({ dataUrl: dataUrl, mime: f.type || 'image/jpeg', name: f.name });
+        if (pendingImages.length > 4) pendingImages = pendingImages.slice(-4);
+        renderPreview();
+      });
+    });
+    photoInput.value = '';
   });
-});
-// welcome greeting message on load
-setTimeout(()=>{
-  addBotMessage("Hi! I am Mr. Effie.\nFeel free to ask me mathematics questions. You may also attach photos or files.");
-},400);
-console.log("Mr.Effie chatbox loaded (local test mode, Gemini 1.5 Flash)");
+
+  fileInput.addEventListener('change', function () {
+    var files = Array.prototype.slice.call(fileInput.files || []);
+    files.forEach(function (f) {
+      if (f.type && f.type.indexOf('image/') === 0) {
+        readFileAsDataUrl(f).then(function (dataUrl) {
+          pendingImages.push({ dataUrl: dataUrl, mime: f.type || 'image/jpeg', name: f.name });
+          if (pendingImages.length > 4) pendingImages = pendingImages.slice(-4);
+          renderPreview();
+        });
+      } else {
+        readFileAsText(f).then(function (txt) {
+          pendingFiles.push({ name: f.name, text: txt });
+          if (pendingFiles.length > 3) pendingFiles = pendingFiles.slice(-3);
+          renderPreview();
+        });
+      }
+    });
+    fileInput.value = '';
+  });
+
+  // ===== SEND =====
+  function handleSend() {
+    var text = chatInput.value.trim();
+    if (!text && pendingImages.length === 0 && pendingFiles.length === 0) return;
+
+    var snapImages = pendingImages.slice();
+    var snapFiles = pendingFiles.slice();
+
+    addUserMessage(text);
+    chatInput.value = '';
+    pendingImages = [];
+    pendingFiles = [];
+    renderPreview();
+
+    var typing = document.createElement('div');
+    typing.className = 'msg bot';
+    typing.textContent = 'Ms. Effie is checking…';
+    typing.style.opacity = '0.7';
+    chatLog.appendChild(typing);
+    scrollBottom();
+
+    // Build the request parts
+    var parts = [];
+    var textBlock = text ? text : '';
+    if (snapFiles.length) {
+      textBlock += '\n\n[Attached files]\n' + snapFiles.map(function (f) {
+        return f.name + (f.text ? ':\n' + f.text : ' (format not readable as text)');
+      }).join('\n\n');
+    }
+    if (textBlock) parts.push({ text: textBlock });
+
+    snapImages.forEach(function (img) {
+      var b64 = img.dataUrl.split(',')[1];
+      parts.push({ inline_data: { mime_type: img.mime, data: b64 } });
+    });
+
+    fetch(GEMINI_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [{ parts: parts }]
+      })
+    })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        typing.remove();
+        var reply = json && json.candidates && json.candidates[0] &&
+          json.candidates[0].content && json.candidates[0].content.parts &&
+          json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text;
+        if (!reply) {
+          addBotMessage('Sorry, I could not get a reply. Please check that the AI proxy URL is set and the worker is deployed.');
+          return;
+        }
+        addBotMessage(renderMarked(reply));
+      })
+      .catch(function (err) {
+        typing.remove();
+        addBotMessage('⚠️ Could not reach the AI: ' + escHtml(String(err && err.message ? err.message : err)) +
+          '<br><br>If you are on the live site, make sure the Cloudflare Worker is deployed and GEMINI_PROXY_URL is set to its URL.');
+      });
+  }
+
+  sendBtn.addEventListener('click', handleSend);
+  chatInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  });
+
+  // Quick suggestion chips
+  document.querySelectorAll('#suggestions button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      chatInput.value = btn.getAttribute('data-prompt');
+      handleSend();
+    });
+  });
+
+  // Welcome message
+  setTimeout(function () {
+    addBotMessage('Hi! I’m <strong>Ms. Effie</strong>, your Matric Functions tutor.<br>' +
+      'Type a question, or attach a <strong>📷 photo</strong> of your working or a <strong>📄 file</strong>.<br>' +
+      'I’ll check your work against the marking scheme and guide you with hints — I won’t just hand you the answer.');
+  }, 300);
+})();
 </script>
 </body>
 </html>
