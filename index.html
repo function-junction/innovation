@@ -5082,6 +5082,174 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- ===== End AI Assistant Floating Popup ===== -->
 
+<!-- ===== Function Junction Settings (font size + read aloud) ===== -->
+<style>
+#fj-settings-btn{
+  position:fixed;left:18px;bottom:18px;z-index:10000;
+  width:52px;height:52px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#0d4265,#069aa6 58%,#37b48b);
+  color:#fff;border:2px solid rgba(255,255,255,0.85);
+  box-shadow:0 10px 26px rgba(13,66,101,0.35);
+  cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+}
+#fj-settings-btn:hover{transform:scale(1.08);box-shadow:0 14px 30px rgba(13,66,101,0.45)}
+#fj-settings-btn svg{display:block}
+
+#fj-settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:10001}
+#fj-settings-overlay.show{display:block}
+
+#fj-settings-panel{
+  position:fixed;left:18px;bottom:82px;z-index:10002;
+  width:320px;max-width:calc(100vw - 36px);
+  background:#fdfefe;border-radius:20px;
+  border:1px solid rgba(13,66,101,0.18);
+  box-shadow:0 24px 60px rgba(16,47,74,0.3);
+  padding:18px 20px 20px;
+  display:none;
+  font-family:"NEXA RUST","Nexa Rust",Rockwell,"Bahnschrift SemiBold","Arial Black",Impact,sans-serif;
+}
+#fj-settings-panel.open{display:block;animation:fj-pop .18s ease}
+@keyframes fj-pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.fj-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.fj-title{font-size:1.3rem;font-weight:900;letter-spacing:.03em;color:#0d4265;text-transform:uppercase}
+#fj-settings-close{width:34px;height:34px;border-radius:10px;border:0;background:#eef4f8;color:#0d4265;font-size:1.4rem;font-weight:900;cursor:pointer;line-height:1}
+#fj-settings-close:hover{background:#ddeaf2}
+
+.fj-section{margin-top:16px}
+.fj-row-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.fj-row-head svg{color:#0d6571;flex:0 0 auto}
+.fj-label{font-size:0.98rem;font-weight:900;letter-spacing:.02em;color:#123852;text-transform:uppercase}
+
+#fj-font-slider{width:100%;height:10px;border-radius:999px;accent-color:#069aa6;appearance:none;background:#eef4f8;outline:none;cursor:pointer}
+#fj-font-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#0d72ff,#05a8a8);border:3px solid #fff;box-shadow:0 3px 10px rgba(13,114,255,0.4);cursor:pointer}
+#fj-font-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#05a8a8;border:3px solid #fff;cursor:pointer}
+.fj-ticks{display:flex;justify-content:space-between;margin-top:9px}
+.fj-ticks span{font-size:0.7rem;font-weight:800;letter-spacing:.02em;color:#557084;text-transform:uppercase}
+
+.fj-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fj-onoff{font-size:0.86rem;font-weight:800;letter-spacing:.02em;color:#123852;text-transform:uppercase}
+.fj-switch{position:relative;display:inline-block;width:52px;height:30px;flex:0 0 auto}
+.fj-switch input{opacity:0;width:0;height:0}
+.fj-knob{position:absolute;cursor:pointer;inset:0;background:#cbd7e0;border-radius:999px;transition:.2s}
+.fj-knob:before{content:"";position:absolute;height:24px;width:24px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,0.2)}
+.fj-switch input:checked + .fj-knob{background:linear-gradient(135deg,#0d72ff,#05a8a8)}
+.fj-switch input:checked + .fj-knob:before{transform:translateX(22px)}
+</style>
+
+<button id="fj-settings-btn" aria-label="Settings" title="Settings">
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M19.14,12.94c0.04,-0.3 0.06,-0.61 0.06,-0.94c0,-0.32 -0.02,-0.64 -0.07,-0.94l2.03,-1.58c0.18,-0.14 0.23,-0.41 0.12,-0.61l-1.92,-3.32c-0.12,-0.22 -0.37,-0.29 -0.59,-0.22l-2.39,0.96c-0.5,-0.38 -1.03,-0.7 -1.62,-0.94L14.4,2.81c-0.04,-0.24 -0.24,-0.41 -0.48,-0.41h-3.84c-0.24,0 -0.43,0.17 -0.47,0.41L9.25,5.35C8.66,5.59 8.12,5.92 7.63,6.29L5.24,5.33c-0.22,-0.08 -0.47,0 -0.59,0.22L2.74,8.87C2.62,9.08 2.66,9.34 2.86,9.48l2.03,1.58C4.84,11.36 4.8,11.69 4.8,12s0.02,0.64 0.07,0.94l-2.03,1.58c-0.18,0.14 -0.23,0.41 -0.12,0.61l1.92,3.32c0.12,0.22 0.37,0.29 0.59,0.22l2.39,-0.96c0.5,0.38 1.03,0.7 1.62,0.94l0.36,2.54c0.05,0.24 0.24,0.41 0.48,0.41h3.84c0.24,0 0.44,-0.17 0.47,-0.41l0.36,-2.54c0.59,-0.24 1.13,-0.56 1.62,-0.94l2.39,0.96c0.22,0.08 0.47,0 0.59,-0.22l1.92,-3.32c0.12,-0.22 0.07,-0.47 -0.12,-0.61L19.14,12.94zM12,15.6c-1.98,0 -3.6,-1.62 -3.6,-3.6s1.62,-3.6 3.6,-3.6s3.6,1.62 3.6,3.6S13.98,15.6 12,15.6z"/></svg>
+</button>
+
+<div id="fj-settings-overlay"></div>
+
+<div id="fj-settings-panel" role="dialog" aria-label="Settings">
+  <div class="fj-head">
+    <span class="fj-title">Settings</span>
+    <button id="fj-settings-close" aria-label="Close">×</button>
+  </div>
+
+  <div class="fj-section">
+    <div class="fj-row-head">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M9,4v3h5v12h3V7h5V4H9zM3,12h3v7h3v-7h3V9H3V12z"/></svg>
+      <span class="fj-label">Font Size</span>
+    </div>
+    <input type="range" id="fj-font-slider" min="0" max="3" step="1" value="1" aria-label="Font size" />
+    <div class="fj-ticks"><span>Small</span><span>Medium</span><span>Big</span><span>Large</span></div>
+  </div>
+
+  <div class="fj-section">
+    <div class="fj-row-head">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M3,9v6h4l5,5V4L7,9H3zM16.5,12c0,-1.77 -1.02,-3.29 -2.5,-4.03v8.05C15.48,15.29 16.5,13.77 16.5,12zM14,3.23v2.06c2.89,0.86 5,3.54 5,6.71s-2.11,5.85 -5,6.71v2.06c4.01,-0.91 7,-4.49 7,-8.77S18.01,4.14 14,3.23z"/></svg>
+      <span class="fj-label">Read Aloud</span>
+    </div>
+    <div class="fj-toggle-row">
+      <span class="fj-onoff">Auto read text</span>
+      <label class="fj-switch"><input type="checkbox" id="fj-tts-toggle" checked /><span class="fj-knob"></span></label>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var FONT_ZOOMS = { small: 0.9, medium: 1, big: 1.12, large: 1.28 };
+  var LEVELS = ['small', 'medium', 'big', 'large'];
+
+  var slider = document.getElementById('fj-font-slider');
+  var ttsToggle = document.getElementById('fj-tts-toggle');
+  var btn = document.getElementById('fj-settings-btn');
+  var panel = document.getElementById('fj-settings-panel');
+  var overlay = document.getElementById('fj-settings-overlay');
+  var closeBtn = document.getElementById('fj-settings-close');
+  var iframe = document.getElementById('ai-popup-iframe');
+
+  function store(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
+  function read(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+  function getFont() { return read('fj_font_size') || 'medium'; }
+  function getTts() { var v = read('fj_tts'); return v === null ? true : v === '1'; }
+
+  function applyFont(level) {
+    var z = FONT_ZOOMS[level] || 1;
+    document.documentElement.style.zoom = String(z);
+    store('fj_font_size', level);
+    if (slider) slider.value = String(LEVELS.indexOf(level));
+  }
+
+  function applyTts(on) {
+    store('fj_tts', on ? '1' : '0');
+    if (ttsToggle) ttsToggle.checked = on;
+  }
+
+  function sendToIframe() {
+    if (iframe && iframe.contentWindow) {
+      try {
+        iframe.contentWindow.postMessage({
+          source: 'function-junction',
+          type: 'fj-settings',
+          font: getFont(),
+          tts: getTts()
+        }, '*');
+      } catch (e) {}
+    }
+  }
+
+  function openPanel() { panel.classList.add('open'); overlay.classList.add('show'); }
+  function closePanel() { panel.classList.remove('open'); overlay.classList.remove('show'); }
+
+  // Init
+  applyFont(getFont());
+  applyTts(getTts());
+
+  slider.addEventListener('input', function () {
+    applyFont(LEVELS[parseInt(slider.value, 10)] || 'medium');
+    sendToIframe();
+  });
+
+  ttsToggle.addEventListener('change', function () {
+    applyTts(ttsToggle.checked);
+    sendToIframe();
+  });
+
+  btn.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closePanel();
+  });
+
+  if (iframe) {
+    iframe.addEventListener('load', sendToIframe);
+    sendToIframe();
+  }
+})();
+</script>
+<!-- ===== End Function Junction Settings ===== -->
+
 </body>
 </html>
 
