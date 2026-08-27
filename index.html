@@ -5175,7 +5175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 (function () {
   'use strict';
 
-  var FONT_ZOOMS = { small: 0.9, medium: 1, big: 1.12, large: 1.28 };
+  var FONT_SIZES = { small: '14px', medium: '16px', big: '18px', large: '20px' };
   var LEVELS = ['small', 'medium', 'big', 'large'];
 
   var slider = document.getElementById('fj-font-slider');
@@ -5193,8 +5193,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function getTts() { var v = read('fj_tts'); return v === null ? true : v === '1'; }
 
   function applyFont(level) {
-    var z = FONT_ZOOMS[level] || 1;
-    document.documentElement.style.zoom = String(z);
+    var px = FONT_SIZES[level] || '16px';
+    document.documentElement.style.fontSize = px;
     store('fj_font_size', level);
     if (slider) slider.value = String(LEVELS.indexOf(level));
   }
