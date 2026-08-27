@@ -5035,7 +5035,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function openPopup() {
       if (!isOpen) {
         // Load iframe only on first open
-        if (!iframe.getAttribute('src')) {
+        var src = iframe.getAttribute('src');
+        if (!src || src === 'about:blank') {
           iframe.src = './ai-assistant.html';
         }
         popup.style.display   = 'flex';
@@ -5053,17 +5054,19 @@ document.addEventListener('DOMContentLoaded', function() {
       if (launcher) launcher.classList.remove('hidden');
     }
 
-    // Attach click to all .ai-launcher-avatar elements
-    document.querySelectorAll('.ai-launcher-avatar').forEach(function (el) {
-      el.addEventListener('click', function (e) {
-        e.stopPropagation();   // prevent the old openAiPanel() from hiding the launcher
+    // Open the popup from anywhere on the launcher (avatar OR bubble).
+    // Capture phase + stopPropagation stops the old openAiPanel() from also
+    // firing and hiding the avatar (fixes the disappearing-icon bug).
+    var launcherBtn = document.getElementById('aiLauncher');
+    if (launcherBtn) {
+      launcherBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
         e.preventDefault();
-        // Defensive fix: keep the launcher avatar visible
         var launcher = document.getElementById('aiLauncher');
         if (launcher) launcher.classList.remove('hidden');
         openPopup();
-      });
-    });
+      }, true);
+    }
 
     // Close button
     closeBtn.addEventListener('click', closePopup);
