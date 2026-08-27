@@ -45,15 +45,15 @@ body{
 
 .ai-header{
   display:flex;align-items:center;gap:12px;padding:12px 14px;flex:0 0 auto;
-  background:linear-gradient(135deg, #eef1fa, #e5eaf6);
-  color:#0d4265;
+  background:linear-gradient(135deg, #0d4265, #069aa6 58%, #37b48b);
+  color:#fff;
 }
-.ai-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#fff;border:2px solid rgba(13,66,101,0.18);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.12)}
+.ai-avatar{width:46px;height:46px;border-radius:12px;overflow:hidden;background:#eefcff;border:2px solid rgba(255,255,255,0.8);flex:0 0 auto;box-shadow:0 6px 14px rgba(3,42,67,0.2)}
 .ai-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .ai-header-text{flex:1;min-width:0}
-.ai-header h3{margin:0;font-size:1.15rem;line-height:1.1;font-weight:950;color:#0d4265}
-.ai-header p{margin:3px 0 0;color:#557084;font-size:0.82rem;font-weight:700}
-.ai-close{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:#fff;color:#0d4265;font-size:1.6rem;line-height:1;font-weight:700;border:1px solid rgba(13,66,101,0.15);cursor:pointer;flex:0 0 auto}
+.ai-header h3{margin:0;font-size:1.15rem;line-height:1.1;font-weight:950;color:#fff}
+.ai-header p{margin:3px 0 0;color:rgba(255,255,255,0.92);font-size:0.82rem;font-weight:700}
+.ai-close{width:38px;height:38px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.9);color:#0d4265;font-size:1.6rem;line-height:1;font-weight:700;border:0;cursor:pointer;flex:0 0 auto}
 
 /* Messages */
 .chat-log{
@@ -77,13 +77,24 @@ body{
 .attach-chip img{width:28px;height:28px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.08)}
 .attach-chip button{width:18px;height:18px;border-radius:50%;background:#0d4265;color:#fff;font-size:0.7rem;display:grid;place-items:center;border:0;flex:0 0 auto;cursor:pointer}
 
-/* Bottom input bar: text + image + file + send */
-.chat-controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(6,154,166,0.16);background:#fff;flex:0 0 auto}
-.chat-controls .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(6,154,166,0.2);background:#fff;font-size:1.15rem;cursor:pointer;flex:0 0 auto;color:#0d6571}
-.chat-controls .icon-btn:hover{background:#eefcff}
-.chat-controls input{flex:1;min-width:0;border:1px solid rgba(6,154,166,0.2);border-radius:10px;padding:0 12px;height:38px;font-size:1rem;outline:none;color:#11364e}
-.chat-controls input::placeholder{color:rgba(17,54,78,0.55)}
-#sendBtn{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;border:0;cursor:pointer;flex:0 0 auto;display:grid;place-items:center}
+/* Bottom input bar: + attach, text, send — dark bar */
+.chat-controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,0.08);background:linear-gradient(135deg, #0d4265, #069aa6 58%, #37b48b);flex:0 0 auto}
+.chat-controls input{flex:1;min-width:0;border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:0 12px;height:38px;font-size:1rem;outline:none;color:#0d4265;background:#fff}
+.chat-controls input::placeholder{color:rgba(13,66,101,0.5)}
+#sendBtn{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;border:0;cursor:pointer;flex:0 0 auto;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,0.22)}
+#sendBtn:hover{filter:brightness(1.06)}
+
+/* + attach button + popup menu */
+.attach-wrap{position:relative;flex:0 0 auto}
+#attachBtn{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.16);color:#fff;font-size:1.6rem;line-height:1;font-weight:700;border:1px solid rgba(255,255,255,0.3);cursor:pointer;display:grid;place-items:center;transition:background 0.15s}
+#attachBtn:hover{background:rgba(255,255,255,0.3)}
+.attach-menu{position:absolute;bottom:48px;left:0;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.25);overflow:hidden;min-width:150px;display:none;z-index:60}
+.attach-menu.show{display:block;animation:fadeUp 0.15s ease}
+.attach-menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 14px;background:#fff;border:0;font-size:0.9rem;font-weight:700;color:#0d4265;cursor:pointer}
+.attach-menu button:hover{background:#eefcff}
+.attach-menu button .mi{font-size:1.1rem}
+.attach-menu button + button{border-top:1px solid rgba(6,154,166,0.12)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* When embedded inside the parent popup iframe, fill it and hide the launcher + close button */
 body.embedded{margin:0;padding:0;background:#f7fbff;display:block;overflow:hidden}
@@ -116,8 +127,13 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
   <div class="attach-preview" id="attachPreview"></div>
 
   <div class="chat-controls">
-    <button class="icon-btn" id="photoBtn" type="button" title="Upload photo / handwriting" aria-label="Upload photo">📷</button>
-    <button class="icon-btn" id="fileBtn" type="button" title="Upload file" aria-label="Upload file">📄</button>
+    <div class="attach-wrap">
+      <button id="attachBtn" type="button" title="Add photo or file" aria-label="Add attachment">+</button>
+      <div class="attach-menu" id="attachMenu">
+        <button type="button" id="menuPhoto"><span class="mi">📷</span> Photo</button>
+        <button type="button" id="menuFile"><span class="mi">📄</span> File</button>
+      </div>
+    </div>
     <input id="chatInput" type="text" placeholder="Type your question…" aria-label="Type your question" />
     <button id="sendBtn" type="button" title="Send" aria-label="Send">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
@@ -151,8 +167,10 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
   var chatLog = document.getElementById('chatLog');
   var chatInput = document.getElementById('chatInput');
   var sendBtn = document.getElementById('sendBtn');
-  var photoBtn = document.getElementById('photoBtn');
-  var fileBtn = document.getElementById('fileBtn');
+  var attachBtn = document.getElementById('attachBtn');
+  var attachMenu = document.getElementById('attachMenu');
+  var menuPhoto = document.getElementById('menuPhoto');
+  var menuFile = document.getElementById('menuFile');
   var photoInput = document.getElementById('photoInput');
   var fileInput = document.getElementById('fileInput');
   var attachPreview = document.getElementById('attachPreview');
@@ -168,20 +186,38 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
     '- Be short and natural: usually 1-4 sentences. Never long essays, tables or rigid templates.\n' +
     '- Use "you" and plain English; mix in Malay terms the student uses (julat, lakar graf, pintasan).\n' +
     '- Casual chat (hi, good morning, thanks): reply briefly and warmly.\n' +
+    '- When a student asks about a graph, give hints by linking it to the PARENT function plus the transformation. Example: "e^x + 3 is the graph of e^x shifted up 3 units" — name the base graph, say how it moved, then ask what that means for the vertex/asymptote/domain/range. Never write the full final answer.\n' +
     '- Maths: never give the full final answer or full solution. Give hints and guiding questions so the student self-corrects; name the error type and why it is wrong.\n' +
     '- The marking scheme (a-o) is INTERNAL reference only: never list question letters like (a), (b) to the student. Stay flexible for any question.\n' +
     '- If a photo or handwriting is unclear, ask for a clearer one; do not guess.\n' +
     '- Grading format ONLY when checking actual work: correct points in [[OK]]...[[/OK]], wrong points in [[WRONG]]...[[/WRONG]], then one short [[HINT]]...[[/HINT]]. Otherwise answer in plain text.\n' +
-    '- Maths in plain text: Df, Rf, -infinity, sqrt(x), x^2, e^x, ln x, |x|.';
+    '- Write maths with clean Unicode symbols only: e^x, x^2, sqrt(x), ∞, ≥, ≤, ≠, ±, ∪, ∩, →. Never use LaTeX (backslash commands) or markdown (**bold**, $math$, `code`).';
 
   // ===== HELPERS =====
   function escHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // Clean up leftover LaTeX / markdown so maths shows as readable symbols
+  function cleanMath(s) {
+    s = s.replace(/\$\$/g, '').replace(/\$/g, '');
+    s = s.split('\\(').join('').split('\\)').join('').split('\\[').join('').split('\\]').join('');
+    var map = {
+      '\\infty': '∞', '\\geq': '≥', '\\ge': '≥', '\\leq': '≤', '\\le': '≤',
+      '\\neq': '≠', '\\ne': '≠', '\\pm': '±', '\\times': '×', '\\cdot': '·',
+      '\\cup': '∪', '\\cap': '∩', '\\rightarrow': '→', '\\to': '→'
+    };
+    for (var k in map) { s = s.split(k).join(map[k]); }
+    s = s.replace(/\\sqrt\s*\{([^{}]*)\}/g, '√($1)');
+    s = s.replace(/\\frac\s*\{([^{}]*)\}\{([^{}]*)\}/g, '($1)/($2)');
+    s = s.replace(/`([^`]*)`/g, '$1');
+    s = s.replace(/^#{1,6}\s+/gm, '');
+    return s;
+  }
+
   // Convert [[OK]] / [[WRONG]] / [[HINT]] markers into styled boxes
   function renderMarked(text) {
-    var s = escHtml(text);
+    var s = escHtml(cleanMath(text));
     s = s.replace(/\[\[OK\]\]([\s\S]*?)\[\[\/OK\]\]/g, '<div class="box-ok">$1</div>');
     s = s.replace(/\[\[WRONG\]\]([\s\S]*?)\[\[\/WRONG\]\]/g, '<div class="box-wrong">$1</div>');
     s = s.replace(/\[\[HINT\]\]([\s\S]*?)\[\[\/HINT\]\]/g, '<div class="hint-panel"><strong>Hint:</strong> $1</div>');
@@ -294,8 +330,21 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
     });
   }
 
-  photoBtn.addEventListener('click', function () { photoInput.click(); });
-  fileBtn.addEventListener('click', function () { fileInput.click(); });
+  attachBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    attachMenu.classList.toggle('show');
+  });
+  menuPhoto.addEventListener('click', function () {
+    attachMenu.classList.remove('show');
+    photoInput.click();
+  });
+  menuFile.addEventListener('click', function () {
+    attachMenu.classList.remove('show');
+    fileInput.click();
+  });
+  document.addEventListener('click', function () {
+    attachMenu.classList.remove('show');
+  });
 
   photoInput.addEventListener('change', function () {
     var files = Array.prototype.slice.call(photoInput.files || []);
