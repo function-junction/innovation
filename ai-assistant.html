@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ms. Effie — AI Marking Assistant (a–o)</title>
+<title>Mr. Effie — AI Math Tutor</title>
 <style>
 /* ai-assistant core styles - English only comments */
 *{box-sizing:border-box}
@@ -21,17 +21,40 @@ body{
   padding:18px;
 }
 a{color:#0d6571}
-.page-head{position:fixed;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:2}
-.page-head a{font-weight:800;text-decoration:none;background:rgba(255,255,255,0.9);border:1px solid rgba(16,32,51,0.12);padding:8px 12px;border-radius:10px}
-.page-head span{font-weight:700;color:#304a63;background:rgba(255,255,255,0.86);padding:8px 12px;border-radius:10px;border:1px solid rgba(16,32,51,0.08)}
-/* Launcher and panel - original positions */
+
+.box-ok{
+  border:2px solid #27ae60;
+  border-radius:12px;
+  padding:10px 12px;
+  background-color:rgba(39,174,96,0.06);
+  margin:8px 0;
+}
+.box-wrong{
+  border:2px solid #e74c3c;
+  border-radius:12px;
+  padding:10px 12px;
+  background-color:rgba(231,76,60,0.06);
+  margin:8px 0;
+}
+.hint-panel{
+  border:1.5px solid #05a8a8;
+  border-radius:10px;
+  padding:9px 11px;
+  background:rgba(5,168,168,0.07);
+  margin:6px 0 14px 12px;
+}
+.hint-panel strong{
+  color:#0d6571;
+}
+
+/* Launcher and panel - original layout preserved */
 .ai-launcher{
   position:fixed;right:max(18px, env(safe-area-inset-right));bottom:max(18px, env(safe-area-inset-bottom));
   z-index:20;display:flex;align-items:end;gap:10px;min-width:78px;min-height:78px;background:transparent;border:0;cursor:pointer;
 }
 .ai-launcher.hidden{opacity:0;transform:translateY(12px);pointer-events:none}
 .ai-launcher-bubble{padding:11px 14px;border-radius:18px 18px 4px 18px;background:rgba(255,255,255,0.94);color:#354052;box-shadow:0 12px 30px rgba(74,21,51,0.18);font-weight:800;border:1px solid rgba(140,16,75,0.12)}
-.ai-launcher-avatar{width:clamp(76px,5.2vw,94px);height:clamp(76px,5.2vw,94px);border-radius:50%;overflow:hidden;background:#ffe2ef;border:6px solid rgba(255,224,237,0.9);box-shadow:0 16px 36px rgba(74,21,51,0.26)}
+.ai-launcher-avatar{width:clamp(76px,5.2vw,94px);height:clamp(76px,5.2vw,94px);border-radius:50%;overflow:hidden;background:#ffe2ef;border:6px solid rgba(224,224,237,0.9);box-shadow:0 16px 36px rgba(74,21,51,0.26)}
 .ai-launcher-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .ai-panel{
   position:fixed;right:22px;bottom:22px;z-index:21;
@@ -72,10 +95,17 @@ a{color:#0d6571}
 .msg{max-width:92%;padding:11px 13px;border-radius:15px;line-height:1.55;font-size:0.98rem;overflow-wrap:anywhere}
 .msg.bot{align-self:flex-start;background:rgba(255,255,255,0.76);border:1px solid rgba(6,154,166,0.14);color:#123852;box-shadow:0 8px 18px rgba(17,54,78,0.06)}
 .msg.user{align-self:flex-end;background:linear-gradient(135deg, #d9f6ef, #c8ecff);color:#0e3c58;border:1px solid rgba(55,180,139,0.24)}
-.chat-controls{margin:0 16px 16px;padding:10px;display:grid;grid-template-columns:auto auto 1fr 46px;gap:8px;background:#e3f5f7;border-radius:14px;border:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
+.chat-controls{margin:0 16px 16px;padding:10px;display:grid;grid-template-columns:auto 1fr 46px;gap:8px;background:#e3f5f7;border-radius:14px;border:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
 .chat-controls input{min-width:0;border:0;border-radius:10px;padding:0 12px;color:#11364e;background:transparent;font-size:1rem;outline:none}
 .chat-controls input::placeholder{color:rgba(17,54,78,0.55)}
 #sendChat{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg, #0d72ff, #05a8a8);color:#fff;font-size:1.3rem;border:0;cursor:pointer}
+/* plus button + upload dropdown menu */
+.attach-plus-btn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#fff;border:1px solid rgba(6,154,166,0.18);color:#0d6571;font-size:1.4rem;font-weight:bold;cursor:pointer;position:relative;}
+.attach-menu{position:absolute;bottom:44px;left:0;background:#ffffff;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,0.15);min-width:140px;overflow:hidden;display:none;z-index:100;}
+.attach-menu.show{display:block;}
+.attach-menu button{width:100%;text-align:left;padding:10px 12px;background:#fff;border:none;font-size:0.9rem;cursor:pointer;color:#102033;}
+.attach-menu button:hover{background:#e8f7f8;}
+
 .suggestions{padding:0 16px 12px;display:flex;gap:7px;flex-wrap:wrap;background:#f7fbff;position:relative;z-index:1}
 .suggestions button{background:rgba(230,250,247,0.86);color:#0d6571;border:1px solid rgba(6,154,166,0.18);border-radius:999px;padding:7px 9px;font-size:0.78rem;font-weight:800;cursor:pointer}
 .ai-tabs{display:grid;grid-template-columns:1fr;min-height:48px;background:#f7fbff;border-top:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
@@ -85,1220 +115,274 @@ a{color:#0d6571}
 .chat-icon::after{content:"";position:absolute;left:5px;bottom:-7px;width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;background:#f7fbff;transform:skew(-18deg)}
 .chat-icon::before{content:"fx";position:absolute;inset:0;display:grid;place-items:center;font-size:0.58rem;line-height:1;font-weight:950}
 .ai-powered{min-height:34px;display:grid;place-items:center;background:linear-gradient(90deg, #eefcff, #f8fbff);color:#557084;font-size:0.78rem;font-weight:800;position:relative;z-index:1}
-.ai-config{padding:10px 16px;display:grid;gap:8px;background:#f7fbff;border-bottom:1px solid rgba(6,154,166,0.12);position:relative;z-index:1}
-.ai-config-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ai-config label{font-size:0.76rem;font-weight:800;color:#0d6571;white-space:nowrap}
-.ai-config input[type="password"],.ai-config select{flex:1;min-width:120px;height:32px;border-radius:8px;border:1px solid rgba(6,154,166,0.22);padding:0 8px;font-size:0.84rem;background:#fff;color:#11364e}
-.ai-config button.tiny{height:32px;padding:0 10px;border-radius:8px;font-size:0.76rem;font-weight:800;background:#0d6571;color:#fff;border:0;cursor:pointer}
-.ai-config .hint{font-size:0.72rem;color:#557084;line-height:1.35}
 .attach-preview{padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;background:#f7fbff;position:relative;z-index:1}
 .attach-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:#e3f5f7;border:1px solid rgba(6,154,166,0.18);font-size:0.74rem;font-weight:700;color:#0d4265;max-width:180px;overflow:hidden}
 .attach-chip img{width:28px;height:28px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.08)}
 .attach-chip button{width:18px;height:18px;border-radius:50%;background:#0d4265;color:#fff;font-size:0.7rem;display:grid;place-items:center;border:0;flex:0 0 auto;cursor:pointer}
-.icon-btn-attach{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#fff;border:1px solid rgba(6,154,166,0.18);color:#0d6571;font-size:1.05rem;flex:0 0 auto;cursor:pointer}
+
 .msg .mark-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.86rem}
 .msg .mark-table th,.msg .mark-table td{border:1px solid rgba(6,154,166,0.18);padding:6px 7px;text-align:left}
 .msg .mark-table th{background:#e3f5f7;color:#0d4265;font-weight:800}
 .msg .badge-ok{color:#0a7a42;font-weight:800}.msg .badge-wrong{color:#c0392b;font-weight:800}.msg .badge-partial{color:#b7791f;font-weight:800}
 .chat-log.drag-over{outline:2px dashed #05a8a8;outline-offset:-6px;background-color:rgba(5,168,168,0.06)}
-/* Embed mode for iframe */
-body.embed{background:transparent;padding:0;display:block}
-body.embed .page-head{display:none}
-body.embed .ai-launcher{display:none !important}
-body.embed .ai-panel{position:relative;right:auto;bottom:auto;width:100%;max-width:100%;max-height:100vh;height:100vh;height:100dvh;border-radius:16px;box-shadow:none;margin:0}
-@media(max-width:560px){.page-head{position:static;margin-bottom:12px} body{place-items:start center}}
+@media(max-width:560px){body{place-items:start center}}
 </style>
 </head>
 <body>
-<script>
-// Embed detection - hide outer chrome when loaded in index.html iframe
-(function(){
-  try{
-    const params=new URLSearchParams(location.search);
-    if(params.get("embed")==="1"){
-      document.body.classList.add("embed");
-      document.documentElement.classList.add("embed");
-      document.addEventListener("DOMContentLoaded",()=>{
-        const panel=document.getElementById("aiPanel");
-        if(panel){ panel.classList.add("open"); panel.setAttribute("aria-hidden","false"); }
-      });
-      document.addEventListener("DOMContentLoaded",()=>{
-        const closeBtn=document.getElementById("aiClose");
-        if(closeBtn){ closeBtn.addEventListener("click",()=>{ try{ parent.postMessage({type:"fj-close-ai"}, "*"); }catch(e){} }); }
-      });
-    }
-  }catch(e){}
-})();
-</script>
-
-<div class="page-head">
-  <a href="index.html">← Back to Function Junction</a>
-  <span>Standalone Marking AI — works with or without index.html</span>
-</div>
-
-<button class="ai-launcher" id="aiLauncher" aria-label="Open AI chatbox"><span class="ai-launcher-bubble">Hi! How can I assist you?</span><span class="ai-launcher-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffe2ef' stroke='%23ff6f91' stroke-width='4'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='42' font-family='Georgia'%3Eff%3C/text%3E%3C/svg%3E" alt="open chat" /></span></button>
+<button class="ai-launcher" id="aiLauncher" aria-label="Open AI chatbox">
+  <span class="ai-launcher-bubble">Hi! How can I assist you?</span>
+  <span class="ai-launcher-avatar">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffe2ef' stroke='%23ff6f91' stroke-width='4'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-size='42' font-family='Georgia'%3EMr%3C/text%3E%3C/svg%3E" alt="open chat" />
+  </span>
+</button>
 <aside class="ai-panel" id="aiPanel" aria-label="AI math teacher chatbox" aria-hidden="true">
   <div class="ai-header">
-    <div class="ai-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23eefcff'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='42' font-family='Georgia'%3Eff%3C/text%3E%3C/svg%3E" alt="Ms Effie" /></div>
+    <div class="ai-avatar">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23eefcff'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='42' font-family='Georgia'%3EMr%3C/text%3E%3C/svg%3E" alt="Mr Effie" />
+    </div>
     <div class="ai-header-content">
-      <h3>Ms. Effie <span class="ai-badge">AI</span></h3>
-      <p>Mathematics Learning Assistant — Marking (a–o)</p>
+      <h3>Mr. Effie <span class="ai-badge">AI</span></h3>
+      <p>Mathematics Learning Assistant</p>
     </div>
     <button class="ai-close" id="aiClose" aria-label="Close">×</button>
   </div>
   <div class="chat-log" id="chatLog"></div>
+  <div class="attach-preview" id="attachPreview"></div>
+  <div class="chat-controls">
+    <div class="attach-plus-btn" id="attachPlusBtn">
+      +
+      <div class="attach-menu" id="attachMenu">
+        <button id="menuPhoto">📷 Upload Photo</button>
+        <button id="menuFile">📄 Upload File</button>
+      </div>
+    </div>
+    <input id="chatInput" type="text" placeholder="Type here — or attach photo/file" aria-label="Type your question" />
+    <button id="sendChat" title="Send">↑</button>
+  </div>
   <div class="suggestions">
     <button data-prompt="Explain this slide simply.">Explain simply</button>
     <button data-prompt="Give me an example.">Example</button>
     <button data-prompt="How do I find domain and range?">Domain &amp; range</button>
   </div>
-  <div class="chat-controls">
-    <input id="chatInput" type="text" placeholder="Type here — or attach photo/file" aria-label="Type your question" />
-    <button id="sendChat" title="Send">↑</button>
-  </div>
   <div class="ai-tabs"><button class="ai-tab active" type="button"><span class="chat-icon"></span><span>Chat</span></button></div>
-  <div class="ai-powered">Powered by FUNCTION JUNCTION · Hint-only marking (a–o)</div>
+  <div class="ai-powered">Powered by FUNCTION JUNCTION</div>
 </aside>
 
+<input type="file" id="photoInput" accept="image/*" hidden />
+<input type="file" id="fileInput" accept=".pdf,.txt,.docx,image/*" hidden />
+
 <script>
-// Minimal shims for standalone - provide fallback helpers
-window.formatMathHTML = window.formatMathHTML || function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); };
-window.speak = window.speak || function(){};
+// ===================== LOCAL TEST ONLY =====================
+// WARNING: Never upload this file to github / public web server! Key will leak.
+const API_URL = '/api/gemini';
+// System Instruction: INTERNAL ONLY, never rendered/shown to end‑user browser UI
+const SYSTEM_PROMPT = You are Mr. Effie, friendly mathematics tutor for students.
+Strict rules:
+1. NEVER give full final answers, NEVER write complete step‑by‑step solutions.
+2. Provide only guiding hints, point out mistakes, explain why something is wrong, use guiding questions to push student to think on their own.
+3. Handle text questions, hand‑written homework photos, function graph sketching, domain and range tasks.
+4. Keep replies natural and flexible, avoid rigid template tables.
+5. When you receive uploaded image of student work: analyze their work, identify errors, provide correction hints.
+6. Use simple plain English, speak using second‑person "you".
+7. Do NOT output raw internal marking scheme data to chat output. Use marking knowledge internally for reasoning.;
+
 window.el = {
   aiPanel: document.getElementById('aiPanel'),
   aiLauncher: document.getElementById('aiLauncher'),
   aiClose: document.getElementById('aiClose'),
   chatLog: document.getElementById('chatLog'),
   chatInput: document.getElementById('chatInput'),
-  sendChat: document.getElementById('sendChat')
+  sendChat: document.getElementById('sendChat'),
+  attachPreview: document.getElementById('attachPreview')
 };
-function openAiPanel(){ el.aiPanel.classList.add('open'); el.aiPanel.setAttribute('aria-hidden','false'); el.aiLauncher.classList.add('hidden'); setTimeout(function(){ el.chatInput.focus(); },120); }
-function closeAiPanel(){ el.aiPanel.classList.remove('open'); el.aiPanel.setAttribute('aria-hidden','true'); el.aiLauncher.classList.remove('hidden'); }
-document.getElementById('aiLauncher').addEventListener('click', openAiPanel);
-document.getElementById('aiClose').addEventListener('click', closeAiPanel);
-</script>
 
-<script>
-/* ai-assistant.js — Ms. Effie Marking AI (separated from index.html)
-   Handles: typed text + photo upload + file upload, marking-scheme-based hints
-   Requires: index.html to load this AFTER its main script's `el`/`state`/`formatMathHTML` are defined.
-   If OpenAI key is set, uses gpt-4o vision; otherwise falls back to offline tutorReply.
-*/
-(function () {
-  // ---------- MARKING SCHEME: TEST ME Graph Sketching (a)-(o) ----------
-  // Each entry mirrors the Suggested Answer table from the provided PDF.
-  const MARKING_SCHEME = {
-    a: { id: "a", question: "f(x) = -6", marks: 3, type: "constant",
-      expected: { graph: "Horizontal line y = -6", domain: "(-∞, +∞)", range: "{-6}" },
-      breakdown: [
-        { code: "M1", desc: "Graph is horizontal line at y = -6", mark: 1 },
-        { code: "M1", desc: "Domain Df = (-∞, +∞)", mark: 1 },
-        { code: "A1", desc: "Range Rf = {-6}", mark: 1 }
-      ],
-      commonErrors: ["Drawing line at y=6 instead of y=-6", "Writing range as (-∞,∞) instead of single value"] },
-    b: { id: "b", question: "f(x) = -3x + 4", marks: 3, type: "linear",
-      expected: { graph: "Decreasing line, y-intercept 4, x-intercept 4/3", domain: "(-∞, +∞)", range: "(-∞, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Gradient negative → decreasing line", mark: 1 },
-        { code: "M1", desc: "Intercepts correct: (0,4) and (4/3,0)", mark: 1 },
-        { code: "A1", desc: "Domain & range both (-∞,+∞)", mark: 1 }
-      ],
-      commonErrors: ["Drawing increasing line (wrong sign)", "Wrong intercept"] },
-    c: { id: "c", question: "f(x) = x² - 4", marks: 3, type: "quadratic",
-      expected: { graph: "U-shaped parabola, vertex (0,-4)", domain: "(-∞, +∞)", range: "[-4, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Parabola opens upward", mark: 1 },
-        { code: "M1", desc: "Vertex at (0,-4)", mark: 1 },
-        { code: "A1", desc: "Range from -4 inclusive", mark: 1 }
-      ] },
-    d: { id: "d", question: "f(x) = 9 - x²", marks: 3, type: "quadratic",
-      expected: { graph: "Inverted parabola, max at (0,9)", domain: "(-∞, +∞)", range: "(-∞, 9]" },
-      breakdown: [
-        { code: "M1", desc: "Parabola opens downward", mark: 1 },
-        { code: "M1", desc: "Vertex/maximum at (0,9)", mark: 1 },
-        { code: "A1", desc: "Range (-∞,9]", mark: 1 }
-      ] },
-    e: { id: "e", question: "f(x) = x³ - 3", marks: 2, type: "cubic",
-      expected: { graph: "Cubic S-shape, inflection at (0,-3)", domain: "(-∞, +∞)", range: "(-∞, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Correct cubic shape through (0,-3)", mark: 1 },
-        { code: "A1", desc: "Domain & range both (-∞,∞)", mark: 1 }
-      ] },
-    f: { id: "f", question: "f(x) = |2x+1|", marks: 3, type: "absolute",
-      expected: { graph: "V-shape, vertex at (-1/2,0)", domain: "(-∞, +∞)", range: "[0, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "V-shape with vertex at x=-1/2", mark: 1 },
-        { code: "M1", desc: "Vertex touches x-axis at y=0", mark: 1 },
-        { code: "A1", desc: "Range [0,∞)", mark: 1 }
-      ] },
-    g: { id: "g", question: "f(x) = |2x-1| + 1", marks: 3, type: "absolute",
-      expected: { graph: "V-shape vertex (0.5,1), y-intercept 2", domain: "(-∞, +∞)", range: "[1, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Vertex at (0.5,1)", mark: 1 },
-        { code: "M1", desc: "Correct V opening upward, intercept 2", mark: 1 },
-        { code: "A1", desc: "Range [1,∞)", mark: 1 }
-      ] },
-    h: { id: "h", question: "f(x) = √(3x-2)", marks: 3, type: "surd",
-      expected: { graph: "Square-root curve starting at (2/3,0)", domain: "[2/3, +∞)", range: "[0, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Domain condition 3x-2 ≥ 0 → x ≥ 2/3", mark: 1 },
-        { code: "M1", desc: "Starts at (2/3,0), increasing", mark: 1 },
-        { code: "A1", desc: "Range [0,∞)", mark: 1 }
-      ] },
-    i: { id: "i", question: "f(x) = √(2-3x)", marks: 3, type: "surd",
-      expected: { graph: "Decreasing root curve ending at (2/3,0)", domain: "(-∞, 2/3]", range: "[0, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Domain 2-3x ≥ 0 → x ≤ 2/3", mark: 1 },
-        { code: "M1", desc: "Curve ends at (2/3,0)", mark: 1 },
-        { code: "A1", desc: "Range [0,∞)", mark: 1 }
-      ] },
-    j: { id: "j", question: "f(x) = 5/(2+x)", marks: 4, type: "rational",
-      expected: { graph: "Hyperbola asymptotes x=-2, y=0", domain: "(-∞,-2)∪(-2,+∞) or ℝ\\{-2}", range: "(-∞,0)∪(0,+∞) or ℝ\\{0}" },
-      breakdown: [
-        { code: "M1", desc: "Vertical asymptote x=-2", mark: 1 },
-        { code: "M1", desc: "Horizontal asymptote y=0", mark: 1 },
-        { code: "A1", desc: "Domain excludes -2", mark: 1 },
-        { code: "A1", desc: "Range excludes 0", mark: 1 }
-      ] },
-    k: { id: "k", question: "f(x) = 5/(2-x)", marks: 4, type: "rational",
-      expected: { graph: "Hyperbola asymptotes x=2, y=0", domain: "(-∞,+2)∪(2,+∞) or ℝ\\{2}", range: "(-∞,0)∪(0,+∞) or ℝ\\{0}" },
-      breakdown: [
-        { code: "M1", desc: "Vertical asymptote x=2", mark: 1 },
-        { code: "M1", desc: "Horizontal asymptote y=0", mark: 1 },
-        { code: "A1", desc: "Domain excludes 2", mark: 1 },
-        { code: "A1", desc: "Range excludes 0", mark: 1 }
-      ] },
-    l: { id: "l", question: "f(x) = e^{2x} + 1", marks: 3, type: "exponential",
-      expected: { graph: "Exponential rising, asymptote y=1, via (0,2)", domain: "(-∞, +∞)", range: "(1, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Horizontal asymptote y=1", mark: 1 },
-        { code: "M1", desc: "Increasing through (0,2)", mark: 1 },
-        { code: "A1", desc: "Range (1,∞)", mark: 1 }
-      ] },
-    m: { id: "m", question: "f(x) = e^{-x} - 2", marks: 3, type: "exponential",
-      expected: { graph: "Decreasing exponential, asymptote y=-2, via (0,-1)", domain: "(-∞, +∞)", range: "(-2, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Horizontal asymptote y=-2", mark: 1 },
-        { code: "M1", desc: "Decreasing, passes (0,-1)", mark: 1 },
-        { code: "A1", desc: "Range (-2,∞)", mark: 1 }
-      ] },
-    n: { id: "n", question: "f(x) = ln(x-3)", marks: 3, type: "logarithmic",
-      expected: { graph: "Log curve asymptote x=3, via (4,0)", domain: "(3, +∞)", range: "(-∞, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Vertical asymptote x=3", mark: 1 },
-        { code: "M1", desc: "Passes (4,0), increasing slowly", mark: 1 },
-        { code: "A1", desc: "Domain (3,∞)", mark: 1 }
-      ] },
-    o: { id: "o", question: "f(x) = ln(3-x)", marks: 3, type: "logarithmic",
-      expected: { graph: "Reflected log, asymptote x=3, via (2,0), decreasing", domain: "(-∞, 3)", range: "(-∞, +∞)" },
-      breakdown: [
-        { code: "M1", desc: "Vertical asymptote x=3, reflected shape", mark: 1 },
-        { code: "M1", desc: "Passes (2,0)", mark: 1 },
-        { code: "A1", desc: "Domain (-∞,3)", mark: 1 }
-      ] }
-  };
+// file inputs
+const photoInput = document.getElementById("photoInput");
+const fileInput = document.getElementById("fileInput");
+const attachPlusBtn = document.getElementById("attachPlusBtn");
+const attachMenu = document.getElementById("attachMenu");
+const menuPhoto = document.getElementById("menuPhoto");
+const menuFile = document.getElementById("menuFile");
 
-  // ---------- Malaysian Matriculation Exam Scoring Rules ----------
-  const MATRIC_SCORING_RULES = {
-    "M marks": "Method marks - awarded for correct method/steps, even if final answer is wrong",
-    "A marks": "Accuracy marks - awarded only if final answer is correct",
-    "Full marks": "Both M and A marks must be obtained for full credit",
-    "Half marks": "For partially correct steps or minor calculation errors",
-    "Zero marks": "Wrong method or no working shown",
-    "No marks for method if answer wrong": "In some cases, M marks are not awarded if the final answer is incorrect",
-    "Neatness": "Bonus marks may be awarded for neat presentation and clear working",
-    "Units": "Marks deducted for missing or incorrect units",
-    "Significant figures": "Answers should be in appropriate significant figures (usually 3 sf)"
-  };
+let pendingImages = [];
+let pendingFiles = [];
 
-  // ---------- Dynamic Scheme Generation Knowledge Base ----------
-  const FUNCTION_TEMPLATES = {
-    constant: { 
-      form: "f(x) = k", 
-      graph: "Horizontal line", 
-      domain: "(-∞, +∞)", 
-      range: "{k}",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Correct horizontal line", mark: 1 },
-        { code: "M1", desc: "Domain all real numbers", mark: 1 },
-        { code: "A1", desc: "Range is single value {k}", mark: 1 }
-      ]
-    },
-    linear: { 
-      form: "f(x) = ax + b", 
-      graph: "Straight line", 
-      domain: "(-∞, +∞)", 
-      range: "(-∞, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Correct gradient and intercepts", mark: 1 },
-        { code: "M1", desc: "Domain all real numbers", mark: 1 },
-        { code: "A1", desc: "Range all real numbers", mark: 1 }
-      ]
-    },
-    quadratic: { 
-      form: "f(x) = ax² + bx + c", 
-      graph: "Parabola", 
-      domain: "(-∞, +∞)", 
-      range: "Depends on vertex",
-      marks: 4,
-      breakdown: [
-        { code: "M1", desc: "Correct parabola shape and direction", mark: 1 },
-        { code: "M1", desc: "Vertex calculated correctly", mark: 1 },
-        { code: "A1", "M1", desc: "Domain all real numbers", mark: 1 },
-        { code: "A1", desc: "Range from vertex y-value", mark: 1 }
-      ]
-    },
-    cubic: { 
-      form: "f(x) = ax³ + bx² + cx + d", 
-      graph: "S-shaped cubic", 
-      domain: "(-∞, +∞)", 
-      range: "(-∞, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Correct cubic shape", mark: 1 },
-        { code: "A1", desc: "Domain all real numbers", mark: 1 },
-        { code: "A1", desc: "Range all real numbers", mark: 1 }
-      ]
-    },
-    absolute: { 
-      form: "f(x) = |ax + b| + c", 
-      graph: "V-shape", 
-      domain: "(-∞, +∞)", 
-      range: "[vertex_y, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Vertex found correctly", mark: 1 },
-        { code: "M1", desc: "V-shape orientation correct", mark: 1 },
-        { code: "A1", desc: "Range from vertex upward", mark: 1 }
-      ]
-    },
-    surd: { 
-      form: "f(x) = √(ax + b)", 
-      graph: "Square root curve", 
-      domain: "Solve ax + b ≥ 0", 
-      range: "[0, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Domain inequality solved correctly", mark: 1 },
-        { code: "M1", desc: "Starting point correct", mark: 1 },
-        { code: "A1", desc: "Range [0,∞)", mark: 1 }
-      ]
-    },
-    rational: { 
-      form: "f(x) = (ax + b)/(cx + d)", 
-      graph: "Hyperbola", 
-      domain: "Exclude where denominator = 0", 
-      range: "Exclude horizontal asymptote",
-      marks: 4,
-      breakdown: [
-        { code: "M1", desc: "Vertical asymptote found", mark: 1 },
-        { code: "M1", desc: "Horizontal asymptote identified", mark: 1 },
-        { code: "A1", desc: "Domain excludes asymptote", mark: 1 },
-        { code: "A1", desc: "Range excludes asymptote", mark: 1 }
-      ]
-    },
-    exponential: { 
-      form: "f(x) = a^(bx) + c", 
-      graph: "Exponential curve", 
-      domain: "(-∞, +∞)", 
-      range: "(asymptote, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", desc: "Horizontal asymptote y = c", mark: 1 },
-        { code: "M1", desc: "Curve orientation correct", mark: 1 },
-        { code: "A1", desc: "Range above asymptote", mark: 1 }
-      ]
-    },
-    logarithmic: { 
-      form: "f(x) = log(ax + b) + c", 
-      graph: "Logarithmic curve", 
-      domain: "Solve ax + b > 0", 
-      range: "(-∞, +∞)",
-      marks: 3,
-      breakdown: [
-        { code: "M1", "desc: "Vertical asymptote x = -b/a", mark: 1 },
-        { code: "M1", desc: "Domain inequality solved", mark: 1 },
-        { code: "A1", desc: "Range all real numbers", mark: 1 }
-      ]
-    }
-  };
+// open / close chat panel
+function openAiPanel(){
+  el.aiPanel.classList.add('open');
+  el.aiPanel.setAttribute('aria-hidden','false');
+  el.aiLauncher.classList.add('hidden');
+  setTimeout(()=>{ el.chatInput.focus(); },120);
+}
+function closeAiPanel(){
+  el.aiPanel.classList.remove('open');
+  el.aiPanel.setAttribute('aria-hidden','true');
+  el.aiLauncher.classList.remove('hidden');
+}
+el.aiLauncher.addEventListener('click', openAiPanel);
+el.aiClose.addEventListener('click', closeAiPanel);
 
-  // ---------- System prompt: hint-only marking ----------
-  function buildSystemPrompt() {
-    const schemeText = Object.values(MARKING_SCHEME).map(function (s) {
-      return "(" + s.id + ") " + s.question + " | Expected: " + s.expected.graph + " ; Domain " + s.expected.domain + " ; Range " + s.expected.range
-        + " | Marks " + s.marks + " (" + s.breakdown.map(function (b) { return b.code + ":" + b.desc; }).join(", ") + ")";
-    }).join("\n");
-    
-    const templatesText = Object.entries(FUNCTION_TEMPLATES).map(function ([type, template]) {
-      return type + ": " + template.form + " | " + template.graph + " | Marks " + template.marks;
-    }).join("\n");
-    
-    return "You are Ms. Effie, a flexible Malaysian Matriculation Mathematics tutor for Function Junction (Topic 5: Graph Sketching, Domain & Range).\n"
-      + "\nENHANCED UPLOAD CAPABILITIES:\n"
-      + "- Images are preprocessed for better handwriting recognition (contrast enhanced)\n"
-      + "- Files are auto-detected by type: marking schemes, question papers, reference materials\n"
-      + "- Images are categorized: graphs, handwritten work, question papers, general math\n"
-      + "- Drag-and-drop is supported for quick uploading\n"
-      + "\nFLEXIBLE TUTORING MODE:\n"
-      + "- You are NOT just a marker - you are a helpful tutor who can answer ANY math question\n"
-      + "- Respond naturally and conversationally to students' questions\n"
-      + "- Avoid rigid template answers - adapt your response to each student's situation\n"
-      + "- If students ask general questions, explain concepts clearly with examples\n"
-      + "- If students submit work, provide detailed feedback and hints\n"
-      + "- If students are confused, break down concepts step by step\n"
-      + "- Use encouraging language and build confidence\n"
-      + "\nAUTO-GENERATED GRADING SCHEMES:\n"
-      + "- When students upload NEW questions not in the pre-defined scheme, automatically generate an appropriate marking scheme\n"
-      + "- Use the function templates knowledge base to determine the correct approach\n"
-      + "- Apply Malaysian Matriculation exam scoring rules (M marks, A marks, etc.)\n"
-      + "- Be consistent with Matric exam standards\n"
-      + "\nMALAYSIAN MATRICULATION SCORING RULES:\n"
-      + "- M marks (Method): Awarded for correct method/steps, even if final answer is wrong\n"
-      + "- A marks (Accuracy): Awarded only if final answer is correct\n"
-      + "- Full marks require both correct method AND correct answer\n"
-      + "- Half marks for partially correct steps or minor calculation errors\n"
-      + "- Neatness bonus: Up to 1 mark for clear presentation\n"
-      + "- Units: Deduct marks for missing/incorrect units\n"
-      + "- Significant figures: Answers should be in 3 significant figures unless specified\n"
-      + "\nGRADING FEEDBACK PRINCIPLES:\n"
-      + "1) Mark STRICTLY against the appropriate scheme (pre-defined or auto-generated)\n"
-      + "2) For submitted work: Give detailed feedback with specific marks breakdown\n"
-      + "3) NEVER give the full correct answer directly - use hints and guidance\n"
-      + "4) Identify error types: concept error / procedure error / algebra slip / carelessness / not answered\n"
-      + "5) Explain WHY it's wrong using mathematical principles\n"
-      + "6) Give directional hints: what to check, what to recalculate, what to redraw\n"
-      + "7) If handwriting is unclear, ask for a clearer photo\n"
-      + "8) For uploaded marking schemes, use them as the authoritative standard\n"
-      + "\nRESPONSE STYLE:\n"
-      + "- Use simple, clear English\n"
-      + "- Mix Malay terms if student uses them (e.g., domain/ruang, julat/range)\n"
-      + "- Render maths as plain text: Df, Rf, -infinity, √, etc.\n"
-      + "- Be encouraging and supportive\n"
-      + "- Adapt length and detail to the student's needs\n"
-      + "\nFUNCTION TEMPLATES FOR AUTO-GENERATION:\n" + templatesText
-      + "\nPRE-DEFINED MARKING SCHEME (TEST ME a-o):\n" + schemeText;
-  }
+// plus button dropdown menu toggle
+attachPlusBtn.addEventListener("click", (e)=>{
+  e.stopPropagation();
+  attachMenu.classList.toggle("show");
+});
+// click outside close menu
+document.addEventListener("click", ()=>{ attachMenu.classList.remove("show"); });
 
-  // ---------- State for pending uploads ----------
-  let pendingImages = []; // { dataUrl, mime, name }
-  let pendingFiles = [];  // { name, textSnippet }
+menuPhoto.addEventListener("click",(e)=>{
+  e.stopPropagation(); attachMenu.classList.remove("show"); photoInput.click();
+});
+menuFile.addEventListener("click",(e)=>{
+  e.stopPropagation(); attachMenu.classList.remove("show"); fileInput.click();
+});
 
-  // Wait for the main page's `el` object to exist
-  function ready(fn) {
-    if (window.el && window.el.chatLog) fn();
-    else setTimeout(function () { ready(fn); }, 100);
-  }
-
-  ready(function initMarkingAI() {
-    const chatLog = window.el.chatLog;
-    const chatInput = window.el.chatLog ? document.getElementById("chatInput") : null;
-    const inputEl = document.getElementById("chatInput");
-    const sendBtn = document.getElementById("sendChat");
-    const chatControls = document.querySelector(".chat-controls");
-
-    // ---- Inject upload buttons and config UI ----
-    if (chatControls && !document.getElementById("attachPhotoBtn")) {
-      const photoBtn = document.createElement("button");
-      photoBtn.id = "attachPhotoBtn";
-      photoBtn.type = "button";
-      photoBtn.className = "icon-btn-attach";
-      photoBtn.title = "Attach photo / handwriting";
-      photoBtn.setAttribute("aria-label", "Attach photo");
-      photoBtn.textContent = "📷";
-      const fileBtn = document.createElement("button");
-      fileBtn.id = "attachFileBtn";
-      fileBtn.type = "button";
-      fileBtn.className = "icon-btn-attach";
-      fileBtn.title = "Attach file / PDF (marking scheme)";
-      fileBtn.setAttribute("aria-label", "Attach file");
-      fileBtn.textContent = "📄";
-      chatControls.insertBefore(fileBtn, chatControls.firstChild);
-      chatControls.insertBefore(photoBtn, chatControls.firstChild);
-    }
-
-    // hidden file inputs
-    let photoInput = document.getElementById("photoInput");
-    if (!photoInput) {
-      photoInput = document.createElement("input");
-      photoInput.id = "photoInput";
-      photoInput.type = "file";
-      photoInput.accept = "image/*";
-      photoInput.multiple = true;
-      photoInput.style.display = "none";
-      document.body.appendChild(photoInput);
-    }
-    let fileInput = document.getElementById("fileInput");
-    if (!fileInput) {
-      fileInput = document.createElement("input");
-      fileInput.id = "fileInput";
-      fileInput.type = "file";
-      fileInput.accept = ".pdf,.txt,.docx,image/*";
-      fileInput.multiple = true;
-      fileInput.style.display = "none";
-      document.body.appendChild(fileInput);
-    }
-
-    // preview strip
-    let preview = document.getElementById("attachPreview");
-    if (!preview) {
-      preview = document.createElement("div");
-      preview.id = "attachPreview";
-      preview.className = "attach-preview";
-      const chatLogEl = document.getElementById("chatLog");
-      chatLogEl.parentNode.insertBefore(preview, chatLogEl.nextSibling);
-    }
-
-    // Config removed - now handled in index.html
-
-    // Helper functions (must be defined before event handlers)
-    function detectMathImageType(filename) {
-      const name = filename.toLowerCase();
-      if (name.includes('graph') || name.includes('plot') || name.includes('sketch')) {
-        return 'graph';
-      } else if (name.includes('handwritten') || name.includes('work') || name.includes('solution')) {
-        return 'handwritten_work';
-      } else if (name.includes('question') || name.includes('problem') || name.includes('exam')) {
-        return 'question_paper';
-      } else if (name.includes('scheme') || name.includes('marking') || name.includes('rubric')) {
-        return 'marking_scheme';
-      }
-      return 'general_math';
-    }
-
-    function detectDocumentType(filename, mimeType) {
-      const name = filename.toLowerCase();
-      if (name.includes('scheme') || name.includes('marking') || name.includes('rubric') || 
-          name.includes('answer') || name.includes('key') || name.includes('solution')) {
-        return 'marking_scheme';
-      } else if (name.includes('question') || name.includes('exam') || name.includes('test')) {
-        return 'question_paper';
-      } else if (name.includes('notes') || name.includes('formula') || name.includes('reference')) {
-        return 'reference_material';
-      } else if (mimeType.includes('pdf')) {
-        return 'pdf_document';
-      }
-      return 'general_document';
-    }
-
-    function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-
-    function renderPreview() {
-      preview.innerHTML = "";
-      pendingImages.forEach(function (img, idx) {
-        const chip = document.createElement("span");
-        chip.className = "attach-chip";
-        
-        // Add type indicator with fallback for undefined type
-        let typeIcon = '📷';
-        let typeLabel = '';
-        const imgType = img.type || 'general_math';
-        
-        if (imgType === 'graph') { typeIcon = '📈'; typeLabel = '(graph)'; }
-        else if (imgType === 'handwritten_work') { typeIcon = '✍️'; typeLabel = '(work)'; }
-        else if (imgType === 'question_paper') { typeIcon = '📝'; typeLabel = '(question)'; }
-        else if (imgType === 'marking_scheme') { typeIcon = '📋'; typeLabel = '(scheme)'; }
-        
-        chip.innerHTML = '<img src="' + img.dataUrl + '" alt="preview" /><span>' + typeIcon + ' ' + escHtml(img.name) + ' ' + typeLabel + '</span>';
-        const rm = document.createElement("button");
-        rm.type = "button";
-        rm.textContent = "×";
-        rm.addEventListener("click", function () { pendingImages.splice(idx, 1); renderPreview(); });
-        chip.appendChild(rm);
-        preview.appendChild(chip);
-      });
-      pendingFiles.forEach(function (f, idx) {
-        const chip = document.createElement("span");
-        chip.className = "attach-chip";
-        
-        // Add file type indicator with fallback
-        let fileIcon = '📄';
-        let fileLabel = '';
-        const fileType = f.type || 'general_document';
-        
-        if (fileType === 'marking_scheme') { fileIcon = '📋'; fileLabel = '(scheme)'; }
-        else if (fileType === 'question_paper') { fileIcon = '📝'; fileLabel = '(exam)'; }
-        else if (fileType === 'reference_material') { fileIcon = '📚'; fileLabel = '(reference)'; }
-        else if (fileType === 'pdf_document') { fileIcon = '📕'; fileLabel = '(PDF)'; }
-        
-        chip.innerHTML = '<span>' + fileIcon + ' ' + escHtml(f.name) + ' ' + fileLabel + '</span>';
-        const rm = document.createElement("button");
-        rm.type = "button";
-        rm.textContent = "×";
-        rm.addEventListener("click", function () { pendingFiles.splice(idx, 1); renderPreview(); });
-        chip.appendChild(rm);
-        preview.appendChild(chip);
-      });
-    }
-
-    function fileToDataUrl(file) {
-      return new Promise(function (resolve, reject) {
-        const r = new FileReader();
-        r.onload = function () { resolve(r.result); };
-        r.onerror = reject;
-        r.readAsDataURL(file);
-      });
-    }
-
-    // Math-specific image preprocessing for better handwriting recognition
-    function preprocessMathImage(dataUrl) {
-      return new Promise(function (resolve) {
-        const img = new Image();
-        img.onload = function () {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          // Set reasonable size for processing (max 1200px width)
-          const maxWidth = 1200;
-          const scale = Math.min(1, maxWidth / img.width);
-          canvas.width = img.width * scale;
-          canvas.height = img.height * scale;
-          
-          // Draw image with enhanced contrast for handwriting
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          // Apply contrast enhancement for better math symbol recognition
-          try {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            
-            for (let i = 0; i < data.length; i += 4) {
-              // Enhance contrast for better handwriting recognition
-              const factor = 1.2; // contrast factor
-              const intercept = 128 * (1 - factor);
-              
-              data[i] = data[i] * factor + intercept;     // R
-              data[i + 1] = data[i + 1] * factor + intercept; // G
-              data[i + 2] = data[i + 2] * factor + intercept; // B
-            }
-            
-            ctx.putImageData(imageData, 0, 0);
-          } catch (e) {
-            // If canvas manipulation fails, use original
-            console.log('Image preprocessing skipped:', e.message);
-          }
-          
-          resolve(canvas.toDataURL('image/jpeg', 0.85));
-        };
-        img.onerror = function () { resolve(dataUrl); }; // fallback to original
-        img.src = dataUrl;
-      });
-    }
-
-    function fileToTextSnippet(file) {
-      return new Promise(function (resolve) {
-        if (file.type.startsWith("image/")) { resolve(""); return; }
-        const r = new FileReader();
-        r.onload = function () { resolve(String(r.result).slice(0, 6000)); };
-        r.onerror = function () { resolve(""); };
-        
-        // Enhanced PDF handling for marking schemes
-        if (file.type === "application/pdf") {
-          // Check if it's likely a marking scheme by filename
-          const isMarkingScheme = /scheme|marking|rubric|answer|key|solution/i.test(file.name);
-          if (isMarkingScheme) {
-            resolve("[MARKING SCHEME PDF: " + file.name + " - This appears to be a marking scheme document. The AI will use this for grading standards.]");
-          } else {
-            resolve("[PDF file: " + file.name + " - Content will be analyzed for math content]");
-          }
-          return;
-        }
-        
-        // Check for common math document formats
-        if (file.name.match(/\.(tex|latex|math)$/i)) {
-          resolve("[LATEX MATH FILE: " + file.name + " - Mathematical notation detected]");
-          return;
-        }
-        
-        r.readAsText(file);
-      });
-    }
-
-    document.getElementById("attachPhotoBtn").addEventListener("click", function () { photoInput.click(); });
-    document.getElementById("attachFileBtn").addEventListener("click", function () { fileInput.click(); });
-
-    photoInput.addEventListener("change", async function () {
-      const files = Array.from(photoInput.files || []);
-      for (const f of files) {
-        if (!f.type.startsWith("image/")) continue;
-        const rawDataUrl = await fileToDataUrl(f);
-        // Apply math-specific preprocessing for better handwriting recognition
-        const processedDataUrl = await preprocessMathImage(rawDataUrl);
-        pendingImages.push({ 
-          dataUrl: processedDataUrl, 
-          originalDataUrl: rawDataUrl, // keep original for fallback
-          mime: f.type || "image/jpeg", 
-          name: f.name,
-          type: detectMathImageType ? detectMathImageType(f.name) : 'general_math'
-        });
-        if (pendingImages.length > 4) pendingImages = pendingImages.slice(-4);
-      }
-      photoInput.value = "";
-      renderPreview();
-    });
-
-    fileInput.addEventListener("change", async function () {
-      const files = Array.from(fileInput.files || []);
-      for (const f of files) {
-        if (f.type.startsWith("image/")) {
-          const rawDataUrl = await fileToDataUrl(f);
-          const processedDataUrl = await preprocessMathImage(rawDataUrl);
-          pendingImages.push({ 
-            dataUrl: processedDataUrl, 
-            originalDataUrl: rawDataUrl,
-            mime: f.type || "image/jpeg", 
-            name: f.name,
-            type: detectMathImageType ? detectMathImageType(f.name) : 'general_math'
-          });
-        } else {
-          const snippet = await fileToTextSnippet(f);
-          const fileType = detectDocumentType ? detectDocumentType(f.name, f.type) : 'general_document';
-          pendingFiles.push({ 
-            name: f.name, 
-            textSnippet: snippet,
-            type: fileType,
-            isMarkingScheme: fileType === 'marking_scheme'
-          });
-        }
-        if (pendingFiles.length > 3) pendingFiles = pendingFiles.slice(-3);
-      }
-      fileInput.value = "";
-      renderPreview();
-    });
-
-    // drag & drop on chatLog
-    const logEl = document.getElementById("chatLog");
-    ["dragenter", "dragover"].forEach(function (ev) {
-      logEl.addEventListener(ev, function (e) { e.preventDefault(); logEl.classList.add("drag-over"); });
-    });
-    ["dragleave", "drop"].forEach(function (ev) {
-      logEl.addEventListener(ev, function () { logEl.classList.remove("drag-over"); });
-    });
-    logEl.addEventListener("drop", async function (e) {
-      e.preventDefault();
-      const files = Array.from(e.dataTransfer.files || []);
-      for (const f of files) {
-        if (f.type.startsWith("image/")) {
-          const rawDataUrl = await fileToDataUrl(f);
-          const processedDataUrl = await preprocessMathImage(rawDataUrl);
-          pendingImages.push({ 
-            dataUrl: processedDataUrl, 
-            originalDataUrl: rawDataUrl,
-            mime: f.type, 
-            name: f.name,
-            type: detectMathImageType ? detectMathImageType(f.name) : 'general_math'
-          });
-        } else {
-          const snippet = await fileToTextSnippet(f);
-          const fileType = detectDocumentType ? detectDocumentType(f.name, f.type) : 'general_document';
-          pendingFiles.push({ 
-            name: f.name, 
-            textSnippet: snippet,
-            type: fileType,
-            isMarkingScheme: fileType === 'marking_scheme'
-          });
-        }
-      }
-      renderPreview();
-    });
-
-    // ---------- Override send handler to use marking AI ----------
-    const origSend = window.el.sendChat.onclick; // not used; we replace listener
-    // Remove old listeners by cloning buttons
-    const oldSendBtn = document.getElementById("sendChat");
-    const newSendBtn = oldSendBtn.cloneNode(true);
-    oldSendBtn.parentNode.replaceChild(newSendBtn, oldSendBtn);
-    window.el.sendChat = newSendBtn;
-
-    const oldInput = document.getElementById("chatInput");
-    const newInput = oldInput.cloneNode(true);
-    oldInput.parentNode.replaceChild(newInput, oldInput);
-    window.el.chatInput = newInput;
-
-    // remove old suggestion listeners and re-add
-    document.querySelectorAll(".suggestions button").forEach(function (btn) {
-      const clone = btn.cloneNode(true);
-      btn.parentNode.replaceChild(clone, btn);
-    });
-
-    function addUserWithAttachments(text) {
-      const wrap = document.createElement("div");
-      wrap.className = "msg user";
-      let html = "";
-      if (text) html += "<div>" + escHtml(text).replace(/\n/g, "<br>") + "</div>";
-      
-      // Enhanced image display with type indicators
-      pendingImages.forEach(function (img) {
-        const imgType = img.type || 'general_math';
-        let typeBadge = '';
-        if (imgType === 'graph') typeBadge = '<span style="font-size:0.7rem;background:#e3f5f7;padding:2px 6px;border-radius:4px;margin-left:4px">📈 Graph</span>';
-        else if (imgType === 'handwritten_work') typeBadge = '<span style="font-size:0.7rem;background:#fff4e6;padding:2px 6px;border-radius:4px;margin-left:4px">✍️ Work</span>';
-        else if (imgType === 'question_paper') typeBadge = '<span style="font-size:0.7rem;background:#f0e6ff;padding:2px 6px;border-radius:4px;margin-left:4px">📝 Question</span>';
-        
-        html += '<div style="margin-top:8px;position:relative">' 
-          + '<img src="' + img.dataUrl + '" alt="uploaded" style="max-width:100%;max-height:180px;border-radius:8px;border:1px solid rgba(0,0,0,0.12)" />'
-          + typeBadge
-          + '</div>';
-      });
-      
-      // Enhanced file display with type indicators
-      pendingFiles.forEach(function (f) {
-        const fileType = f.type || 'general_document';
-        let fileBadge = '';
-        if (fileType === 'marking_scheme') fileBadge = '<span style="font-size:0.7rem;background:#e6fff0;padding:2px 6px;border-radius:4px;margin-left:4px">📋 Scheme</span>';
-        else if (fileType === 'question_paper') fileBadge = '<span style="font-size:0.7rem;background:#f0e6ff;padding:2px 6px;border-radius:4px;margin-left:4px">📝 Exam</span>';
-        else if (fileType === 'reference_material') fileBadge = '<span style="font-size:0.7rem;background:#fff9e6;padding:2px 6px;border-radius:4px;margin-left:4px">📚 Reference</span>';
-        
-        html += '<div style="margin-top:6px;font-size:0.82rem;opacity:0.8">📄 ' + escHtml(f.name) + fileBadge + '</div>';
-      });
-      
-      if (!html) html = "<em>(image/file only)</em>";
-      wrap.innerHTML = html;
-      window.el.chatLog.appendChild(wrap);
-      scrollChatToBottom();
-    }
-
-    function scrollChatToBottom() {
-      requestAnimationFrame(function () {
-        window.el.chatLog.scrollTop = window.el.chatLog.scrollHeight;
-        setTimeout(function () { window.el.chatLog.scrollTop = window.el.chatLog.scrollHeight; }, 80);
-      });
-    }
-
-    function addBotHTML(html) {
-      const msg = document.createElement("div");
-      msg.className = "msg bot";
-      // use existing formatMathHTML if available for nice maths
-      if (window.formatMathHTML) msg.innerHTML = window.formatMathHTML(html);
-      else msg.innerHTML = html;
-      window.el.chatLog.appendChild(msg);
-      scrollChatToBottom();
-      if (window.speak) { try { window.speak(msg.textContent.slice(0, 400)); } catch (e) {} }
-    }
-
-    function offlineHintReply(text) {
-      // Enhanced adaptive response logic for offline mode - natural, flexible tutoring
-      const q = (text || "").toLowerCase();
-      
-      // General conversation starters
-      if (q.length < 3) {
-        return "Hi there! 👋 I'm Ms. Effie, your Malaysian Matriculation math tutor. I can help you with:\n\n📊 Graph sketching\n🔢 Finding domain and range\n✏️ Checking your work\n❓ Any math questions\n\nWhat would you like to work on today?";
-      }
-      
-      // Help requests
-      if (q.includes("help") || q.includes("how") || q.includes("what") || q.includes("explain") || q.includes("can you")) {
-        if (q.includes("domain") || q.includes("range")) {
-          return "Of course! Finding domain and range is an important skill. Here's the general approach:\n\n🔹 **Domain (Df)**: All x-values the function can accept\n   - For √(something): Set inside ≥ 0 and solve\n   - For fractions: Denominator ≠ 0\n   - For logs: Inside > 0\n   - Most polynomials: All real numbers\n\n🔹 **Range (Rf)**: All y-values the function produces\n   - Read the graph from bottom to top\n   - Check for asymptotes\n   - Consider the vertex for quadratics\n\nWhat specific function are you working with? Type it out or upload a photo!";
-        } else if (q.includes("graph") || q.includes("sketch") || q.includes("draw")) {
-          return "Great question! For graph sketching, here's my step-by-step approach:\n\n1️⃣ **Identify the function type** (linear, quadratic, cubic, etc.)\n2️⃣ **Find key points**: intercepts, vertex, asymptotes\n3️⃣ **Determine domain and range**\n4️⃣ **Sketch the shape** using the key points\n5️⃣ **Label important features**\n\nWhich function are you trying to sketch? I'll walk you through it!";
-        } else if (q.includes("mark") || q.includes("grade") || q.includes("score")) {
-          return "I can help mark your work! Malaysian Matriculation marking uses:\n\n📝 **M marks** (Method): For correct steps\n📝 **A marks** (Accuracy): For correct final answers\n\nUpload your work (photo or typed) and I'll provide detailed feedback following Matric exam standards!";
-        } else {
-          return "I'm here to help! As your Malaysian Matriculation math tutor, I can assist with:\n\n📚 Topic 5: Graph Sketching, Domain & Range\n📐 Function types: linear, quadratic, cubic, absolute, surd, rational, exponential, logarithmic\n✅ Work marking and feedback\n💡 Concept explanations\n\nWhat would you like to explore?";
-        }
-      }
-      
-      // Concept questions
-      if (q.includes("what is") || q.includes("define") || q.includes("meaning")) {
-        if (q.includes("domain")) {
-          return "The **domain** (or Df) of a function is all the possible x-values that can be input into the function. Think of it as: \"What x-values can I use?\"\n\n🔹 For f(x) = √(x): Domain is [0, ∞) because we can't take √ of negative numbers\n🔹 For f(x) = 1/x: Domain is ℝ\\{0} because x cannot be 0\n\nWant me to explain with a specific example?";
-        } else if (q.includes("range")) {
-          return "The **range** (or Rf) of a function is all the possible y-values (outputs) the function can produce. Think of it as: \"What y-values will I get?\"\n\n🔹 For f(x) = x²: Range is [0, ∞) because squaring always gives non-negative results\n🔹 For f(x) = e^x: Range is (0, ∞) because e^x is always positive\n\nWhich function's range would you like to understand?";
-        } else if (q.includes("asymptote")) {
-          return "An **asymptote** is a line that a graph approaches but never touches.\n\n📈 **Vertical asymptote**: x = a (graph approaches this x-value)\n   - Found where denominator = 0 for rational functions\n   - Example: f(x) = 1/(x-2) has vertical asymptote x = 2\n\n📉 **Horizontal asymptote**: y = b (graph approaches this y-value)\n   - Found for rational functions when degrees differ\n   - Example: f(x) = 1/x has horizontal asymptote y = 0\n\nNeed help finding asymptotes for a specific function?";
-        }
-      }
-      
-      // Function-specific questions
-      if (q.includes("f(x)=") || q.includes("function") || q.includes("df") || q.includes("rf") || q.includes("domain") || q.includes("range")) {
-        const scheme = getSchemeForInput(text);
-        if (scheme) {
-          const questionId = scheme.isDynamic ? "custom" : scheme.id;
-          return "I can see you're working with: " + scheme.question + "\n\nThis is a **" + scheme.type + " function**. Here's how to approach it:\n\n" + getDetailedHint(scheme) + "\n\nUpload your work or typed answer and I'll mark it according to Malaysian Matriculation standards!";
-        } else {
-          return "I'd love to help with that function! Could you provide:\n• The complete function expression\n• A photo of your work\n• Or tell me specifically what you're trying to find (domain/range/graph)\n\nThis will help me give you the most relevant guidance!";
-        }
-      }
-      
-      // Troubleshooting
-      if (q.includes("wrong") || q.includes("error") || q.includes("mistake") || q.includes("confused")) {
-        return "No worries - that's how we learn! 💪 Let me help you figure it out.\n\nTell me:\n• What function are you working with?\n• What answer did you get?\n• What step are you unsure about?\n\nI'll help identify where things might have gone wrong and guide you to the correct approach.";
-      }
-      
-      // Greetings
-      if (q.includes("hello") || q.includes("hi") || q.includes("hey") || q.includes("morning") || q.includes("afternoon")) {
-        return "Hello! 👋 Welcome to our math session! I'm Ms. Effie, ready to help you with Malaysian Matriculation mathematics.\n\nWhether you need help with:\n📊 Graph sketching\n🔢 Domain and range\n✏️ Checking your work\n❓ Any questions\n\nI'm here for you! What shall we work on?";
-      }
-      
-      // Thank you
-      if (q.includes("thank") || q.includes("thanks") || q.includes("terima kasih")) {
-        return "You're very welcome! 😊 It's my pleasure to help you learn. Keep up the great work with your mathematics!\n\nFeel free to come back anytime you need help. Remember: practice makes perfect! 🌟";
-      }
-      
-      // Farewell
-      if (q.includes("bye") || q.includes("goodbye") || q.includes("see you")) {
-        return "Goodbye! 👋 All the best with your studies. Remember:\n\n💡 Ask questions when you're unsure\n📝 Practice regularly\n🎯 Focus on understanding, not just memorizing\n\nSee you next time!";
-      }
-      
-      // Default - adaptive response
-      if (window.tutorReply) {
-        const originalReply = window.tutorReply(text);
-        if (originalReply && originalReply.length > 50) {
-          return originalReply;
-        }
-      }
-      
-      return "I'm here to help with your Malaysian Matriculation mathematics! 📚\n\nYou can:\n• Type a math question or function\n• Upload a photo of your work\n• Ask for explanations\n• Request marking feedback\n\nWhat would you like to explore today?";
-    }
-    
-    function getDetailedHint(scheme) {
-      const hints = {
-        constant: "For constant functions f(x) = k:\n🔹 Graph is a horizontal line at y = k\n🔹 Domain: All real numbers (-∞, ∞)\n🔹 Range: Just the single value {k}\n\nMake sure your line is perfectly horizontal!",
-        linear: "For linear functions f(x) = ax + b:\n🔹 Gradient = a (positive = increasing, negative = decreasing)\n🔹 y-intercept: set x = 0 → (0, b)\n🔹 x-intercept: set y = 0 → x = -b/a\n🔹 Domain & Range: Both (-∞, ∞)\n\nThe gradient tells you everything about the line's direction!",
-        quadratic: "For quadratic functions f(x) = ax² + bx + c:\n🔹 Shape: Parabola (U if a > 0, inverted if a < 0)\n🔹 Vertex: Complete the square or use x = -b/(2a)\n🔹 Domain: Always (-∞, ∞)\n🔹 Range: From vertex y-value (inclusive) upward or downward\n\nThe vertex is the most important point!",
-        cubic: "For cubic functions f(x) = ax³ + bx² + cx + d:\n🔹 Shape: S-shaped curve\n🔹 Point of inflection: Where curvature changes\n🔹 Domain & Range: Both (-∞, ∞)\n🔹 Always passes through all y-values\n\nCubics are smooth curves with no breaks!",
-        absolute: "For absolute functions f(x) = |ax + b| + c:\n🔹 Shape: V-shape\n🔹 Vertex: Solve ax + b = 0 → x = -b/a\n🔹 y-value at vertex: c\n🔹 Domain: (-∞, ∞)\n🔹 Range: [c, ∞) if opening upward\n\nThe vertex is the sharp corner of the V!",
-        surd: "For square root functions f(x) = √(ax + b):\n🔹 Domain: Solve ax + b ≥ 0\n🔹 Starting point: Where inside = 0\n🔹 Range: Always [0, ∞)\n🔹 Shape: Half-parabola opening to the right\n\nThe inside of the square root must never be negative!",
-        rational: "For rational functions f(x) = (ax + b)/(cx + d):\n🔹 Vertical asymptote: Set denominator = 0 → x = -d/c\n🔹 Horizontal asymptote: Compare degrees of numerator/denominator\n🔹 Domain: All real except where denominator = 0\n🔹 Range: All real except horizontal asymptote value\n\nAsymptotes are the key to understanding rational functions!",
-        exponential: "For exponential functions f(x) = a^(bx) + c:\n🔹 Horizontal asymptote: y = c\n🔹 y-intercept: Set x = 0 → f(0) = a^0 + c = 1 + c\n🔹 Domain: (-∞, ∞)\n🔹 Range: (c, ∞) if a > 1\n\nExponential functions grow or decay very quickly!",
-        logarithmic: "For logarithmic functions f(x) = log(ax + b) + c:\n🔹 Vertical asymptote: Set ax + b = 0 → x = -b/a\n🔹 Domain: Solve ax + b > 0\n🔹 Range: (-∞, ∞)\n🔹 x-intercept: Set log(ax + b) + c = 0\n\nLogarithms are the inverse of exponentials!"
-      };
-      return hints[scheme.type] || "Let's work through this step by step. Start by identifying the function type, then find key features like intercepts, asymptotes, or the vertex.";
-    }
-
-    function getSchemeForInput(text) {
-      // Config now in index.html, use localStorage for scheme selection
-      const sel = (localStorage.getItem("fj_scheme_pick") || "").toLowerCase();
-      if (sel && MARKING_SCHEME[sel]) return MARKING_SCHEME[sel];
-      const q = (text || "").toLowerCase();
-      // crude detect: look for (a)-(o) or function string
-      for (const k in MARKING_SCHEME) {
-        const s = MARKING_SCHEME[k];
-        // if student mentions the exact question snippet
-        if (q.includes(s.question.toLowerCase().replace(/\s+/g, "")) || q.includes("(" + k + ")")) return s;
-      }
-      // try to detect by type keywords
-      if (q.includes("sqrt") || q.includes("√")) {
-        if (q.includes("3x-2")) return MARKING_SCHEME.h;
-        if (q.includes("2-3x")) return MARKING_SCHEME.i;
-      }
-      if (q.includes("5/") || q.includes("5 ")) {
-        if (q.includes("2+x") || q.includes("2 + x")) return MARKING_SCHEME.j;
-        if (q.includes("2-x") || q.includes("2 - x")) return MARKING_SCHEME.k;
-      }
-      // Try to generate dynamic scheme if function detected
-      const dynamicScheme = generateDynamicScheme(text);
-      if (dynamicScheme) return dynamicScheme;
-      
-      return null;
-    }
-
-    // Dynamic scheme generation for new questions
-    function generateDynamicScheme(text) {
-      const q = (text || "").toLowerCase();
-      let detectedType = null;
-      let functionForm = "";
-      
-      // Detect function type
-      if (q.match(/\^2|squared|x²|x\^2/)) {
-        detectedType = "quadratic";
-        functionForm = "f(x) = ax² + bx + c";
-      } else if (q.match(/\^3|cubed|x³|x\^3/)) {
-        detectedType = "cubic";
-        functionForm = "f(x) = ax³ + bx² + cx + d";
-      } else if (q.match(/\||absolute/)) {
-        detectedType = "absolute";
-        functionForm = "f(x) = |ax + b| + c";
-      } else if (q.match(/sqrt|√|surd/)) {
-        detectedType = "surd";
-        functionForm = "f(x) = √(ax + b)";
-      } else if (q.match(/\//) && !q.match(/sqrt|√/)) {
-        detectedType = "rational";
-        functionForm = "f(x) = (ax + b)/(cx + d)";
-      } else if (q.match(/e\^|exp|exponential/)) {
-        detectedType = "exponential";
-        functionForm = "f(x) = a^(bx) + c";
-      } else if (q.match(/ln|log|logarithm/)) {
-        detectedType = "logarithmic";
-        functionForm = "f(x) = log(ax + b) + c";
-      } else if (q.match(/= -?\d+\s*$/)) {
-        detectedType = "constant";
-        functionForm = "f(x) = k";
-      } else if (q.match(/= -?\d*x\s*[+-]\s*\d+/)) {
-        detectedType = "linear";
-        functionForm = "f(x) = ax + b";
-      }
-      
-      if (detectedType && FUNCTION_TEMPLATES[detectedType]) {
-        const template = FUNCTION_TEMPLATES[detectedType];
-        return {
-          id: "dynamic",
-          question: functionForm,
-          marks: template.marks,
-          type: detectedType,
-          expected: {
-            graph: template.graph,
-            domain: template.domain,
-            range: template.range
-          },
-          breakdown: template.breakdown,
-          isDynamic: true,
-          commonErrors: []
-        };
-      }
-      
-      return null;
-    }
-
-    async function callOpenAI(text) {
-      const key = (localStorage.getItem("fj_openai_key") || "").trim();
-      if (!key) return null;
-      const scheme = getSchemeForInput(text);
-      const schemeNote = scheme ? "Student is asking about question (" + scheme.id + ") " + scheme.question + ". Use this scheme entry for marking." : "Auto-detect the question (a-o).";
-      const userContent = [];
-      const combinedText = [
-        text || "(no typed text — please read the attached image/handwriting)",
-        schemeNote,
-        pendingFiles.length ? "Attached files: " + pendingFiles.map(function (f) { return f.name + ": " + f.textSnippet; }).join(" | ") : ""
-      ].filter(Boolean).join("\n\n");
-
-      userContent.push({ type: "text", text: combinedText });
-      pendingImages.forEach(function (img) {
-        userContent.push({ type: "image_url", image_url: { url: img.dataUrl, detail: "high" } });
-      });
-
-      const body = {
-        model: "gpt-4o",
-        temperature: 0.3,
-        max_tokens: 900,
-        messages: [
-          { role: "system", content: buildSystemPrompt() },
-          { role: "user", content: userContent }
-        ]
-      };
-
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
-        body: JSON.stringify(body)
-      });
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error("OpenAI " + res.status + ": " + err.slice(0, 400));
-      }
-      const data = await res.json();
-      return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
-    }
-
-    // Math-focused upload validation and error detection
-    function validateMathUploads(images, files, text) {
-      const warnings = [];
-      const errors = [];
-      
-      // Check for potential issues
-      if (images.length === 0 && files.length === 0 && !text.trim()) {
-        errors.push("Please provide at least some text, an image, or a file to grade.");
-      }
-      
-      // Validate image types
-      images.forEach(function (img) {
-        if (img.type === 'general_math' && !text.toLowerCase().includes('graph') && !text.toLowerCase().includes('function')) {
-          warnings.push("Image '" + img.name + "' appears to be general content. For math grading, please upload graphs, handwritten work, or question papers.");
-        }
-      });
-      
-      // Check for marking scheme conflicts
-      const hasMarkingScheme = files.some(function (f) { return f.isMarkingScheme; });
-      if (hasMarkingScheme && !text.toLowerCase().includes('scheme') && !text.toLowerCase().includes('marking')) {
-        warnings.push("You uploaded a marking scheme file. Make sure you want to use this as the grading standard, or remove it if you're submitting student work.");
-      }
-      
-      // Check for mixed content types
-      const hasGraphs = images.some(function (img) { return img.type === 'graph'; });
-      const hasHandwritten = images.some(function (img) { return img.type === 'handwritten_work'; });
-      
-      if (hasGraphs && hasHandwritten && !text) {
-        warnings.push("You uploaded both graphs and handwritten work. Please specify which one you want me to grade, or provide context in your text.");
-      }
-      
-      return { warnings: warnings, errors: errors, isValid: errors.length === 0 };
-    }
-
-    async function handleSend() {
-      const text = window.el.chatInput.value.trim();
-      if (!text && pendingImages.length === 0 && pendingFiles.length === 0) return;
-      
-      // Validate uploads before processing
-      const validation = validateMathUploads(pendingImages, pendingFiles, text);
-      
-      if (!validation.isValid) {
-        addBotHTML("❌ " + validation.errors.join("<br>"));
-        return;
-      }
-      
-      // Show warnings if any
-      if (validation.warnings.length > 0) {
-        const warningHtml = "⚠️ <strong>Please note:</strong><br>" + validation.warnings.join("<br>") + "<br><br>Proceeding with grading...";
-        setTimeout(function () { addBotHTML(warningHtml); }, 100);
-      }
-      
-      const snapshotImages = pendingImages.slice();
-      const snapshotFiles = pendingFiles.slice();
-      addUserWithAttachments(text);
-      window.el.chatInput.value = "";
-      // keep snapshots for this turn, then clear preview
-      pendingImages = [];
-      pendingFiles = [];
-      renderPreview();
-
-      // typing indicator
-      const typing = document.createElement("div");
-      typing.className = "msg bot";
-      typing.textContent = "Ms. Effie is checking against the marking scheme…";
-      typing.style.opacity = "0.7";
-      window.el.chatLog.appendChild(typing);
-      scrollChatToBottom();
-
-      try {
-        const key = (localStorage.getItem("fj_openai_key") || "").trim();
-        let reply = "";
-        if (key && (snapshotImages.length > 0 || snapshotFiles.length > 0 || text.length > 5)) {
-          // temporarily restore snapshots for API call
-          pendingImages = snapshotImages;
-          pendingFiles = snapshotFiles;
-          reply = await callOpenAI(text);
-          pendingImages = [];
-          pendingFiles = [];
-        }
-        if (!reply) {
-          // offline fallback: produce a structured hint using scheme data
-          const scheme = getSchemeForInput(text);
-          if (scheme) {
-            reply = offlineSchemeHint(scheme, text, snapshotImages.length > 0);
-          } else {
-            reply = offlineHintReply(text);
-          }
-        }
-        typing.remove();
-        addBotHTML(reply);
-      } catch (err) {
-        typing.remove();
-        addBotHTML("⚠️ Could not reach OpenAI: " + escHtml(err.message).slice(0, 500)
-          + "<br><br>Offline hint: " + offlineHintReply(text));
-      }
-    }
-
-    function offlineSchemeHint(scheme, text, hasImage) {
-      // Dynamic offline marking - analyzes student's actual input vs scheme
-      const raw = (text || "");
-      const q = raw.toLowerCase();
-      const compact = q.replace(/\s+/g, "");
-      // helper to check if student mentioned expected value
-      function mentions(expected){
-        const e = expected.toLowerCase().replace(/\s+/g,"");
-        // handle infinity variants
-        const normQ = compact.replace(/\\infty/g,"infinity").replace(/∞/g,"infinity");
-        const normE = e.replace(/∞/g,"infinity");
-        return normQ.includes(normE) || normQ.includes(normE.replace(/[\(\)]/g,""));
-      }
-      // Build dynamic status per criterion
-      let total = scheme.marks, obtained = 0;
-      const rows = scheme.breakdown.map(function(b){
-        let status = "—";
-        let cls = "badge-partial";
-        // heuristic: if student text contains key concept, mark as ok
-        if(b.desc.includes("horizontal") && (q.includes("horizontal") || q.includes("y=-6") || q.includes("y = -6"))){ status="✓ Likely ok"; cls="badge-ok"; obtained+=b.mark; }
-        else if(b.desc.includes("Gradient") && (q.includes("decreasing") || q.includes(" -3") || compact.includes("-3x+4"))){ status="✓ Likely ok"; cls="badge-ok"; obtained+=b.mark; }
-        else if(b.desc.includes("Intercepts") && (q.includes("(0,4)") || q.includes("4/3") || q.includes("x-intercept"))){ status="✓ Likely ok"; cls="badge-ok"; obtained+=b.mark; }
-        else if(b.desc.includes("Domain")){ if(mentions(scheme.expected.domain)){ status="✓ Matches"; cls="badge-ok"; obtained+=b.mark; } else if(q.includes("domain")||q.includes("df")){ status="✗ Check domain"; cls="badge-wrong"; } else { status="○ Not shown"; cls="badge-partial"; } }
-        else if(b.desc.includes("Range")){ if(mentions(scheme.expected.range)){ status="✓ Matches"; cls="badge-ok"; obtained+=b.mark; } else if(q.includes("range")||q.includes("rf")){ status="✗ Check range"; cls="badge-wrong"; } else { status="○ Not shown"; cls="badge-partial"; } }
-        else if(b.desc.includes("Vertex") && (q.includes("vertex") || q.includes("0,") || q.includes("(0"))){ status="? See hint"; cls="badge-partial"; }
-        else if(b.desc.includes("asymptote") && (q.includes("asymptote") || q.includes("x=") || q.includes("y="))){ status="? See hint"; cls="badge-partial"; }
-        else { status="○ Not shown"; cls="badge-partial"; }
-        return {b:b, status:status, cls:cls};
-      });
-      // If no text at all and has image, keep partial
-      let html = "<strong>Question (" + scheme.id + ") " + escHtml(scheme.question) + "</strong><br>"
-        + "<em>Scheme: " + scheme.marks + " marks</em> &nbsp;|&nbsp; <span class='" + (obtained===total?"badge-ok":obtained===0?"badge-wrong":"badge-partial") + "'>" + obtained + "/" + total + " estimated</span><br>"
-        + "<span style='font-size:0.82rem;color:#557084'>Expected: Graph: " + escHtml(scheme.expected.graph) + " · Domain " + escHtml(scheme.expected.domain) + " · Range " + escHtml(scheme.expected.range) + "</span><br><br>";
-      if(hasImage){
-        html += "📷 <em>Photo received.</em> Without an OpenAI key I cannot read handwriting precisely — I analyzed your typed text " + (raw?"and image placeholder":"only image") + ". Add a key for full vision reading.<br><br>";
-      }
-      if(!raw && !hasImage){
-        html += "<em>You sent no text. Type your Df/Rf or describe your graph (e.g. 'my domain is ...') and I will check it.</em><br><br>";
-      }
-      html += "<table class='mark-table'><tr><th>Criterion</th><th>Full</th><th>Status</th></tr>";
-      rows.forEach(function(r){
-        html += "<tr><td>" + escHtml(r.b.desc) + "</td><td>" + r.b.mark + "</td><td><span class='" + r.cls + "'>" + r.status + "</span></td></tr>";
-      });
-      html += "</table>";
-      // Dynamic hint based on actual mismatch
-      html += "<br><strong>Real-time hint for you:</strong><br>";
-      const hintPool = [];
-      // Check domain mismatch
-      if(rows.some(function(r){ return r.b.desc.includes("Domain") && r.cls==="badge-wrong"; })){
-        if(scheme.type==="surd") hintPool.push("Your domain seems off. For a square root, set the inside ≥0 and solve for x. Where does the curve actually start?");
-        else if(scheme.type==="rational") hintPool.push("Domain excludes the vertical asymptote (denominator = 0). What x-value makes the denominator zero? Exclude it.");
-        else if(scheme.type==="logarithmic") hintPool.push("Log needs inside >0. Solve " + (scheme.id==="n"?"x-3>0":"3-x>0") + " to find the allowed x side of x=3.");
-        else hintPool.push("Check your domain again — does it match " + escHtml(scheme.expected.domain) + "? Read the graph left to right.");
-      }
-      if(rows.some(function(r){ return r.b.desc.includes("Range") && r.cls==="badge-wrong"; })){
-        if(scheme.type==="quadratic") hintPool.push("Range starts at the vertex's y-value. Is your parabola opening up or down? That decides the direction.");
-        else if(scheme.type==="constant") hintPool.push("A constant has only one y-value. Your range should be a single set " + escHtml(scheme.expected.range) + ", not an interval.");
-        else if(scheme.type==="rational") hintPool.push("Range excludes the horizontal asymptote y=0. What y can never be reached?");
-        else hintPool.push("Check your range: read bottom to top. For this graph, " + escHtml(scheme.expected.range) + " — how does yours compare?");
-      }
-      if(hintPool.length===0){
-        // generic but still specific to type
-        if(scheme.type === "linear" && scheme.id === "b") hintPool.push("Check the sign of the gradient. Negative means decreasing left→right. Is your slope -3 and intercept 4?");
-        else if(scheme.type === "constant") hintPool.push("Constant y=k is horizontal. Is your line at y=-6? Domain all real, range single value.");
-        else if(scheme.type === "surd") hintPool.push("Inside of √ must be ≥0. Solve the inequality to find the start x. Where is your starting point?");
-        else if(scheme.type === "rational") hintPool.push("Find denominator zero → vertical asymptote. Exclude it from domain. Horizontal asymptote y=0 excluded from range.");
-        else if(scheme.type === "quadratic") hintPool.push("Vertex at (0,±4 or 9) decides opening and range start. Check sign of x².");
-        else if(scheme.type === "absolute") hintPool.push("V-shape vertex solves 2x±1=0. Is your corner at the expected x?");
-        else if(scheme.type === "exponential") hintPool.push("Horizontal asymptote y=c (shift). Does your graph approach it? Check f(0).");
-        else if(scheme.type === "logarithmic") hintPool.push("Vertical asymptote at x=3. Check left/right side of it for domain.");
-        else hintPool.push("Compare your graph shape/domain/range to expected — which part differs?");
-      }
-      // Show one or two hints, not all
-      html += hintPool.slice(0,2).join("<br>") + "<br><br><em>Next:</em> Fix only the ✗/○ parts and resend your updated Df/Rf or a clearer photo.";
-      return html;
-    }
-
-    newSendBtn.addEventListener("click", handleSend);
-    newInput.addEventListener("keydown", function (e) { if (e.key === "Enter") handleSend(); });
-
-    document.querySelectorAll(".suggestions button").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        window.el.chatInput.value = btn.dataset.prompt;
-        handleSend();
-      });
-    });
-
-    // welcome message update
-    // keep original welcome, add marking hint
-    setTimeout(function () {
-      addBotHTML("Hi! I’m <strong>Ms. Effie — Your Malaysian Matriculation Math Tutor</strong> 👋<br><br>"
-        + "I'm here to help you with mathematics in a flexible, natural way. I can:<br><br>"
-        + "📚 <strong>Teach Concepts:</strong> Explain any math topic clearly<br>"
-        + "  <strong>Graph Sketching:</strong> Guide you through drawing functions<br>"
-        + "  <strong>Domain & Range:</strong> Help find Df and Rf for any function<br>"
-        + "✅ <strong>Mark Your Work:</strong> Provide detailed feedback using Matric standards<br>"
-        + "🆕 <strong>Auto-Generate Schemes:</strong> Create marking schemes for new questions<br><br>"
-        + "🎯 <strong>Smart Upload Features:</strong><br>"
-        + "• 📷 Auto-detects graphs, handwritten work, question papers<br>"
-        + "• 📄 Recognizes marking schemes, exam papers, references<br>"
-        + "• ✍️ Enhances handwriting for better recognition<br>"
-        + "• 🔄 Drag & drop support<br><br>"
-        + "Just type your question, upload your work, or ask for help. I'll respond naturally to guide you! 💪");
-    }, 600);
-
-    console.log("ai-assistant.js loaded — marking schemes (a-o) ready, upload enabled.");
+function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function renderAttachPreview(){
+  el.attachPreview.innerHTML = "";
+  pendingImages.forEach((img,idx)=>{
+    const chip = document.createElement("span"); chip.className="attach-chip";
+    chip.innerHTML = <img src="${img.dataUrl}" alt="preview"/><span>${escHtml(img.name)}</span>;
+    const rmBtn = document.createElement("button"); rmBtn.textContent="×";
+    rmBtn.onclick = ()=>{ pendingImages.splice(idx,1); renderAttachPreview(); };
+    chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
   });
-})();
+  pendingFiles.forEach((f,idx)=>{
+    const chip = document.createElement("span"); chip.className="attach-chip";
+    chip.innerHTML = <span>📄 ${escHtml(f.name)}</span>;
+    const rmBtn = document.createElement("button"); rmBtn.textContent="×";
+    rmBtn.onclick = ()=>{ pendingFiles.splice(idx,1); renderAttachPreview(); };
+    chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
+  });
+}
 
+async function readFileAsDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+photoInput.onchange = async function(){
+  const files = Array.from(this.files||[]);
+  for(let f of files){
+    if(!f.type.startsWith("image/")) continue;
+    const dataUrl = await readFileAsDataUrl(f);
+    pendingImages.push({dataUrl:dataUrl,name:f.name,mime:f.type});
+  }
+  this.value = ""; renderAttachPreview();
+};
+
+fileInput.onchange = async function(){
+  const files = Array.from(this.files||[]);
+  for(let f of files){
+    if(f.type.startsWith("image/")){
+      const dataUrl = await readFileAsDataUrl(f);
+      pendingImages.push({dataUrl:dataUrl,name:f.name,mime:f.type});
+    }else{
+      pendingFiles.push({name:f.name});
+    }
+  }
+  this.value = ""; renderAttachPreview();
+};
+
+function scrollChatBottom(){
+  requestAnimationFrame(()=>{
+    el.chatLog.scrollTop = el.chatLog.scrollHeight;
+    setTimeout(()=>{ el.chatLog.scrollTop = el.chatLog.scrollHeight; },80);
+  });
+}
+
+function addUserMessage(text){
+  const wrap = document.createElement("div"); wrap.className="msg user";
+  let html = "";
+  if(text) html += <div>${escHtml(text).replace(/\n/g,"<br>")}</div>;
+  pendingImages.forEach(img=>{
+    html += <div style="margin-top:8px"><img src="${img.dataUrl}" style="max‑width:100%;max‑height:180px;border‑radius:8px;border:1px solid #00000012"/></div>;
+  });
+  pendingFiles.forEach(f=>{
+    html += <div style="margin‑top:6px;font‑size:0.82rem;opacity:0.8">📄 ${escHtml(f.name)}</div>;
+  });
+  if(!html) html = "<em>(image / file only)</em>";
+  wrap.innerHTML = html;
+  el.chatLog.appendChild(wrap);
+  scrollChatBottom();
+}
+
+function addBotMessage(text){
+  const wrap = document.createElement("div"); wrap.className="msg bot";
+  wrap.innerHTML = escHtml(text).replace(/\n/g,"<br>");
+  el.chatLog.appendChild(wrap);
+  scrollChatBottom();
+}
+
+async function handleSend(){
+  const userText = el.chatInput.value.trim();
+  if(!userText && pendingImages.length===0 && pendingFiles.length===0) return;
+
+  const snapImages = [...pendingImages];
+  const snapFiles = [...pendingFiles];
+  addUserMessage(userText);
+  el.chatInput.value = "";
+  pendingImages = []; pendingFiles = [];
+  renderAttachPreview();
+
+  // typing indicator
+  const typing = document.createElement("div");
+  typing.className="msg bot";
+  typing.textContent = "Mr. Effie is thinking...";
+  typing.style.opacity = "0.7";
+  el.chatLog.appendChild(typing);
+  scrollChatBottom();
+
+  try{
+    const parts = [];
+    parts.push({text: SYSTEM_PROMPT + "\nStudent input: " + userText});
+    for(const img of snapImages){
+      const b64 = img.dataUrl.split(",")[1];
+      parts.push({ inline_data: { mime_type: img.mime, data:b64 }});
+    }
+    const payload = { contents:[ { parts: parts } ] };
+    const res = await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content‑Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    typing.remove();
+    const reply = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if(!reply){
+      addBotMessage("Sorry, I could not generate a reply. Check API‑key, Generative‑Language‑API permission and CORS browser restrictions.");
+    }else{
+      addBotMessage(reply);
+    }
+  }catch(err){
+    typing.remove();
+    addBotMessage(Request error: ${err.message}\nMost‑likely‑cause: browser CORS blocks Gemini request when opening local html file.);
+  }
+}
+
+// bind events
+el.sendChat.onclick = handleSend;
+el.chatInput.addEventListener("keydown",(e)=>{ if(e.key==="Enter") handleSend(); });
+
+// suggestion quick buttons
+document.querySelectorAll(".suggestions button").forEach(btn=>{
+  const clone = btn.cloneNode(true);
+  btn.parentNode.replaceChild(clone,btn);
+  clone.addEventListener("click",()=>{
+    el.chatInput.value = clone.dataset.prompt;
+    handleSend();
+  });
+});
+
+// welcome greeting message on load (neutral welcome, no internal‑rule description)
+setTimeout(()=>{
+  addBotMessage("Hi! I am Mr. Effie.\nFeel free to ask me mathematics questions. You may also attach photos or files.");
+},400);
+
+console.log("Mr.Effie chatbox loaded (local test mode, Gemini 1.5 Flash)");
 </script>
 </body>
 </html>
