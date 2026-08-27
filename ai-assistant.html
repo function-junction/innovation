@@ -21,7 +21,6 @@ body{
   padding:18px;
 }
 a{color:#0d6571}
-
 .box-ok{
   border:2px solid #27ae60;
   border-radius:12px;
@@ -46,7 +45,6 @@ a{color:#0d6571}
 .hint-panel strong{
   color:#0d6571;
 }
-
 /* Launcher and panel - original layout preserved */
 .ai-launcher{
   position:fixed;right:max(18px, env(safe-area-inset-right));bottom:max(18px, env(safe-area-inset-bottom));
@@ -85,7 +83,7 @@ a{color:#0d6571}
 .ai-header-content{margin-left:84px;flex:1;padding-right:50px}
 .ai-header h3{margin:0;font-size:1.16rem;line-height:1.05;font-weight:950}
 .ai-header p{margin:4px 0 0;color:rgba(255,255,255,0.92);font-size:0.9rem;font-weight:700}
-.ai-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;margin-left:5px;padding:0 6px;border-radius:7px;background:rgba(255,211,105,0.26);font-size:0.78rem;font-weight:950}
+  .ai-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;margin-left:5px;padding:0 6px;border-radius:7px;background:rgba(255,211,105,0.26);font-size:0.78rem;font-weight:950}
 .ai-close{position:absolute;top:14px;right:14px;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:rgba(255,255,255,0.88);color:#0d4265;font-size:1.8rem;line-height:1;font-weight:700;border:0;cursor:pointer;z-index:3}
 .chat-log{
   min-height:260px;overflow-y:auto;padding:18px 16px 28px;display:flex;flex-direction:column;gap:12px;
@@ -105,7 +103,6 @@ a{color:#0d6571}
 .attach-menu.show{display:block;}
 .attach-menu button{width:100%;text-align:left;padding:10px 12px;background:#fff;border:none;font-size:0.9rem;cursor:pointer;color:#102033;}
 .attach-menu button:hover{background:#e8f7f8;}
-
 .suggestions{padding:0 16px 12px;display:flex;gap:7px;flex-wrap:wrap;background:#f7fbff;position:relative;z-index:1}
 .suggestions button{background:rgba(230,250,247,0.86);color:#0d6571;border:1px solid rgba(6,154,166,0.18);border-radius:999px;padding:7px 9px;font-size:0.78rem;font-weight:800;cursor:pointer}
 .ai-tabs{display:grid;grid-template-columns:1fr;min-height:48px;background:#f7fbff;border-top:1px solid rgba(6,154,166,0.18);position:relative;z-index:1}
@@ -115,11 +112,10 @@ a{color:#0d6571}
 .chat-icon::after{content:"";position:absolute;left:5px;bottom:-7px;width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;background:#f7fbff;transform:skew(-18deg)}
 .chat-icon::before{content:"fx";position:absolute;inset:0;display:grid;place-items:center;font-size:0.58rem;line-height:1;font-weight:950}
 .ai-powered{min-height:34px;display:grid;place-items:center;background:linear-gradient(90deg, #eefcff, #f8fbff);color:#557084;font-size:0.78rem;font-weight:800;position:relative;z-index:1}
-.attach-preview{padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;background:#f7fbff;position:relative;z-index:1}
+  .attach-preview{padding:0 16px;display:flex;flex-wrap:wrap;gap:8px;background:#f7fbff;position:relative;z-index:1}
 .attach-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:#e3f5f7;border:1px solid rgba(6,154,166,0.18);font-size:0.74rem;font-weight:700;color:#0d4265;max-width:180px;overflow:hidden}
 .attach-chip img{width:28px;height:28px;object-fit:cover;border-radius:6px;border:1px solid rgba(0,0,0,0.08)}
 .attach-chip button{width:18px;height:18px;border-radius:50%;background:#0d4265;color:#fff;font-size:0.7rem;display:grid;place-items:center;border:0;flex:0 0 auto;cursor:pointer}
-
 .msg .mark-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.86rem}
 .msg .mark-table th,.msg .mark-table td{border:1px solid rgba(6,154,166,0.18);padding:6px 7px;text-align:left}
 .msg .mark-table th{background:#e3f5f7;color:#0d4265;font-weight:800}
@@ -167,16 +163,13 @@ a{color:#0d6571}
   <div class="ai-tabs"><button class="ai-tab active" type="button"><span class="chat-icon"></span><span>Chat</span></button></div>
   <div class="ai-powered">Powered by FUNCTION JUNCTION</div>
 </aside>
-
 <input type="file" id="photoInput" accept="image/*" hidden />
 <input type="file" id="fileInput" accept=".pdf,.txt,.docx,image/*" hidden />
-
 <script>
 // ===================== LOCAL TEST ONLY =====================
-// WARNING: Never upload this file to github / public web server! Key will leak.
 const API_URL = '/api/gemini';
-// System Instruction: INTERNAL ONLY, never rendered/shown to end‑user browser UI
-const SYSTEM_PROMPT = You are Mr. Effie, friendly mathematics tutor for students.
+// System Instruction
+const SYSTEM_PROMPT = `You are Mr. Effie, friendly mathematics tutor for students.
 Strict rules:
 1. NEVER give full final answers, NEVER write complete step‑by‑step solutions.
 2. Provide only guiding hints, point out mistakes, explain why something is wrong, use guiding questions to push student to think on their own.
@@ -195,7 +188,6 @@ window.el = {
   sendChat: document.getElementById('sendChat'),
   attachPreview: document.getElementById('attachPreview')
 };
-
 // file inputs
 const photoInput = document.getElementById("photoInput");
 const fileInput = document.getElementById("fileInput");
@@ -203,10 +195,8 @@ const attachPlusBtn = document.getElementById("attachPlusBtn");
 const attachMenu = document.getElementById("attachMenu");
 const menuPhoto = document.getElementById("menuPhoto");
 const menuFile = document.getElementById("menuFile");
-
 let pendingImages = [];
 let pendingFiles = [];
-
 // open / close chat panel
 function openAiPanel(){
   el.aiPanel.classList.add('open');
@@ -221,7 +211,6 @@ function closeAiPanel(){
 }
 el.aiLauncher.addEventListener('click', openAiPanel);
 el.aiClose.addEventListener('click', closeAiPanel);
-
 // plus button dropdown menu toggle
 attachPlusBtn.addEventListener("click", (e)=>{
   e.stopPropagation();
@@ -229,33 +218,30 @@ attachPlusBtn.addEventListener("click", (e)=>{
 });
 // click outside close menu
 document.addEventListener("click", ()=>{ attachMenu.classList.remove("show"); });
-
 menuPhoto.addEventListener("click",(e)=>{
   e.stopPropagation(); attachMenu.classList.remove("show"); photoInput.click();
 });
 menuFile.addEventListener("click",(e)=>{
   e.stopPropagation(); attachMenu.classList.remove("show"); fileInput.click();
 });
-
 function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function renderAttachPreview(){
   el.attachPreview.innerHTML = "";
   pendingImages.forEach((img,idx)=>{
     const chip = document.createElement("span"); chip.className="attach-chip";
-    chip.innerHTML = <img src="${img.dataUrl}" alt="preview"/><span>${escHtml(img.name)}</span>;
+    chip.innerHTML = <img src="${img.dataUrl}" alt="preview" /><span>${escHtml(img.name)}</span>;
     const rmBtn = document.createElement("button"); rmBtn.textContent="×";
     rmBtn.onclick = ()=>{ pendingImages.splice(idx,1); renderAttachPreview(); };
     chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
   });
   pendingFiles.forEach((f,idx)=>{
     const chip = document.createElement("span"); chip.className="attach-chip";
-    chip.innerHTML = <span>📄 ${escHtml(f.name)}</span>;
+    chip.innerHTML = <span>📄 ${escHtml(f.name)}</span>`;
     const rmBtn = document.createElement("button"); rmBtn.textContent="×";
     rmBtn.onclick = ()=>{ pendingFiles.splice(idx,1); renderAttachPreview(); };
     chip.appendChild(rmBtn); el.attachPreview.appendChild(chip);
   });
 }
-
 async function readFileAsDataUrl(file){
   return new Promise((resolve,reject)=>{
     const r = new FileReader();
@@ -273,7 +259,6 @@ photoInput.onchange = async function(){
   }
   this.value = ""; renderAttachPreview();
 };
-
 fileInput.onchange = async function(){
   const files = Array.from(this.files||[]);
   for(let f of files){
@@ -286,20 +271,18 @@ fileInput.onchange = async function(){
   }
   this.value = ""; renderAttachPreview();
 };
-
 function scrollChatBottom(){
   requestAnimationFrame(()=>{
     el.chatLog.scrollTop = el.chatLog.scrollHeight;
     setTimeout(()=>{ el.chatLog.scrollTop = el.chatLog.scrollHeight; },80);
   });
 }
-
 function addUserMessage(text){
   const wrap = document.createElement("div"); wrap.className="msg user";
   let html = "";
   if(text) html += <div>${escHtml(text).replace(/\n/g,"<br>")}</div>;
   pendingImages.forEach(img=>{
-    html += <div style="margin-top:8px"><img src="${img.dataUrl}" style="max‑width:100%;max‑height:180px;border‑radius:8px;border:1px solid #00000012"/></div>;
+    html += <div style="margin-top:8px"><img src="${img.dataUrl}" style="max‑width:100%;max‑height:180px;border‑radius:8px;border:1px solid #00000012" /></div>;
   });
   pendingFiles.forEach(f=>{
     html += <div style="margin‑top:6px;font‑size:0.82rem;opacity:0.8">📄 ${escHtml(f.name)}</div>;
@@ -309,25 +292,21 @@ function addUserMessage(text){
   el.chatLog.appendChild(wrap);
   scrollChatBottom();
 }
-
 function addBotMessage(text){
   const wrap = document.createElement("div"); wrap.className="msg bot";
   wrap.innerHTML = escHtml(text).replace(/\n/g,"<br>");
   el.chatLog.appendChild(wrap);
   scrollChatBottom();
 }
-
 async function handleSend(){
   const userText = el.chatInput.value.trim();
   if(!userText && pendingImages.length===0 && pendingFiles.length===0) return;
-
   const snapImages = [...pendingImages];
   const snapFiles = [...pendingFiles];
   addUserMessage(userText);
   el.chatInput.value = "";
   pendingImages = []; pendingFiles = [];
   renderAttachPreview();
-
   // typing indicator
   const typing = document.createElement("div");
   typing.className="msg bot";
@@ -335,7 +314,6 @@ async function handleSend(){
   typing.style.opacity = "0.7";
   el.chatLog.appendChild(typing);
   scrollChatBottom();
-
   try{
     const parts = [];
     parts.push({text: SYSTEM_PROMPT + "\nStudent input: " + userText});
@@ -362,11 +340,9 @@ async function handleSend(){
     addBotMessage(Request error: ${err.message}\nMost‑likely‑cause: browser CORS blocks Gemini request when opening local html file.);
   }
 }
-
 // bind events
 el.sendChat.onclick = handleSend;
 el.chatInput.addEventListener("keydown",(e)=>{ if(e.key==="Enter") handleSend(); });
-
 // suggestion quick buttons
 document.querySelectorAll(".suggestions button").forEach(btn=>{
   const clone = btn.cloneNode(true);
@@ -376,12 +352,10 @@ document.querySelectorAll(".suggestions button").forEach(btn=>{
     handleSend();
   });
 });
-
-// welcome greeting message on load (neutral welcome, no internal‑rule description)
+// welcome greeting message on load
 setTimeout(()=>{
   addBotMessage("Hi! I am Mr. Effie.\nFeel free to ask me mathematics questions. You may also attach photos or files.");
 },400);
-
 console.log("Mr.Effie chatbox loaded (local test mode, Gemini 1.5 Flash)");
 </script>
 </body>
