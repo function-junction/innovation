@@ -291,6 +291,23 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
     }
   });
 
+  // Warm up the browser voice list (loads asynchronously)
+  if ('speechSynthesis' in window) { try { window.speechSynthesis.getVoices(); } catch (e) {} }
+
+  function selectFemaleVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    try {
+      var voices = window.speechSynthesis.getVoices();
+      var female = /sonia|libby|maisie|hazel|susan|serena|zira|jenny|aria|samantha|natasha|female/i;
+      return voices.find(function (v) { return female.test(v.name) && /^en-GB/i.test(v.lang); })
+        || voices.find(function (v) { return /^en-GB/i.test(v.lang); })
+        || voices.find(function (v) { return female.test(v.name) && /^en-/i.test(v.lang); })
+        || voices.find(function (v) { return /^en/i.test(v.lang); })
+        || voices[0]
+        || null;
+    } catch (e) { return null; }
+  }
+
   function speakText(text) {
     if (!ttsEnabled || !('speechSynthesis' in window)) return;
     try {
@@ -302,8 +319,11 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
         .trim();
       if (!clean) return;
       var u = new SpeechSynthesisUtterance(clean);
-      u.lang = 'en-US';
-      u.rate = 1.0;
+      var voice = selectFemaleVoice();
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-GB'; }
+      u.rate = 0.9;
+      u.pitch = 1.06;
+      u.volume = 1;
       window.speechSynthesis.speak(u);
     } catch (err) {}
   }
