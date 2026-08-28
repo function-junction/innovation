@@ -189,7 +189,7 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
     'Your specialty is Functions: graph sketching, domain and range, transformations, asymptotes, amplitude and period.\n\n' +
     'HOW TO TALK\n' +
     '- Be natural and warm, like a real teacher. Never use rigid templates, scripts or pre-made tables.\n' +
-    '- Use second person ("you") and simple English. Mix in Malay terms the student uses (julat, lakar graf, pintasan, paksi).\n' +
+    '- Use second person ("you"). Reply ONLY in standard British English (spellings like colour, centre, recognise). Never use Malay or any other language, even if the student writes in Malay.\n' +
     '- Keep answers focused: 2-6 short sentences normally. For casual chat (hi, good morning, thanks) reply in one short warm line.\n\n' +
     'GRADING RULES\n' +
     '- Mark against the marking scheme below as your reference, but stay flexible and adapt to what the student actually wrote, typed, or photographed.\n' +
@@ -544,15 +544,31 @@ body.embedded .ai-panel{position:absolute;inset:0;width:100%;height:100%;border-
       .then(function (res) { return res.json(); })
       .then(function (json) {
         typing.remove();
-        var reply = json && json.candidates && json.candidates[0] &&
-          json.candidates[0].content && json.candidates[0].content.parts &&
-          json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text;
-        if (!reply) {
-          addBotMessage('Sorry, I could not get a reply. Please check that the AI proxy URL is set and the worker is deployed.');
+        // Join every text part (some replies are split across parts)
+        var reply = '';
+        try {
+          var partsArr = json && json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts;
+          if (partsArr) {
+            reply = partsArr.map(function (p) { return p && p.text ? p.text : ''; }).join('').trim();
+          }
+        } catch (e) { reply = ''; }
+
+        if (reply) {
+          addBotMessage(renderMarked(reply));
+          if (ttsEnabled) speakText(reply);
           return;
         }
-        addBotMessage(renderMarked(reply));
-        if (ttsEnabled) speakText(reply);
+
+        // No usable reply — surface the real error if the API returned one
+        var errMsg = '';
+        if (json && json.error && (json.error.message || json.error.status)) {
+          errMsg = json.error.message || ('Error ' + json.error.status);
+        } else if (json && json.candidates && json.candidates[0] && json.candidates[0].finishReason === 'SAFETY') {
+          errMsg = 'The answer was blocked by the safety filter. Please rephrase your question.';
+        }
+        addBotMessage('Sorry, I could not reply this time.'
+          + (errMsg ? '<br><small>' + escHtml(errMsg) + '</small>' : '')
+          + '<br><small>Please try again. If it keeps failing, the free AI quota may be used up for the moment.</small>');
       })
       .catch(function (err) {
         typing.remove();
