@@ -1719,10 +1719,10 @@
       }
     }
 
-    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(700px, 1.7fr) minmax(360px, 0.5fr); gap: 18px; min-height: 720px; }
+    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(720px, 1.95fr) minmax(330px, 0.42fr); gap: 18px; min-height: 720px; }
     .desmos-canvas-wrap { min-height: 680px; height: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,168,168,0.22); background: linear-gradient(135deg, #f8ffff, #fff8f0); }
-    .desmos-canvas-wrap canvas { width: 100%; height: 680px; display: block; }
-    #desmosCalculator { width: 100%; height: 680px; display: none; }
+    .desmos-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+    #desmosCalculator { width: 100%; height: 100%; display: none; }
     .desmos-controls { display: grid; gap: 22px; align-content: start; font-size: 1.42rem; }
     .desmos-controls label { font-weight: 850; color: #173754; display: grid; gap: 12px; font-size: 1.3rem; }
     .desmos-controls small { font-size: 1.16rem; line-height: 1.38; }
@@ -4386,7 +4386,7 @@
           calculator.setMathBounds({ left: -2 * Math.PI, right: 2 * Math.PI, bottom: -7, top: 7 });
           try { calculator.updateSettings({ xAxisStep: "π" }); } catch (e) {}
         } else {
-          calculator.setMathBounds({ left: -7, right: 7, bottom: -7, top: 7 });
+          calculator.setMathBounds({ left: -8, right: 8, bottom: -8, top: 8 });
           try { calculator.updateSettings({ xAxisStep: 1 }); } catch (e) {}
         }
         if (!isValid) return;
@@ -4470,7 +4470,7 @@
       const { ctx, w, h } = resizeCanvas(canvas);
       ctx.clearRect(0, 0, w, h);
       const isTrig = ["sin", "cos", "tan"].includes(type);
-      const pad = 54, xMin = isTrig ? -2 * Math.PI : -7, xMax = isTrig ? 2 * Math.PI : 7, yMin = -7, yMax = 7;
+      const pad = 54, xMin = isTrig ? -2 * Math.PI : -8, xMax = isTrig ? 2 * Math.PI : 8, yMin = -8, yMax = 8;
       const piAxisLabel = k => { if (k === 0) return "0"; const s = k < 0 ? "-" : ""; const n = Math.abs(k); if (n === 2) return s + "π"; if (n % 2 === 0) return s + (n / 2) + "π"; return s + n + "π/2"; };
       const formatPiValue = x => { const r = x / Math.PI; const rnd = Math.round(r * 2) / 2; if (Math.abs(r - rnd) > 0.01) return x.toFixed(2); const num = Math.round(r * 2); if (num === 0) return "0"; const s = num < 0 ? "-" : ""; const n = Math.abs(num); if (n === 2) return s + "π"; if (n % 2 === 0) return s + (n / 2) + "π"; return s + n + "π/2"; };
       const sx = (w - pad * 2) / (xMax - xMin), sy = (h - pad * 2) / (yMax - yMin);
@@ -4562,7 +4562,7 @@
         return;
       }
       ctx.save(); ctx.beginPath(); ctx.rect(pad, pad, w - pad * 2, h - pad * 2); ctx.clip(); ctx.strokeStyle = "#2077ff"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath(); let started = false;
-      for (let x = xMin; x <= xMax; x += 0.025) { const y = fn(x); if (!Number.isFinite(y) || y < yMin || y > yMax) { started = false; continue; } const X = px(x), Y = py(y); if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y); }
+      for (let x = xMin; x <= xMax; x += 0.025) { const y = fn(x); if (!Number.isFinite(y)) { started = false; continue; } const cy = Math.min(yMax, Math.max(yMin, y)); const X = px(x), Y = py(cy); if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y); }
       ctx.stroke(); ctx.restore();
       const intercepts = [];
       const yInt = fn(0); if (Number.isFinite(yInt) && yInt >= yMin && yInt <= yMax) intercepts.push({ x: 0, y: yInt });
