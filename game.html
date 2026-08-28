@@ -1599,6 +1599,13 @@
       overflow: auto !important;
       padding: 28px 30px 30px !important;
       text-align: left !important;
+      scrollbar-width: none !important;
+    }
+
+    .panel.guide::-webkit-scrollbar {
+      width: 0 !important;
+      height: 0 !important;
+      display: none !important;
     }
 
     .guide h1 {
@@ -5130,6 +5137,7 @@
       state.quiz = sampleQuestions();
       state.quizIndex = 0;
       ui.chestModal.classList.remove("show");
+      ui.confirmModal.classList.remove("show");
       ui.quizModal.classList.add("show");
       showQuestion();
     }
