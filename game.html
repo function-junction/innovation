@@ -15,6 +15,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Baloo+2:wght@500;600;700;800&family=Pixelify+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* Replace the hard-to-read Pixelify Sans "5" with Silkscreen's clear "5".
+       Only the "5" character (U+0035) is overridden; everything else is unchanged. */
+    @font-face {
+      font-family: 'Pixelify Sans';
+      font-style: normal;
+      font-weight: 400 900;
+      font-display: swap;
+      src: url(https://fonts.gstatic.com/s/silkscreen/v6/m8JXjfVPf62XiF7kO-i9YLNlaw.woff2) format('woff2');
+      unicode-range: U+0035;
+    }
     :root {
       --ink: #f7f0d4;
       --panel: #202640;
