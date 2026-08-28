@@ -1683,6 +1683,15 @@
       min-width: 220px !important;
     }
 
+    #confirmModal .guide-actions {
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    #confirmModal .confirm-exit {
+      background: linear-gradient(180deg, #8f536b 0%, #6f3b52 48%, #522b3e 100%);
+    }
+
     .guide-actions button:disabled {
       cursor: wait !important;
       filter: grayscale(0.25) brightness(0.82) !important;
@@ -1776,6 +1785,17 @@
     </div>
 
     <div class="help">Goal: defeat 20 monsters, open the treasure chest, then answer 5 quiz questions correctly. Computer: WASD / Arrow keys and click / Enter / Space. Phone or tablet: joystick and tap.</div>
+
+    <div id="confirmModal" class="modal">
+      <div class="panel guide">
+        <h1 id="confirmTitle">Ready to Play?</h1>
+        <p class="guide-intro" id="confirmIntro">Do you want to play the Function Junction Pixel Quiz Battle?</p>
+        <div class="guide-actions">
+          <button id="confirmPlayBtn" type="button">PLAY</button>
+          <button id="confirmExitBtn" type="button" class="confirm-exit">SKIP TO QUIZ</button>
+        </div>
+      </div>
+    </div>
 
     <div id="guideModal" class="modal show guide-open">
       <div class="panel guide">
@@ -4212,6 +4232,11 @@
       guideModal: document.getElementById("guideModal"),
       guideLoadingText: document.getElementById("guideLoadingText"),
       startGuideBtn: document.getElementById("startGuideBtn"),
+      confirmModal: document.getElementById("confirmModal"),
+      confirmTitle: document.getElementById("confirmTitle"),
+      confirmIntro: document.getElementById("confirmIntro"),
+      confirmPlayBtn: document.getElementById("confirmPlayBtn"),
+      confirmExitBtn: document.getElementById("confirmExitBtn"),
       chestModal: document.getElementById("chestModal"),
       openChestBtn: document.getElementById("openChestBtn"),
       quizModal: document.getElementById("quizModal"),
@@ -4650,6 +4675,19 @@
       ui.chestModal.classList.remove("show");
       ui.quizModal.classList.remove("show");
       ui.endModal.classList.remove("show");
+      ui.confirmModal.classList.remove("show");
+    }
+
+    function showConfirm(reason) {
+      hideAllModals();
+      if (reason === "lose") {
+        ui.confirmTitle.textContent = "You Lost!";
+        ui.confirmIntro.textContent = "Do you want to play again?";
+      } else {
+        ui.confirmTitle.textContent = "Ready to Play?";
+        ui.confirmIntro.textContent = "Do you want to play the Function Junction Pixel Quiz Battle?";
+      }
+      ui.confirmModal.classList.add("show");
     }
 
     function rand(min, max) { return min + Math.random() * (max - min); }
@@ -5136,6 +5174,10 @@
         if (win) sfxWin();
         else sfxWrong();
       }
+      if (!win) {
+        showConfirm("lose");
+        return;
+      }
       ui.endModal.classList.add("show");
       ui.endModal.classList.toggle("win-result", win);
       ui.endModal.classList.toggle("lose-result", !win);
@@ -5476,6 +5518,14 @@
       unlockAudio();
       resetGame();
     });
+    ui.confirmPlayBtn.addEventListener("click", () => {
+      unlockAudio();
+      resetGame();
+    });
+    ui.confirmExitBtn.addEventListener("click", () => {
+      unlockAudio();
+      startQuiz();
+    });
     ui.returnBackBtn.addEventListener("click", () => {
       unlockAudio();
       returnBackToLesson();
@@ -5496,6 +5546,7 @@
 
     resize();
     resetGame();
+    showConfirm("first");
     focusGameInput();
     updateSoundButton();
     setTimeout(tryAutoAudio, 250);
