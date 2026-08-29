@@ -4585,64 +4585,68 @@
       ctx.stroke(); ctx.restore();
       const intercepts = [];
       const yInt = fn(0); if (Number.isFinite(yInt) && yInt >= yMin && yInt <= yMax) intercepts.push({ x: 0, y: yInt });
-      for (let x = xMin; x <= xMax; x += 0.01) { const y1 = fn(x), y2 = fn(x + 0.01); if (Number.isFinite(y1) && Number.isFinite(y2) && y1 * y2 <= 0) intercepts.push({ x: x + 0.005, y: 0 }); }
-      const seen = new Set();
-      intercepts.forEach(pt => {
-        const key = pt.x.toFixed(1) + "," + pt.y.toFixed(1); if (seen.has(key)) return; seen.add(key);
+      for (let x = xMin; x <= xMax; x += 0.005) {
+        const ym = fn(x - 0.005), y0 = fn(x), yp = fn(x + 0.005);
+        if (!Number.isFinite(ym) || !Number.isFinite(y0) || !Number.isFinite(yp)) continue;
+        if (Math.abs(y0) < 1e-9) { intercepts.push({ x, y: 0 }); continue; }
+        if ((y0 > 0 && yp < 0) || (y0 < 0 && yp > 0)) { intercepts.push({ x: x + 0.005 * (y0 / (y0 - yp)), y: 0 }); continue; }
+        if (Math.abs(y0) < 0.05 && ((y0 <= ym && y0 <= yp) || (y0 >= ym && y0 >= yp))) {
+          const denom = ym - 2 * y0 + yp;
+          const xv = Math.abs(denom) > 1e-9 ? x - 0.005 * (yp - ym) / (2 * denom) : x;
+          intercepts.push({ x: xv, y: 0 });
+        }
+      }
+      const dedup = [];
+      intercepts.forEach(pt => { if (!dedup.some(q => Math.abs(q.x - pt.x) < 0.08 && Math.abs(q.y - pt.y) < 0.15)) dedup.push(pt); });
+      dedup.forEach(pt => {
         const X = px(pt.x), Y = py(pt.y);
         if (X < pad - 4 || X > w - pad + 4 || Y < pad - 4 || Y > h - pad + 4) return;
         ctx.fillStyle = "#ff6f61"; ctx.strokeStyle = "#c0392b"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X, Y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        const txt = "(" + pt.x.toFixed(2) + ", " + pt.y.toFixed(2) + ")";
-        ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        let bx = X + 10, by = Y - 26; if (bx + tw + 12 > w - pad) bx = X - tw - 22; if (by < pad) by = Y + 14;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#ff6f61"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#b02a2a"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
       });
-      asymptotes.forEach((asym, i) => {
-        const txt = asym.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        let bx, by;
-        if (asym.kind === "x") { bx = px(asym.at) + 8; by = pad + 10 + i * 28; }
-        else { bx = w - pad - tw - 20; by = py(asym.at) - 28 - i * 28; }
-        if (bx < pad) bx = pad + 6; if (bx + tw + 12 > w - pad) bx = w - pad - tw - 12;
-        if (by < pad) by = pad + 6; if (by + 21 > h - pad) by = h - pad - 27;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#c0136a"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
+
+      const labels = [];
+      const pushLabel = (txt, ax, ay, color, tcolor, pdx, pdy) => {
+        if (ax < pad - 2 || ax > w - pad + 2 || ay < pad - 2 || ay > h - pad + 2) return;
+        labels.push({ txt, ax, ay, color, tcolor, pdx, pdy });
+      };
+      dedup.forEach(pt => pushLabel("(" + pt.x.toFixed(2) + ", " + pt.y.toFixed(2) + ")", px(pt.x), py(pt.y), "#ff6f61", "#b02a2a", 10, -26));
+      vertices.forEach(v => pushLabel(v.label, px(v.x), py(v.y), "#9b59b6", "#6c3483", 10, -26));
+      guides.forEach(g => {
+        if (g.kind === "point") pushLabel(g.label, px(g.x), py(g.y), "#00b0ff", "#0069c0", 10, -26);
+        else if (g.kind === "x") pushLabel(g.label, px(g.at), h - pad, "#00b0ff", "#0069c0", 8, -40);
+        else pushLabel(g.label, pad, py(g.at), "#00b0ff", "#0069c0", 10, -28);
       });
-      guides.forEach((g, i) => {
-        const txt = g.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        let bx, by;
-        if (g.kind === "point") { bx = px(g.x) + 10; by = py(g.y) - 26; }
-        else if (g.kind === "x") { bx = px(g.at) - tw - 20; by = h - pad - 40 - i * 28; }
-        else { bx = pad + 10; by = py(g.at) - 28 - i * 28; }
-        if (bx < pad) bx = pad + 6; if (bx + tw + 12 > w - pad) bx = w - pad - tw - 12;
-        if (by < pad) by = pad + 6; if (by + 21 > h - pad) by = h - pad - 27;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#00b0ff"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#0069c0"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
+      trigMaxMin.forEach(tm => pushLabel(tm.label, w - pad, py(tm.y), "#ff9d00", "#c25700", 10, -28));
+      asymptotes.forEach(asym => {
+        if (asym.kind === "x") pushLabel(asym.label, px(asym.at), pad, "#ff2d78", "#c0136a", 8, 10);
+        else pushLabel(asym.label, w - pad, py(asym.at), "#ff2d78", "#c0136a", 10, -28);
       });
-      trigMaxMin.forEach((tm, i) => {
-        const txt = tm.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        const Y = py(tm.y); if (Y < pad || Y > h - pad) return;
-        const bx = w - pad - tw - 20, by = Y - 28 - i * 28;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#ff9d00"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#c25700"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
-      });
-      tanAsyms.forEach((t, i) => {
-        const txt = t.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        const X = px(t.x);
-        let bx = X - tw / 2 - 6, by = h - pad - 30 - (i % 4) * 26;
-        if (bx < pad) bx = pad + 6; if (bx + tw + 12 > w - pad) bx = w - pad - tw - 12;
-        if (by < pad) by = pad + 6;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#c0136a"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
-      });
-      vertices.forEach((v, i) => {
-        const txt = v.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
-        const X = px(v.x), Y = py(v.y);
-        let bx = X + 10, by = Y - 26 - i * 28;
-        if (bx + tw + 12 > w - pad) bx = X - tw - 22;
-        if (by < pad) by = Y + 14;
-        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#9b59b6"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
-        ctx.fillStyle = "#6c3483"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
+      tanAsyms.forEach(t => pushLabel(t.label, px(t.x), h - pad, "#ff2d78", "#c0136a", 8, -30));
+
+      const placed = [];
+      const overlap = (a, b) => !(a.x + a.w < b.x || b.x + b.w < a.x || a.y + a.h < b.y || b.y + b.h < a.y);
+      labels.forEach(l => {
+        ctx.font = "bold 13px Arial";
+        const tw = ctx.measureText(l.txt).width;
+        const bw = tw + 12, bh = 21;
+        let bx = l.ax + l.pdx, by = l.ay + l.pdy;
+        bx = Math.max(pad, Math.min(w - pad - bw, bx));
+        by = Math.max(pad, Math.min(h - pad - bh, by));
+        const fits = (yy) => placed.every(b => !overlap({ x: bx, y: yy, w: bw, h: bh }, b));
+        if (!fits(by)) {
+          let ok = false;
+          for (let s = 1; s <= 9 && !ok; s++) {
+            if (fits(by + s * 23)) { by = by + s * 23; ok = true; }
+            else if (fits(by - s * 23)) { by = by - s * 23; ok = true; }
+          }
+          if (!ok) by = Math.max(pad, Math.min(h - pad - bh, by));
+        }
+        by = Math.max(pad, Math.min(h - pad - bh, by));
+        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = l.color; ctx.lineWidth = 1.5;
+        ctx.fillRect(bx, by, bw, bh); ctx.strokeRect(bx, by, bw, bh);
+        ctx.fillStyle = l.tcolor; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(l.txt, bx + 6, by + 11);
+        placed.push({ x: bx, y: by, w: bw, h: bh });
       });
       ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(displayEq, pad + 10, pad - 20);
     }
