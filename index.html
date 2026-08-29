@@ -1719,7 +1719,7 @@
       }
     }
 
-    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(720px, 1.95fr) minmax(330px, 0.42fr); gap: 18px; min-height: 720px; }
+    .desmos-lab-card { grid-column: 1 / -1; background: rgba(255,255,255,0.94); border: 1px solid rgba(16,32,51,0.12); border-radius: 8px; padding: 18px; box-shadow: 0 18px 40px rgba(16,32,51,0.08); display: grid; grid-template-columns: minmax(760px, 2.15fr) minmax(320px, 0.42fr); gap: 18px; min-height: 720px; }
     .desmos-canvas-wrap { min-height: 680px; height: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,168,168,0.22); background: linear-gradient(135deg, #f8ffff, #fff8f0); }
     .desmos-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
     #desmosCalculator { width: 100%; height: 100%; display: none; }
@@ -1729,7 +1729,7 @@
     .desmos-controls select { width: 100%; accent-color: var(--teal); font-size: 1.3rem; font-weight: 700; min-height: 54px; padding: 0 12px; border: 2px solid rgba(0,168,168,0.35); border-radius: 10px; background: #fff; color: #0b2d55; cursor: pointer; box-shadow: 0 3px 8px rgba(16,47,74,0.10); }
     .desmos-controls input[type="range"] { width: 100%; accent-color: var(--teal); font-size: 1.22rem; min-height: 48px; }
     .desmos-controls input[type="range"] { min-height: 48px; }
-    .desmos-equation { font-family: Georgia, "Times New Roman", serif; font-size: 1.85rem; color: #0b2d55; background: linear-gradient(135deg, rgba(216,255,243,0.72), rgba(255,246,214,0.5)); border: 1px solid rgba(0,168,168,0.28); border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(16,47,74,0.06); }
+    .desmos-equation { font-family: Georgia, "Times New Roman", serif; font-size: 1.9rem; font-weight: 700; color: #0b2d55; background: linear-gradient(135deg, rgba(216,255,243,0.72), rgba(255,246,214,0.5)); border: 1px solid rgba(0,168,168,0.28); border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(16,47,74,0.06); }
     @media (max-width: 760px) { .desmos-lab-card { grid-template-columns: 1fr; } }
 
 
@@ -4446,22 +4446,25 @@
         ctx.fillRect(0, 0, w, h);
         return;
       }
-      const fmt = v => String(Math.round(v * 100) / 100);
-      const A = fmt(a), B = fmt(b), C = fmt(c), D = fmt(d);
+      const fmt = v => { const n = Math.round(v * 100) / 100; return String(n); };
+      const mc = v => { const n = Math.round(v * 100) / 100; return n === 1 ? "" : n === -1 ? "-" : String(n); };
+      const add = v => { const n = Math.round(v * 100) / 100; if (n === 0) return ""; return (n > 0 ? " + " : " - ") + String(Math.abs(n)); };
+      const insx = v => { const n = Math.round(v * 100) / 100; if (n === 0) return "x"; return "x " + (n > 0 ? "- " + n : "+ " + Math.abs(n)); };
+      const shx = v => { const n = Math.round(v * 100) / 100; if (n === 0) return "x"; return "(x " + (n > 0 ? "- " + n : "+ " + Math.abs(n)) + ")"; };
       const eq = {
-        linear: "y = " + A + "x + " + B,
-        quadratic: "y = " + A + "(x - " + B + ")^2 + " + C,
-        cubic: "y = " + A + "(x - " + B + ")^3 + " + C,
-        exp: "y = " + A + "e^{" + B + "x + " + C + "} + " + D,
-        power: "y = " + A + "x^{" + B + "} + " + C,
-        log: "y = " + A + "ln(x - " + B + ") + " + C,
-        sqrt: "y = " + A + "sqrt(" + B + "x - " + C + ") + " + D,
-        rational: "y = " + A + "/(" + B + "x - " + C + ") + " + D,
-        absLinear: "y = " + A + "|x - " + B + "| + " + C,
-        absQuadratic: "y = |" + A + "(x - " + B + ")^2 + " + C + "| + " + D,
-        sin: "y = " + A + "sin(" + B + "x + " + C + ") + " + D,
-        cos: "y = " + A + "cos(" + B + "x + " + C + ") + " + D,
-        tan: "y = " + A + "tan(" + B + "x + " + C + ") + " + D
+        linear: "y = " + mc(a) + "x" + add(b),
+        quadratic: "y = " + mc(a) + shx(b) + "^2" + add(c),
+        cubic: "y = " + mc(a) + shx(b) + "^3" + add(c),
+        exp: "y = " + mc(a) + "e^{" + mc(b) + "x" + add(c) + "}" + add(d),
+        power: "y = " + mc(a) + (Math.abs(b - 1) < 0.001 ? "x" : "x^{" + fmt(b) + "}") + add(c),
+        log: "y = " + mc(a) + "ln(" + inshx(b) + ")" + add(c),
+        sqrt: "y = " + mc(a) + "sqrt(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
+        rational: "y = " + fmt(a) + "/(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
+        absLinear: "y = " + mc(a) + "|" + inshx(b) + "|" + add(c),
+        absQuadratic: "y = |" + mc(a) + shx(b) + "^2" + add(c) + "|" + add(d),
+        sin: "y = " + mc(a) + "sin(" + mc(b) + "x" + add(c) + ")" + add(d),
+        cos: "y = " + mc(a) + "cos(" + mc(b) + "x" + add(c) + ")" + add(d),
+        tan: "y = " + mc(a) + "tan(" + mc(b) + "x" + add(c) + ")" + add(d)
       }[type];
       const displayEq = simplifyAdjusterSigns(eq);
       lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(displayEq);
@@ -4523,6 +4526,9 @@
           if (xa > xMin && xa < xMax) tanAsyms.push({ x: xa, label: "x = " + formatPiValue(xa) });
         }
       }
+      const vertices = [];
+      if (isValid && type === "absLinear") vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
+      if (isValid && type === "absQuadratic") vertices.push({ x: b, y: Math.abs(c) + d, label: "(" + b.toFixed(2) + ", " + (Math.abs(c) + d).toFixed(2) + ")" });
       if (isValid) {
         asymptotes.forEach(asym => {
           ctx.save(); ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 3; ctx.setLineDash([9, 7]); ctx.beginPath();
@@ -4550,6 +4556,11 @@
           const X = px(t.x); if (X < pad || X > w - pad) return;
           ctx.save(); ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 3; ctx.setLineDash([9, 7]); ctx.beginPath(); ctx.moveTo(X, pad); ctx.lineTo(X, h - pad); ctx.stroke(); ctx.restore();
         });
+        vertices.forEach(v => {
+          const X = px(v.x), Y = py(v.y);
+          if (X < pad - 4 || X > w - pad + 4 || Y < pad - 4 || Y > h - pad + 4) return;
+          ctx.fillStyle = "#9b59b6"; ctx.strokeStyle = "#6c3483"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X, Y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        });
       }
       ctx.strokeStyle = "#102033"; ctx.fillStyle = "#102033"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(pad, y0); ctx.lineTo(w - pad + 12, y0); ctx.stroke(); drawMiniArrowHead(ctx, w - pad + 12, y0, 0, "#102033"); ctx.beginPath(); ctx.moveTo(x0, h - pad); ctx.lineTo(x0, pad - 12); ctx.stroke(); drawMiniArrowHead(ctx, x0, pad - 12, -Math.PI / 2, "#102033");
       ctx.font = "bold 17px Arial"; ctx.textAlign = "left"; ctx.fillText("x", w - pad + 22, y0 + 20); ctx.fillText("y", x0 + 12, pad - 20); ctx.fillText("0", x0 - 24, y0 + 22);
@@ -4558,11 +4569,19 @@
         ctx.font = "bold 18px Arial";
         ctx.textAlign = "center";
         ctx.fillText("", w / 2, h / 2);
-        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.fillText(displayEq, pad + 10, pad - 20);
+        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.fillText(displayEq, pad + 10, pad - 20);
         return;
       }
       ctx.save(); ctx.beginPath(); ctx.rect(pad, pad, w - pad * 2, h - pad * 2); ctx.clip(); ctx.strokeStyle = "#2077ff"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath(); let started = false;
-      for (let x = xMin; x <= xMax; x += 0.025) { const y = fn(x); if (!Number.isFinite(y)) { started = false; continue; } const cy = Math.min(yMax, Math.max(yMin, y)); const X = px(x), Y = py(cy); if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y); }
+      let prevY = null;
+      for (let x = xMin; x <= xMax; x += 0.02) {
+        const y = fn(x);
+        if (!Number.isFinite(y)) { started = false; prevY = null; continue; }
+        if (prevY !== null && Math.abs(y - prevY) > 1000) { started = false; }
+        const X = px(x), Y = py(y);
+        if (!started) { ctx.moveTo(X, Y); started = true; } else ctx.lineTo(X, Y);
+        prevY = y;
+      }
       ctx.stroke(); ctx.restore();
       const intercepts = [];
       const yInt = fn(0); if (Number.isFinite(yInt) && yInt >= yMin && yInt <= yMax) intercepts.push({ x: 0, y: yInt });
@@ -4616,7 +4635,16 @@
         ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#ff2d78"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
         ctx.fillStyle = "#c0136a"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
       });
-      ctx.fillStyle = "#0b2d55"; ctx.font = "bold 18px Georgia"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(displayEq, pad + 10, pad - 20);
+      vertices.forEach((v, i) => {
+        const txt = v.label; ctx.font = "bold 13px Arial"; const tw = ctx.measureText(txt).width;
+        const X = px(v.x), Y = py(v.y);
+        let bx = X + 10, by = Y - 26 - i * 28;
+        if (bx + tw + 12 > w - pad) bx = X - tw - 22;
+        if (by < pad) by = Y + 14;
+        ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = "#9b59b6"; ctx.lineWidth = 1.5; ctx.fillRect(bx, by, tw + 12, 21); ctx.strokeRect(bx, by, tw + 12, 21);
+        ctx.fillStyle = "#6c3483"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(txt, bx + 6, by + 11);
+      });
+      ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(displayEq, pad + 10, pad - 20);
     }
     function drawTriangle(ctx, w, h, type, t) {
       ctx.save();
