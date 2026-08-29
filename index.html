@@ -4467,6 +4467,7 @@
         tan: "y = " + mc(a) + "tan(" + mc(b) + "x" + add(c) + ")" + add(d)
       }[type];
       const displayEq = simplifyAdjusterSigns(eq);
+      const canvasEq = displayEq.replace(/sqrt\(/g, "√(").replace(/\^\{/g, "^").replace(/\}/g, "").replace(/\^2(?![0-9])/g, "²").replace(/\^3(?![0-9])/g, "³");
       lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(displayEq);
       const isValid = isGraphAdjusterValid(type, a, b, c, d);
       updateDesmosModel(lab, type, desmosLatex(type, a, b, c, d), isValid);
@@ -4527,6 +4528,7 @@
         }
       }
       const vertices = [];
+      if (isValid && type === "quadratic") vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
       if (isValid && type === "absLinear") vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
       if (isValid && type === "absQuadratic") vertices.push({ x: b, y: Math.abs(c) + d, label: "(" + b.toFixed(2) + ", " + (Math.abs(c) + d).toFixed(2) + ")" });
       if (isValid) {
@@ -4569,7 +4571,7 @@
         ctx.font = "bold 18px Arial";
         ctx.textAlign = "center";
         ctx.fillText("", w / 2, h / 2);
-        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.fillText(displayEq, pad + 10, pad - 20);
+        ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.fillText(canvasEq, pad + 10, pad - 20);
         return;
       }
       ctx.save(); ctx.beginPath(); ctx.rect(pad, pad, w - pad * 2, h - pad * 2); ctx.clip(); ctx.strokeStyle = "#2077ff"; ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath(); let started = false;
@@ -4605,9 +4607,9 @@
       });
 
       const labels = [];
-      const pushLabel = (txt, ax, ay, color, tcolor, pdx, pdy) => {
+      const pushLabel = (txt, ax, ay, color, tcolor, pdx, pdy, big) => {
         if (ax < pad - 2 || ax > w - pad + 2 || ay < pad - 2 || ay > h - pad + 2) return;
-        labels.push({ txt, ax, ay, color, tcolor, pdx, pdy });
+        labels.push({ txt, ax, ay, color, tcolor, pdx, pdy, big: !!big });
       };
       dedup.forEach(pt => pushLabel("(" + pt.x.toFixed(2) + ", " + pt.y.toFixed(2) + ")", px(pt.x), py(pt.y), "#ff6f61", "#b02a2a", 10, -26));
       vertices.forEach(v => pushLabel(v.label, px(v.x), py(v.y), "#9b59b6", "#6c3483", 10, -26));
@@ -4616,6 +4618,7 @@
         else if (g.kind === "x") pushLabel(g.label, px(g.at), h - pad, "#00b0ff", "#0069c0", 8, -40);
         else pushLabel(g.label, pad, py(g.at), "#00b0ff", "#0069c0", 10, -28);
       });
+      if (type === "sqrt") pushLabel("This is not an asymptote", pad + 10, pad + 48, "#00897b", "#00695c", 0, 0, true);
       trigMaxMin.forEach(tm => pushLabel(tm.label, w - pad, py(tm.y), "#ff9d00", "#c25700", 10, -28));
       asymptotes.forEach(asym => {
         if (asym.kind === "x") pushLabel(asym.label, px(asym.at), pad, "#ff2d78", "#c0136a", 8, 10);
@@ -4626,9 +4629,9 @@
       const placed = [];
       const overlap = (a, b) => !(a.x + a.w < b.x || b.x + b.w < a.x || a.y + a.h < b.y || b.y + b.h < a.y);
       labels.forEach(l => {
-        ctx.font = "bold 13px Arial";
+        ctx.font = l.big ? "bold 15px Georgia" : "bold 13px Arial";
         const tw = ctx.measureText(l.txt).width;
-        const bw = tw + 12, bh = 21;
+        const bw = tw + (l.big ? 16 : 12), bh = l.big ? 26 : 21;
         let bx = l.ax + l.pdx, by = l.ay + l.pdy;
         bx = Math.max(pad, Math.min(w - pad - bw, bx));
         by = Math.max(pad, Math.min(h - pad - bh, by));
@@ -4645,10 +4648,10 @@
         ctx.fillStyle = "rgba(255,255,255,0.95)"; ctx.strokeStyle = l.color; ctx.lineWidth = 1.5;
         ctx.fillRect(bx, by, bw, bh); ctx.strokeRect(bx, by, bw, bh);
         ctx.fillStyle = l.tcolor; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText(l.txt, bx + 6, by + 11);
+        ctx.fillText(l.txt, bx + (l.big ? 8 : 6), by + (l.big ? 13 : 11));
         placed.push({ x: bx, y: by, w: bw, h: bh });
       });
-      ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(displayEq, pad + 10, pad - 20);
+      ctx.fillStyle = "#0b2d55"; ctx.font = "bold 21px Georgia"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillText(canvasEq, pad + 10, pad - 20);
     }
     function drawTriangle(ctx, w, h, type, t) {
       ctx.save();
@@ -4893,6 +4896,7 @@
     function speak(text) {
       if (!("speechSynthesis" in window)) return;
       if (state.chapter === "desmos") return;
+      try { if (localStorage.getItem("fj_tts") === "0") return; } catch (e) {}
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(plainSpeechText(text));
       const voice = selectTeacherVoice();
@@ -5369,7 +5373,7 @@ document.addEventListener('DOMContentLoaded', function() {
 (function () {
   'use strict';
 
-  var FONT_SIZES = { small: '14px', medium: '16px', big: '18px', large: '20px' };
+  var FONT_SIZES = { small: '13px', medium: '16px', big: '22px', large: '30px' };
   var LEVELS = ['small', 'medium', 'big', 'large'];
 
   var slider = document.getElementById('fj-font-slider');
@@ -5396,6 +5400,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function applyTts(on) {
     store('fj_tts', on ? '1' : '0');
     if (ttsToggle) ttsToggle.checked = on;
+    if (!on && 'speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   }
 
   function sendToIframe() {
