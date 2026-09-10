@@ -4213,8 +4213,8 @@
     // asymptotes (domain) and its all-real range.
     function drawTrigParamDemo(ctx, w, h, t, kind) {
       const pad = 46;
-      const x0 = w / 2, y0 = h / 2;
-      const sx = (w - pad * 2) / (4 * Math.PI);  // x-axis spans -2π .. 2π
+      const x0 = pad, y0 = h / 2;                // y-axis on the LEFT, graph biased to the right
+      const sx = (w - pad * 2) / (2 * Math.PI);  // x-axis spans 0 .. 2π
       const sy = (h - pad * 2) / 6;              // y-axis spans -3 .. 3
 
       const CURVE = kind === "sin" ? "#2077ff" : kind === "cos" ? "#ff6f61" : "#7765e3";
@@ -4273,10 +4273,6 @@
 
       function drawAxisTicks() {
         const xTicks = [
-          { v: -2 * Math.PI, num: "-2π", den: null },
-          { v: -3 * Math.PI / 2, num: "-3π", den: "2" },
-          { v: -Math.PI, num: "-π", den: null },
-          { v: -Math.PI / 2, num: "-π", den: "2" },
           { v: 0, num: "0", den: null },
           { v: Math.PI / 2, num: "π", den: "2" },
           { v: Math.PI, num: "π", den: null },
@@ -4509,8 +4505,8 @@
         });
 
         const gx = rightX + 14, gy = panelTop + 14, gw = rightW - 28, gh = panelBottom - panelTop - 28;
-        const mx0 = gx + gw / 2, my0 = gy + gh / 2;
-        const msx = gw / (4 * Math.PI), msy = gh / 6;
+        const mx0 = gx, my0 = gy + gh / 2;
+        const msx = gw / (2 * Math.PI), msy = gh / 6;
         ctx.strokeStyle = "#334155"; ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(gx, my0); ctx.lineTo(gx + gw, my0);
@@ -4627,8 +4623,9 @@
           plotCurve(1, b, 0, 0, CURVE, 5);
           if (kind === "tan") drawAsymptotes(0, b);
           const period = kind === "tan" ? Math.PI / b : (2 * Math.PI) / b;
-          const x1 = Math.max(pad, x0 - (period / 2) * sx);
-          const x2 = Math.min(w - pad, x0 + (period / 2) * sx);
+          const cycleCenter = x0 + Math.PI * sx;
+          const x1 = Math.max(pad, cycleCenter - (period / 2) * sx);
+          const x2 = Math.min(w - pad, cycleCenter + (period / 2) * sx);
           ctx.save();
           ctx.fillStyle = "rgba(0,168,168,0.10)";
           ctx.fillRect(x1, pad, x2 - x1, h - pad * 2);
