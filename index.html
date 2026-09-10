@@ -4125,23 +4125,56 @@
     }
 
     function drawTrigGraphs(ctx, w, h, type, t) {
-      const map = axes(ctx, w, h, { pad: 46 });
-      map.w = w; map.h = h;
-      const phase = t * 0.8;
-      if (type === "sin") {
-        plot(ctx, map, x => Math.sin(x), "#2077ff", 5);
-      } else if (type === "cos") {
-        plot(ctx, map, x => Math.cos(x), "#ff6f61", 5);
-      } else if (type === "tan") {
-        for (let k = -2; k <= 2; k++) {
-          const x = map.x0 + (Math.PI / 2 + k * Math.PI) * map.sx;
-          ctx.strokeStyle = "rgba(255,111,97,0.6)";
-          ctx.setLineDash([8, 7]);
-          ctx.beginPath(); ctx.moveTo(x, map.pad); ctx.lineTo(x, h - map.pad); ctx.stroke();
-          ctx.setLineDash([]);
+      // Clean minimalist axis: white background, no grid lines, only X/Y axes.
+      function cleanAxis() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        const pad = 46;
+        const x0 = w / 2, y0 = h / 2;
+        const sx = (w - pad * 2) / 8;   // x: about -4 .. 4
+        const sy = (h - pad * 2) / 6;   // y: about -3 .. 3
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(pad, y0); ctx.lineTo(w - pad, y0);   // x-axis
+        ctx.moveTo(x0, pad); ctx.lineTo(x0, h - pad);   // y-axis
+        ctx.stroke();
+        // axis arrow heads
+        ctx.fillStyle = "#334155";
+        ctx.beginPath(); ctx.moveTo(w - pad + 8, y0); ctx.lineTo(w - pad - 2, y0 - 5); ctx.lineTo(w - pad - 2, y0 + 5); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x0, pad - 8); ctx.lineTo(x0 - 5, pad + 2); ctx.lineTo(x0 + 5, pad + 2); ctx.closePath(); ctx.fill();
+        // labels x, y, 0
+        ctx.fillStyle = "#334155"; ctx.font = "700 15px Inter, sans-serif";
+        ctx.fillText("x", w - pad + 12, y0 + 16);
+        ctx.fillText("y", x0 + 10, pad + 10);
+        ctx.fillText("0", x0 - 16, y0 + 16);
+        return { pad, x0, y0, sx, sy, w, h };
+      }
+      function cleanPlot(map, fn, color = "#2077ff", width = 5) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        let started = false;
+        for (let px = map.pad; px <= map.w - map.pad; px += 2) {
+          const x = (px - map.x0) / map.sx;
+          const y = fn(x);
+          const py = map.y0 - y * map.sy;
+          if (!Number.isFinite(y) || py < -5000 || py > map.h + 5000) { started = false; continue; }
+          if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
         }
-        plot(ctx, map, x => Math.tan(x), "#7765e3", 4);
-      } else if (type === "amplitude") {
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      const map = cleanAxis();
+      const phase = t * 0.8;
+      if (type === "sin") { drawTrigParamDemo(ctx, w, h, t, "sin"); return; }
+      else if (type === "cos") { drawTrigParamDemo(ctx, w, h, t, "cos"); return; }
+      else if (type === "tan") { drawTrigParamDemo(ctx, w, h, t, "tan"); return; }
+      else if (type === "amplitude") {
         const a = 1 + (Math.sin(t) + 1) * 0.8;
         plot(ctx, map, x => Math.sin(x), "rgba(16,32,51,0.35)", 3);
         plot(ctx, map, x => a * Math.sin(x), "#2077ff", 5);
@@ -4169,6 +4202,277 @@
         ctx.beginPath();
         ctx.arc(px, map.y0 - yVal * map.sy, 9, 0, Math.PI * 2);
         ctx.fill();
+      }
+    }
+
+    // Animated, silent parameter demonstration for the sine, cosine and tangent
+    // slides. It loops through a -> b -> c -> d on a clean white grid-free axis,
+    // then a small Function Junction mockup with sliders. Each function keeps its
+    // own personality: cosine peaks at x=0, tangent shows asymptotes (domain) and
+    // its all-real range instead of an amplitude.
+    function drawTrigParamDemo(ctx, w, h, t, kind) {
+      const pad = 46;
+      const x0 = w / 2, y0 = h / 2;
+      const sx = (w - pad * 2) / 8;   // x-axis spans about -4 .. 4
+      const sy = (h - pad * 2) / 6;   // y-axis spans about -3 .. 3
+
+      const CURVE = kind === "sin" ? "#2077ff" : kind === "cos" ? "#ff6f61" : "#7765e3";
+      const ROSE = "#e11d48", TEAL = "#00a8a8", AMBER = "#f59e0b", GREEN = "#10b981";
+
+      function baseFn(x, a, b, c, d) {
+        if (kind === "sin") return a * Math.sin(b * x + c) + d;
+        if (kind === "cos") return a * Math.cos(b * x + c) + d;
+        return a * Math.tan(b * x + c) + d;
+      }
+
+      function cleanAxis() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(pad, y0); ctx.lineTo(w - pad, y0);
+        ctx.moveTo(x0, pad); ctx.lineTo(x0, h - pad);
+        ctx.stroke();
+        ctx.fillStyle = "#334155";
+        ctx.beginPath(); ctx.moveTo(w - pad + 8, y0); ctx.lineTo(w - pad - 2, y0 - 5); ctx.lineTo(w - pad - 2, y0 + 5); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x0, pad - 8); ctx.lineTo(x0 - 5, pad + 2); ctx.lineTo(x0 + 5, pad + 2); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#334155"; ctx.font = "700 15px Inter, sans-serif";
+        ctx.fillText("x", w - pad + 12, y0 + 16);
+        ctx.fillText("y", x0 + 10, pad + 10);
+        ctx.fillText("0", x0 - 16, y0 + 16);
+      }
+
+      function plotCurve(a, b, c, d, color, width) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = width;
+        ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath();
+        let started = false;
+        for (let px = pad; px <= w - pad; px += 2) {
+          const x = (px - x0) / sx;
+          const y = baseFn(x, a, b, c, d);
+          const py = y0 - y * sy;
+          if (!Number.isFinite(y) || Math.abs(y) > 20 || py < -6000 || py > h + 6000) { started = false; continue; }
+          if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function dashLine(x1, y1, x2, y2, color, width = 2.5, pattern = [7, 6]) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(pattern);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      function tickH(x, y, color) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(x - 5, y); ctx.lineTo(x + 5, y); ctx.stroke();
+        ctx.restore();
+      }
+
+      function title(text, color) { label(ctx, text, 52, 50, color); }
+      function subtitle(text, color = "#334155") { label(ctx, text, 52, 72, color); }
+      function extra(text, color = "#64748b") {
+        ctx.save();
+        ctx.fillStyle = color; ctx.font = "600 14px Inter, sans-serif";
+        ctx.fillText(canvasMathText(text), 52, 94);
+        ctx.restore();
+      }
+
+      function drawAsymptotes(c, b) {
+        for (let n = -3; n <= 3; n++) {
+          const ax = (Math.PI / 2 + n * Math.PI - c) / b;
+          const px = x0 + ax * sx;
+          if (px < pad - 4 || px > w - pad + 4) continue;
+          dashLine(px, pad, px, h - pad, "rgba(255,111,97,0.7)", 2.5, [8, 7]);
+        }
+      }
+
+      // Timeline: 5 looping scenes — a, b, c, d, then the website mockup.
+      const SEG = 8;
+      const CYCLE = SEG * 5;
+      const lt = ((t % CYCLE) + CYCLE) % CYCLE;
+      const phase = Math.min(4, Math.floor(lt / SEG));
+      const p = (lt % SEG) / SEG;
+      const osc = Math.sin(p * Math.PI * 2);   // -1 .. 1 .. -1, returns to 0 at scene edges
+
+      cleanAxis();
+
+      if (phase === 0) {
+        // Scene 1: a — amplitude (or vertical stretch for tangent).
+        const a = 1 + 0.55 * osc;
+        plotCurve(a, 1, 0, 0, CURVE, 5);
+        if (kind === "tan") {
+          drawAsymptotes(0, 1);
+          title("a controls vertical stretch", ROSE);
+          subtitle("a = " + a.toFixed(2));
+          extra("No amplitude — branches get steeper.  Range: all real y");
+        } else {
+          const peakXv = kind === "cos" ? 0 : Math.PI / 2;
+          const mx = x0 + peakXv * sx;
+          const peakY = y0 - a * sy;
+          dashLine(mx, y0, mx, peakY, ROSE, 2.5);
+          tickH(mx, y0, ROSE);
+          tickH(mx, peakY, ROSE);
+          title("a controls amplitude", ROSE);
+          subtitle("a = " + a.toFixed(2));
+          extra("Range: [-" + a.toFixed(1) + ", " + a.toFixed(1) + "]   Domain: all real x");
+        }
+      } else if (phase === 1) {
+        // Scene 2: b — frequency / period (one full cycle highlighted).
+        const b = 1 + 0.7 * osc;
+        plotCurve(1, b, 0, 0, CURVE, 5);
+        if (kind === "tan") drawAsymptotes(0, b);
+        const period = kind === "tan" ? Math.PI / b : (2 * Math.PI) / b;
+        const x1 = Math.max(pad, x0 - (period / 2) * sx);
+        const x2 = Math.min(w - pad, x0 + (period / 2) * sx);
+        ctx.save();
+        ctx.fillStyle = "rgba(0,168,168,0.10)";
+        ctx.fillRect(x1, pad, x2 - x1, h - pad * 2);
+        ctx.restore();
+        const topY = kind === "tan" ? pad + 8 : y0 - 1.35 * sy;
+        drawArrow(ctx, x1, topY, x2, topY, TEAL);
+        drawArrow(ctx, x2, topY, x1, topY, TEAL);
+        title("b controls frequency / period", TEAL);
+        subtitle("b = " + b.toFixed(2));
+        extra("Period = " + period.toFixed(2) + "   one full cycle highlighted");
+      } else if (phase === 2) {
+        // Scene 3: c — horizontal shift (arrow below the graph).
+        const c = 1.5 * osc;
+        plotCurve(1, 1, c, 0, CURVE, 5);
+        if (kind === "tan") drawAsymptotes(c, 1);
+        const ay = h - 26;
+        drawArrow(ctx, pad + 10, ay, w - pad - 10, ay, AMBER);
+        drawArrow(ctx, w - pad - 10, ay, pad + 10, ay, AMBER);
+        title("c controls horizontal shift", AMBER);
+        subtitle("c = " + c.toFixed(2));
+        extra(kind === "tan" ? "Asymptotes move with the graph — domain shifts too" : "Wave slides left and right along the x-axis");
+      } else if (phase === 3) {
+        // Scene 4: d — vertical shift (arrow beside the graph).
+        const d = 1.15 * osc;
+        plotCurve(1, 1, 0, d, CURVE, 5);
+        if (kind === "tan") drawAsymptotes(0, 1);
+        dashLine(pad, y0 - d * sy, w - pad, y0 - d * sy, "rgba(51,65,85,0.5)", 2, [6, 6]);
+        const vx = 22;
+        drawArrow(ctx, vx, y0 - 44, vx, y0 + 44, GREEN);
+        drawArrow(ctx, vx, y0 + 44, vx, y0 - 44, GREEN);
+        title("d controls vertical shift", GREEN);
+        subtitle("d = " + d.toFixed(2));
+        extra(kind === "tan" ? "Range stays all real — midline moves up or down" : "Midline moves to y = " + d.toFixed(2));
+      } else {
+        // Scene 5: Function Junction mockup — sliders on the left, graph on the right.
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = "rgba(16,32,51,0.12)";
+        ctx.lineWidth = 2;
+        roundRect(ctx, 14, 14, w - 28, h - 28, 16);
+        ctx.stroke();
+
+        label(ctx, "Function Junction", 32, 44, "#0b2d55");
+        ctx.save();
+        ctx.fillStyle = "#64748b"; ctx.font = "600 13px Inter, sans-serif";
+        ctx.fillText("Graph Adjuster · Trigonometric Functions", 32, 64);
+        ctx.restore();
+
+        // Active change label, centred at the top.
+        const wsub = Math.min(2, Math.floor(p * 3));
+        const wsp = (p * 3) % 1;
+        const activeLabel = wsub === 0 ? "Change b — wave density changes" : wsub === 1 ? "Change c — horizontal shift" : "Change d — vertical shift";
+        ctx.save();
+        ctx.fillStyle = "#0b2d55"; ctx.font = "700 16px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(activeLabel, w / 2, 44);
+        ctx.restore();
+
+        // Slider values: only the active parameter animates.
+        const a = 1;
+        let b = 1, c = 0, d = 0;
+        if (wsub === 0) b = 0.5 + 1.5 * wsp;
+        if (wsub === 1) c = -1.5 + 3 * wsp;
+        if (wsub === 2) d = -1 + 2 * wsp;
+
+        const panelTop = 86, panelBottom = h - 58;
+        const leftX = 32, leftW = w * 0.34 - 32;
+        const rightX = w * 0.36, rightW = w - rightX - 32;
+
+        // Left panel: four sliders.
+        roundRect(ctx, leftX, panelTop, leftW, panelBottom - panelTop, 12);
+        ctx.fillStyle = "#fbfdff"; ctx.fill();
+        ctx.strokeStyle = "rgba(16,32,51,0.10)"; ctx.stroke();
+
+        // Right panel: clean grid-free graph.
+        roundRect(ctx, rightX, panelTop, rightW, panelBottom - panelTop, 12);
+        ctx.fillStyle = "#ffffff"; ctx.fill();
+        ctx.strokeStyle = "rgba(16,32,51,0.10)"; ctx.stroke();
+
+        const rows = [
+          { letter: "a", value: a, min: 0.4, max: 1.8, color: ROSE, active: false },
+          { letter: "b", value: b, min: 0.5, max: 2, color: TEAL, active: wsub === 0 },
+          { letter: "c", value: c, min: -1.5, max: 1.5, color: AMBER, active: wsub === 1 },
+          { letter: "d", value: d, min: -1, max: 1, color: GREEN, active: wsub === 2 }
+        ];
+        const rowH = (panelBottom - panelTop) / 4;
+        rows.forEach((r, i) => {
+          const y = panelTop + rowH * i + rowH / 2;
+          ctx.save();
+          ctx.fillStyle = "#102033"; ctx.font = "700 16px Inter, sans-serif";
+          ctx.fillText(r.letter, leftX + 16, y + 5);
+          ctx.restore();
+          const tx = leftX + 40;
+          const tw = leftW - 56;
+          const frac = Math.max(0, Math.min(1, (r.value - r.min) / (r.max - r.min)));
+          ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 6; ctx.lineCap = "round";
+          ctx.beginPath(); ctx.moveTo(tx, y); ctx.lineTo(tx + tw, y); ctx.stroke();
+          ctx.strokeStyle = r.active ? r.color : "#cbd5e1";
+          ctx.beginPath(); ctx.moveTo(tx, y); ctx.lineTo(tx + tw * frac, y); ctx.stroke();
+          ctx.fillStyle = "#ffffff"; ctx.strokeStyle = r.color; ctx.lineWidth = 2.5;
+          ctx.beginPath(); ctx.arc(tx + tw * frac, y, 8.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        });
+
+        // Right graph: clean axes + live curve.
+        const gx = rightX + 14, gy = panelTop + 14, gw = rightW - 28, gh = panelBottom - panelTop - 28;
+        const mx0 = gx + gw / 2, my0 = gy + gh / 2;
+        const msx = gw / 8, msy = gh / 6;
+        ctx.strokeStyle = "#334155"; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(gx, my0); ctx.lineTo(gx + gw, my0);
+        ctx.moveTo(mx0, gy); ctx.lineTo(mx0, gy + gh);
+        ctx.stroke();
+        ctx.strokeStyle = CURVE; ctx.lineWidth = 4; ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath();
+        let started = false;
+        for (let px = gx; px <= gx + gw; px += 2) {
+          const xv = (px - mx0) / msx;
+          const yv = baseFn(xv, a, b, c, d);
+          const py = my0 - yv * msy;
+          if (!Number.isFinite(yv) || Math.abs(yv) > 20) { started = false; continue; }
+          if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+        }
+        ctx.stroke();
+        if (kind === "tan") {
+          ctx.save();
+          ctx.strokeStyle = "rgba(255,111,97,0.6)"; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+          for (let n = -2; n <= 2; n++) {
+            const axv = (Math.PI / 2 + n * Math.PI - c) / b;
+            const axp = mx0 + axv * msx;
+            if (axp < gx || axp > gx + gw) continue;
+            ctx.beginPath(); ctx.moveTo(axp, gy); ctx.lineTo(axp, gy + gh); ctx.stroke();
+          }
+          ctx.setLineDash([]);
+          ctx.restore();
+        }
+
+        // Closing tagline.
+        ctx.save();
+        ctx.fillStyle = "#0b2d55"; ctx.font = "700 15px Inter, sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("Function Junction — Understand graph changes in real time", w / 2, h - 22);
+        ctx.restore();
       }
     }
 
