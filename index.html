@@ -4174,12 +4174,8 @@
       if (type === "sin") { drawTrigParamDemo(ctx, w, h, t, "sin"); return; }
       else if (type === "cos") { drawTrigParamDemo(ctx, w, h, t, "cos"); return; }
       else if (type === "tan") { drawTrigParamDemo(ctx, w, h, t, "tan"); return; }
-      else if (type === "amplitude") {
-        const a = 1 + (Math.sin(t) + 1) * 0.8;
-        plot(ctx, map, x => Math.sin(x), "rgba(16,32,51,0.35)", 3);
-        plot(ctx, map, x => a * Math.sin(x), "#2077ff", 5);
-        label(ctx, `amplitude = ${a.toFixed(1)}`, 50, 60, "#2077ff");
-      } else if (type === "periodShift") {
+      else if (type === "amplitude") { drawAmplitudePeriodDemo(ctx, w, h, t); return; }
+      else if (type === "periodShift") {
         const b = 1 + (Math.sin(t) + 1) * 0.65;
         plot(ctx, map, x => Math.sin(x), "rgba(16,32,51,0.3)", 3);
         plot(ctx, map, x => Math.sin(b * x) + 0.65, "#00a8a8", 5);
@@ -4658,6 +4654,178 @@
           subtitle("d = " + d.toFixed(2));
           extra(kind === "tan" ? "Range stays all real — midline moves" : "Midline moves to y = " + d.toFixed(2));
         }
+      }
+    }
+
+    // Animated demonstration for the "Amplitude And Period" slide (trig page 4).
+    // Soft animated gradient background, clean π-labelled axes (0 .. 2π), and a
+    // two-scene loop: amplitude |a|, then period 2π/|b|.
+    function drawAmplitudePeriodDemo(ctx, w, h, t) {
+      const pad = 46;
+      const x0 = pad, y0 = h / 2;                // y-axis on the left
+      const sx = (w - pad * 2) / (2 * Math.PI);  // x-axis spans 0 .. 2π
+      const sy = (h - pad * 2) / 6;              // y-axis spans -3 .. 3
+      const BLUE = "#2077ff", ROSE = "#e11d48", TEAL = "#00a8a8", FADED = "rgba(16,32,51,0.28)";
+
+      function mix(a, b, s) { return a + (b - a) * s; }
+
+      function dynamicBg() {
+        const s = (Math.sin(t * 0.5) + 1) / 2;
+        const g = ctx.createLinearGradient(0, 0, w, h);
+        g.addColorStop(0, `rgb(${Math.round(mix(214,240,s))},${Math.round(mix(232,248,s))},255)`);
+        g.addColorStop(0.5, `rgb(${Math.round(mix(224,199,s))},${Math.round(mix(242,210,s))},254)`);
+        g.addColorStop(1, `rgb(255,${Math.round(mix(249,236,s))},${Math.round(mix(235,235,s))})`);
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      function drawFraction(num, den, x, y, size, color) {
+        ctx.save();
+        ctx.fillStyle = color; ctx.strokeStyle = color;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.font = "700 " + Math.round(size * 0.74) + "px Inter, sans-serif";
+        const numW = ctx.measureText(num).width;
+        const denW = ctx.measureText(den).width;
+        const barW = Math.max(numW, denW) + size * 0.3;
+        ctx.fillText(num, x, y - size * 0.42);
+        ctx.fillText(den, x, y + size * 0.42);
+        ctx.lineWidth = Math.max(1.4, size * 0.06);
+        ctx.beginPath(); ctx.moveTo(x - barW / 2, y); ctx.lineTo(x + barW / 2, y); ctx.stroke();
+        ctx.restore();
+        return barW;
+      }
+
+      function cleanAxis() {
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(pad, y0); ctx.lineTo(w - pad, y0);
+        ctx.moveTo(x0, pad); ctx.lineTo(x0, h - pad);
+        ctx.stroke();
+        ctx.fillStyle = "#334155";
+        ctx.beginPath(); ctx.moveTo(w - pad + 8, y0); ctx.lineTo(w - pad - 2, y0 - 5); ctx.lineTo(w - pad - 2, y0 + 5); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(x0, pad - 8); ctx.lineTo(x0 - 5, pad + 2); ctx.lineTo(x0 + 5, pad + 2); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#334155"; ctx.font = "700 16px Inter, sans-serif";
+        ctx.fillText("x", w - pad + 12, y0 + 16);
+        ctx.fillText("y", x0 + 10, pad + 10);
+      }
+
+      function drawAxisTicks() {
+        const xTicks = [
+          { v: 0, num: "0", den: null },
+          { v: Math.PI / 2, num: "π", den: "2" },
+          { v: Math.PI, num: "π", den: null },
+          { v: 3 * Math.PI / 2, num: "3π", den: "2" },
+          { v: 2 * Math.PI, num: "2π", den: null }
+        ];
+        ctx.save();
+        ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.4;
+        ctx.fillStyle = "#475569"; ctx.textBaseline = "middle";
+        xTicks.forEach(tk => {
+          const px = x0 + tk.v * sx;
+          if (px < pad - 2 || px > w - pad + 2) return;
+          ctx.beginPath(); ctx.moveTo(px, y0 - 4); ctx.lineTo(px, y0 + 4); ctx.stroke();
+          if (tk.den) drawFraction(tk.num, tk.den, px, y0 + 26, 17, "#475569");
+          else { ctx.font = "700 17px Inter, sans-serif"; ctx.textAlign = "center"; ctx.fillText(tk.num, px, y0 + 25); }
+        });
+        [-2, -1, 1, 2].forEach(v => {
+          const py = y0 - v * sy;
+          ctx.beginPath(); ctx.moveTo(x0 - 4, py); ctx.lineTo(x0 + 4, py); ctx.stroke();
+          ctx.font = "700 17px Inter, sans-serif"; ctx.textAlign = "right";
+          ctx.fillText(String(v), x0 - 10, py);
+        });
+        ctx.restore();
+      }
+
+      function plotCurve(fn, color, width) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = width;
+        ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.beginPath();
+        let started = false;
+        for (let px = pad; px <= w - pad; px += 2) {
+          const x = (px - x0) / sx;
+          const y = fn(x);
+          const py = y0 - y * sy;
+          if (!Number.isFinite(y) || Math.abs(y) > 20) { started = false; continue; }
+          if (!started) { ctx.moveTo(px, py); started = true; } else { ctx.lineTo(px, py); }
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function dashLine(x1, y1, x2, y2, color, width = 2.5, pattern = [7, 6]) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(pattern);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      function tickH(x, y, color) {
+        ctx.save();
+        ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(x - 5, y); ctx.lineTo(x + 5, y); ctx.stroke();
+        ctx.restore();
+      }
+
+      function title(text, color) {
+        ctx.save(); ctx.fillStyle = color; ctx.font = "800 22px Inter, sans-serif";
+        ctx.fillText(canvasMathText(text), 52, 58); ctx.restore();
+      }
+      function subtitle(text, color = "#334155") {
+        ctx.save(); ctx.fillStyle = color; ctx.font = "700 18px Inter, sans-serif";
+        ctx.fillText(canvasMathText(text), 52, 86); ctx.restore();
+      }
+      function extra(text, color = "#64748b") {
+        ctx.save(); ctx.fillStyle = color; ctx.font = "600 16px Inter, sans-serif";
+        ctx.fillText(canvasMathText(text), 52, 112); ctx.restore();
+      }
+
+      // Timeline: 2 looping scenes — amplitude, then period.
+      const SEG = 8, CYCLE = SEG * 2;
+      const lt = ((t % CYCLE) + CYCLE) % CYCLE;
+      const phase = Math.floor(lt / SEG);
+      const p = (lt % SEG) / SEG;
+      const osc = Math.sin(p * Math.PI * 2);
+
+      dynamicBg();
+      cleanAxis();
+      drawAxisTicks();
+
+      if (phase === 0) {
+        // Scene 1: amplitude |a| — wave stretches / compresses vertically.
+        const a = 1 + 0.6 * osc;   // 0.4 .. 1.6
+        plotCurve(x => Math.sin(x), FADED, 3);
+        plotCurve(x => a * Math.sin(x), BLUE, 5);
+        const mx = x0 + (Math.PI / 2) * sx;
+        const peakY = y0 - a * sy;
+        dashLine(mx, y0, mx, peakY, ROSE, 2.5);
+        tickH(mx, y0, ROSE);
+        tickH(mx, peakY, ROSE);
+        dashLine(x0, peakY, w - pad, peakY, "rgba(32,119,255,0.45)", 2, [6, 6]);
+        dashLine(x0, y0 + a * sy, w - pad, y0 + a * sy, "rgba(32,119,255,0.45)", 2, [6, 6]);
+        title("Amplitude = |a|", ROSE);
+        subtitle("a = " + a.toFixed(2));
+        extra("Wave height stretches · Range: [-" + a.toFixed(1) + ", " + a.toFixed(1) + "]");
+      } else {
+        // Scene 2: period 2π/|b| — wave becomes denser / wider.
+        const b = 1 + 0.7 * osc;   // 0.3 .. 1.7
+        plotCurve(x => Math.sin(x), FADED, 3);
+        plotCurve(x => Math.sin(b * x), BLUE, 5);
+        const period = (2 * Math.PI) / b;
+        const x1 = x0;
+        const x2 = Math.min(w - pad, x0 + period * sx);
+        ctx.save();
+        ctx.fillStyle = "rgba(0,168,168,0.10)";
+        ctx.fillRect(x1, pad, x2 - x1, h - pad * 2);
+        ctx.restore();
+        const topY = y0 - 1.4 * sy;
+        drawArrow(ctx, x1, topY, x2, topY, TEAL);
+        drawArrow(ctx, x2, topY, x1, topY, TEAL);
+        title("Period = 2π/|b|", TEAL);
+        subtitle("b = " + b.toFixed(2));
+        extra("Period = " + period.toFixed(2) + " · one full cycle highlighted");
       }
     }
 
