@@ -4614,7 +4614,7 @@
       confetti: []
     };
     state.pointer = { active: false, x: 480, y: 270 };
-    state.joystick = { active: false, pointerId: null, originX: 0, originY: 0, x: 0, y: 0, vx: 0, vy: 0 };
+    state.joystick = { active: false, pointerId: null, originX: 0, originY: 0, x: 0, y: 0, vx: 0, vy: 0, moved: false };
 
     function updateGuideLoadingState() {
       if (!ui.startGuideBtn || !ui.guideLoadingText) return;
@@ -4648,6 +4648,7 @@
       state.joystick.pointerId = null;
       state.joystick.vx = 0;
       state.joystick.vy = 0;
+      state.joystick.moved = false;
       state.monsters = [];
       state.particles = [];
       state.gems = [];
@@ -5380,8 +5381,9 @@
     }
 
     function isJoystickStart(e) {
-      const r = document.querySelector(".shell").getBoundingClientRect();
-      return isTouchControlPointer(e) && e.clientX <= r.left + r.width * 0.46;
+      // Any touch/pen press starts a joystick anywhere on the canvas: dragging
+      // moves, a quick tap (no drag) is treated as an attack.
+      return isTouchControlPointer(e);
     }
 
     function updateJoystick(e) {
@@ -5389,6 +5391,7 @@
       const dy = e.clientY - state.joystick.originY;
       const radius = Math.max(42, Math.min(canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height) * 0.13);
       const len = Math.hypot(dx, dy);
+      if (len > 14) state.joystick.moved = true;   // a real drag, not a tap
       const limited = len > radius ? radius / len : 1;
       state.joystick.x = state.joystick.originX + dx * limited;
       state.joystick.y = state.joystick.originY + dy * limited;
@@ -5401,6 +5404,7 @@
       state.joystick.pointerId = null;
       state.joystick.vx = 0;
       state.joystick.vy = 0;
+      state.joystick.moved = false;
     }
 
     function normalizeGameKey(key) {
@@ -5478,6 +5482,8 @@
       focusGameInput();
       const point = canvasPointFromEvent(e);
       if (isJoystickStart(e) && !state.joystick.active) {
+        // Touch/pen press anywhere: start a pending joystick. Dragging moves;
+        // a tap (no drag) becomes an attack on release.
         state.joystick.active = true;
         state.joystick.pointerId = e.pointerId;
         state.joystick.originX = e.clientX;
@@ -5486,14 +5492,12 @@
         state.joystick.y = e.clientY;
         state.joystick.vx = 0;
         state.joystick.vy = 0;
+        state.joystick.moved = false;
         try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
         return;
       }
-      if (isTouchControlPointer(e)) {
-        performAttack({ x: point.x, y: point.y });
-        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
+      // Mouse click, or a second finger while the joystick is already held:
+      // attack immediately.
       state.pointer.x = point.x;
       state.pointer.y = point.y;
       performAttack({ x: state.pointer.x, y: state.pointer.y });
@@ -5512,7 +5516,14 @@
     });
     canvas.addEventListener("pointerup", e => {
       e.preventDefault();
-      if (state.joystick.active && e.pointerId === state.joystick.pointerId) stopJoystick();
+      if (state.joystick.active && e.pointerId === state.joystick.pointerId) {
+        if (!state.joystick.moved) {
+          // Tap (no drag): attack at the release point.
+          const point = canvasPointFromEvent(e);
+          performAttack({ x: point.x, y: point.y });
+        }
+        stopJoystick();
+      }
       if (!isTouchControlPointer(e)) state.pointer.active = false;
       try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
     });
