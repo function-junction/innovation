@@ -91,13 +91,15 @@
       inset: 8px 10px auto 10px;
       z-index: 4;
       display: grid;
-      grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: start;
       gap: 14px;
       pointer-events: none;
       font-family: var(--font-ui);
       text-shadow: 3px 3px 0 #000;
     }
+
+    .hud > * { min-width: 0; }
 
     .bar-wrap {
       height: 28px;
@@ -129,6 +131,7 @@
       font-size: clamp(26px, 4vw, 46px);
       font-weight: 800;
       letter-spacing: 2px;
+      white-space: nowrap;
       color: #fffbe8;
       background: rgba(6, 12, 10, 0.35);
       padding: 2px 18px;
@@ -1128,9 +1131,13 @@
       content: "" !important;
       position: absolute !important;
       inset: 0 !important;
-      background: url("game-assets/chest.png") no-repeat center / contain !important;
+      background: url("game-assets/chest-closed.png") no-repeat center / contain !important;
       image-rendering: pixelated !important;
       clip-path: none !important;
+    }
+
+    .chest.open::before {
+      background-image: url("game-assets/chest-open.png") !important;
     }
 
     .chest::after {
@@ -1452,7 +1459,7 @@
 
       .hud {
         inset: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) auto max(12px, env(safe-area-inset-left)) !important;
-        grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr) !important;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
         gap: 14px !important;
         transform-origin: top center !important;
       }
@@ -1486,15 +1493,15 @@
 
       .help {
         display: block !important;
-        right: max(12px, env(safe-area-inset-right)) !important;
-        bottom: max(12px, env(safe-area-inset-bottom)) !important;
-        max-width: min(34vw, 330px) !important;
-        padding: 9px 11px !important;
+        right: max(10px, env(safe-area-inset-right)) !important;
+        bottom: max(10px, env(safe-area-inset-bottom)) !important;
+        max-width: min(28vw, 240px) !important;
+        padding: 7px 9px !important;
         border-width: 2px !important;
         border-radius: 8px !important;
-        background: rgba(4, 8, 16, 0.68) !important;
-        font-size: clamp(10px, 1.7vw, 14px) !important;
-        line-height: 1.28 !important;
+        background: rgba(4, 8, 16, 0.5) !important;
+        font-size: clamp(10px, 1.6vw, 13px) !important;
+        line-height: 1.25 !important;
         text-shadow: 2px 2px 0 #000 !important;
       }
     }
@@ -1712,6 +1719,10 @@
       background: linear-gradient(180deg, #8f536b 0%, #6f3b52 48%, #522b3e 100%);
     }
 
+    #confirmModal .confirm-back {
+      background: linear-gradient(180deg, #3f7f8f 0%, #2f5f6e 48%, #234a56 100%);
+    }
+
     .guide-actions button:disabled {
       cursor: wait !important;
       filter: grayscale(0.25) brightness(0.82) !important;
@@ -1813,6 +1824,7 @@
         <div class="guide-actions">
           <button id="confirmPlayBtn" type="button">PLAY</button>
           <button id="confirmExitBtn" type="button" class="confirm-exit">SKIP TO QUIZ</button>
+          <button id="confirmBackBtn" type="button" class="confirm-exit confirm-back" style="display:none">RETURN BACK</button>
         </div>
       </div>
     </div>
@@ -1894,9 +1906,13 @@
     const heroImg = new Image();
     const tileImg = new Image();
     const fxImg = new Image();
+    const chestClosedImg = new Image();
+    const chestOpenImg = new Image();
     heroImg.src = "game-assets/hero.png";
     tileImg.src = "game-assets/tiles.png";
     fxImg.src = "game-assets/effects.png";
+    chestClosedImg.src = "game-assets/chest-closed.png";
+    chestOpenImg.src = "game-assets/chest-open.png";
     let assetsReady = false;
     let pendingGuideStart = false;
     const extraAssetSources = [
@@ -1916,7 +1932,7 @@
       return waitForImage(img);
     };
     Promise.all([
-      ...[heroImg, tileImg, fxImg].map(waitForImage),
+      ...[heroImg, tileImg, fxImg, chestClosedImg, chestOpenImg].map(waitForImage),
       ...extraAssetSources.map(preloadImage)
     ]).then(() => {
       assetsReady = true;
@@ -4257,6 +4273,7 @@
       confirmIntro: document.getElementById("confirmIntro"),
       confirmPlayBtn: document.getElementById("confirmPlayBtn"),
       confirmExitBtn: document.getElementById("confirmExitBtn"),
+      confirmBackBtn: document.getElementById("confirmBackBtn"),
       chestModal: document.getElementById("chestModal"),
       openChestBtn: document.getElementById("openChestBtn"),
       quizModal: document.getElementById("quizModal"),
@@ -4569,6 +4586,14 @@
       [659.25, 880, 1174.66].forEach((f, i) => setTimeout(() => beep(f, 0.08, "triangle", 0.11), i * 70));
     }
 
+    function sfxOpenChest() {
+      if (!audioReady) return;
+      noise(0.2, 0.16, "lowpass");
+      setTimeout(() => beep(392, 0.09, "triangle", 0.12, 523.25), 90);
+      setTimeout(() => beep(659.25, 0.1, "triangle", 0.13), 200);
+      setTimeout(() => beep(880, 0.14, "triangle", 0.14), 300);
+    }
+
     function sfxWrong() {
       if (!audioReady) return;
       [220, 185, 147].forEach((f, i) => setTimeout(() => beep(f, 0.16, "square", 0.12), i * 120));
@@ -4653,6 +4678,9 @@
       state.particles = [];
       state.gems = [];
       state.chest = null;
+      const chestArt = ui.chestModal.querySelector(".chest");
+      if (chestArt) chestArt.classList.remove("open");
+      if (ui.openChestBtn) ui.openChestBtn.dataset.opened = "";
       state.kills = 0;
       state.quiz = [];
       state.quizIndex = 0;
@@ -4701,13 +4729,16 @@
 
     function showConfirm(reason) {
       hideAllModals();
-      if (reason === "lose") {
+      const isLose = reason === "lose";
+      if (isLose) {
         ui.confirmTitle.textContent = "You Lost!";
         ui.confirmIntro.textContent = "Do you want to play again?";
       } else {
         ui.confirmTitle.textContent = "Ready to Play?";
         ui.confirmIntro.textContent = "Do you want to play the Function Junction Pixel Quiz Battle?";
       }
+      ui.confirmPlayBtn.textContent = isLose ? "PLAY AGAIN" : "PLAY";
+      if (ui.confirmBackBtn) ui.confirmBackBtn.style.display = isLose ? "" : "none";
       ui.confirmModal.classList.add("show");
     }
 
@@ -5077,14 +5108,19 @@
 
     function drawChest(x, y, opened) {
       px(x - 34, y + 28, 70, 7, "#060606");
+      const img = opened ? chestOpenImg : chestClosedImg;
+      if (img && img.complete && img.naturalWidth > 0) {
+        const w = 96;
+        const h = w * img.naturalHeight / img.naturalWidth;
+        ctx.drawImage(img, x - w / 2, y + 30 - h, w, h);
+        return;
+      }
       const frames = ATLAS.fx.chestOpen;
       const idx = opened ? frames.length - 1 : 0;
-      const drew = drawSprite(fxImg, frames[idx], x, y + 30, 0.85, false);
-      if (!drew) {
-        px(x - 30, y - 29, 60, 26, "#4d2b16");
-        px(x - 25, y - 33, 50, 13, "#f0c45c");
-        px(x - 31, y - 10, 62, 42, "#4d2b16");
-      }
+      if (drawSprite(fxImg, frames[idx], x, y + 30, 0.85, false)) return;
+      px(x - 30, y - 29, 60, 26, "#4d2b16");
+      px(x - 25, y - 33, 50, 13, "#f0c45c");
+      px(x - 31, y - 10, 62, 42, "#4d2b16");
     }
 
     function drawParticles() {
@@ -5558,11 +5594,23 @@
       unlockAudio();
       startQuiz();
     });
+    if (ui.confirmBackBtn) ui.confirmBackBtn.addEventListener("click", () => {
+      unlockAudio();
+      returnBackToLesson();
+    });
     ui.returnBackBtn.addEventListener("click", () => {
       unlockAudio();
       returnBackToLesson();
     });
-    ui.openChestBtn.addEventListener("click", startQuiz);
+    ui.openChestBtn.addEventListener("click", () => {
+      if (ui.openChestBtn.dataset.opened) return;
+      ui.openChestBtn.dataset.opened = "1";
+      unlockAudio();
+      sfxOpenChest();
+      const chestArt = ui.chestModal.querySelector(".chest");
+      if (chestArt) chestArt.classList.add("open");
+      setTimeout(startQuiz, 800);
+    });
     if (ui.soundToggle) {
       ui.soundToggle.addEventListener("pointerdown", e => {
         e.preventDefault();
