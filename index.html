@@ -2332,7 +2332,7 @@
       slide: 0,
       game: null,
       frame: 0,
-      desmosAdjuster: { type: "", a: 1, b: 1, c: 0, d: 0 }
+      desmosAdjuster: { type: "", quadraticForm: "vertex", a: 1, b: 1, c: 0, d: 0 }
     };
 
     const el = {
@@ -3248,7 +3248,17 @@
     };
     function updateVisibleGraphParams(lab) {
       const type = lab.querySelector("#desmosType").value;
+      const formRow = lab.querySelector("#quadraticFormRow");
+      if (formRow) formRow.style.display = type === "quadratic" ? "block" : "none";
       const config = graphParamConfig[type];
+      let hints = config ? config.hints : {};
+      if (type === "quadratic") {
+        const qFormEl = lab.querySelector("#desmosQuadraticForm");
+        const qForm = qFormEl ? qFormEl.value : "vertex";
+        hints = qForm === "standard"
+          ? { a: "stretch / reflection", b: "coefficient of x", c: "y-intercept" }
+          : { a: "stretch / reflection", b: "horizontal shift", c: "vertical shift" };
+      }
       ["a", "b", "c", "d"].forEach(name => {
         const row = lab.querySelector('[data-param="' + name + '"]');
         if (!row) return;
@@ -3256,7 +3266,7 @@
         row.hidden = !show;
         row.style.display = show ? "grid" : "none";
         const hint = row.querySelector("small");
-        if (hint) hint.textContent = config?.hints?.[name] || "";
+        if (hint) hint.textContent = hints[name] || "";
       });
     }
     function saveDesmosAdjusterState(lab) {
@@ -3264,6 +3274,8 @@
       const typeEl = lab.querySelector("#desmosType");
       if (!typeEl) return;
       state.desmosAdjuster.type = typeEl.value || "";
+      const qFormEl = lab.querySelector("#desmosQuadraticForm");
+      if (qFormEl) state.desmosAdjuster.quadraticForm = qFormEl.value || "vertex";
       ["a", "b", "c", "d"].forEach(name => {
         const slider = lab.querySelector("#" + name + "Slider");
         if (slider) state.desmosAdjuster[name] = Number(slider.value);
@@ -3272,7 +3284,7 @@
     function renderDesmosAdjuster() {
       const lab = document.createElement("article");
       lab.className = "desmos-lab-card";
-      const saved = state.desmosAdjuster || { type: "", a: 1, b: 1, c: 0, d: 0 };
+      const saved = state.desmosAdjuster || { type: "", quadraticForm: "vertex", a: 1, b: 1, c: 0, d: 0 };
       const sliderData = [["a", saved.a ?? 1], ["b", saved.b ?? 1], ["c", saved.c ?? 0], ["d", saved.d ?? 0]];
       const sliders = sliderData.map(([name, value]) => `<label data-param="${name}">${name}: <span id="${name}Val">${Number(value).toFixed(1)}</span><small></small><input id="${name}Slider" type="range" min="-6" max="6" step="0.1" value="${value}"></label>`).join("");
       lab.innerHTML = `
@@ -3286,7 +3298,7 @@
             <select id="desmosType">
               <option value="" selected disabled hidden>Select function graph</option>
               <option value="linear">Linear: y = ax + b</option>
-              <option value="quadratic">Quadratic: y = a(x − b)² + c</option>
+              <option value="quadratic">Quadratic</option>
               <option value="cubic">Cubic: y = a(x − b)³ + c</option>
               <option value="exp">Exponential: y = a·e^(bx + c) + d</option>
               <option value="power">Power: y = a·x^b + c</option>
@@ -3300,11 +3312,19 @@
               <option value="tan">Tangent: y = a·tan(bx + c) + d</option>
             </select>
           </label>
+          <label id="quadraticFormRow" style="display:none">Quadratic form
+            <select id="desmosQuadraticForm">
+              <option value="vertex">Vertex form: y = a(x − b)² + c</option>
+              <option value="standard">Standard form: y = ax² + bx + c</option>
+            </select>
+          </label>
           ${sliders}
         </div>
       `;
       el.topicGrid.appendChild(lab);
       if (saved.type) lab.querySelector("#desmosType").value = saved.type;
+      const qFormSel = lab.querySelector("#desmosQuadraticForm");
+      if (qFormSel) qFormSel.value = saved.quadraticForm || "vertex";
       ["aSlider", "bSlider", "cSlider", "dSlider"].forEach(id => lab.querySelector(`#${id}`).addEventListener("input", () => {
         saveDesmosAdjusterState(lab);
         drawDesmosAdjuster(lab);
@@ -3317,6 +3337,11 @@
           const val = lab.querySelector("#" + name + "Val");
           if (val) val.textContent = defaults[name].toFixed(1);
         });
+        saveDesmosAdjusterState(lab);
+        drawDesmosAdjuster(lab);
+      });
+      const qFormSelect = lab.querySelector("#desmosQuadraticForm");
+      if (qFormSelect) qFormSelect.addEventListener("change", () => {
         saveDesmosAdjusterState(lab);
         drawDesmosAdjuster(lab);
       });
@@ -5012,7 +5037,9 @@
       const A = a.toFixed(2), B = b.toFixed(2), C = c.toFixed(2), D = d.toFixed(2);
       const latex = {
         linear: "y=" + A + "x+" + B,
-        quadratic: "y=" + A + "\\left(x-" + B + "\\right)^{2}+" + C,
+        quadratic: state.desmosAdjuster.quadraticForm === "standard"
+          ? "y=" + A + "x^{2}+" + B + "x+" + C
+          : "y=" + A + "\\left(x-" + B + "\\right)^{2}+" + C,
         cubic: "y=" + A + "\\left(x-" + B + "\\right)^{3}+" + C,
         exp: "y=" + A + "e^{" + B + "x+" + C + "}+" + D,
         power: "y=" + A + "x^{" + B + "}+" + C,
@@ -5087,7 +5114,9 @@
       const b = Number(lab.querySelector("#bSlider").value);
       const c = Number(lab.querySelector("#cSlider").value);
       const d = Number(lab.querySelector("#dSlider").value);
-      state.desmosAdjuster = { type, a, b, c, d };
+      const qFormEl = lab.querySelector("#desmosQuadraticForm");
+      const qForm = qFormEl ? qFormEl.value : "vertex";
+      state.desmosAdjuster = { type, quadraticForm: qForm, a, b, c, d };
       ["a","b","c","d"].forEach(name => lab.querySelector("#" + name + "Val").textContent = Number(lab.querySelector("#" + name + "Slider").value).toFixed(1));
       updateVisibleGraphParams(lab);
       if (!type) {
@@ -5108,21 +5137,27 @@
       const add = v => { const n = Math.round(v * 100) / 100; if (n === 0) return ""; return (n > 0 ? " + " : " - ") + String(Math.abs(n)); };
       const insx = v => { const n = Math.round(v * 100) / 100; if (n === 0) return "x"; return "x " + (n > 0 ? "- " + n : "+ " + Math.abs(n)); };
       const shx = v => { const n = Math.round(v * 100) / 100; if (n === 0) return "x"; return "(x " + (n > 0 ? "- " + n : "+ " + Math.abs(n)) + ")"; };
-      const eq = {
-        linear: "y = " + mc(a) + "x" + add(b),
-        quadratic: "y = " + mc(a) + shx(b) + "^2" + add(c),
-        cubic: "y = " + mc(a) + shx(b) + "^3" + add(c),
-        exp: "y = " + mc(a) + "e^{" + mc(b) + "x" + add(c) + "}" + add(d),
-        power: "y = " + mc(a) + (Math.abs(b - 1) < 0.001 ? "x" : "x^{" + fmt(b) + "}") + add(c),
-        log: "y = " + mc(a) + "ln(" + insx(b) + ")" + add(c),
-        sqrt: "y = " + mc(a) + "sqrt(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
-        rational: "y = " + fmt(a) + "/(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
-        absLinear: "y = " + mc(a) + "|" + insx(b) + "|" + add(c),
-        absQuadratic: "y = |" + mc(a) + shx(b) + "^2" + add(c) + "|" + add(d),
-        sin: "y = " + mc(a) + "sin(" + mc(b) + "x" + add(c) + ")" + add(d),
-        cos: "y = " + mc(a) + "cos(" + mc(b) + "x" + add(c) + ")" + add(d),
-        tan: "y = " + mc(a) + "tan(" + mc(b) + "x" + add(c) + ")" + add(d)
-      }[type];
+      let eq;
+      if (type === "quadratic" && qForm === "standard") {
+        const bxTerm = Math.abs(b) < 0.0001 ? "" : (b > 0 ? " + " : " - ") + (Math.abs(b) === 1 ? "" : fmt(Math.abs(b))) + "x";
+        eq = "y = " + mc(a) + "x^2" + bxTerm + add(c);
+      } else {
+        eq = {
+          linear: "y = " + mc(a) + "x" + add(b),
+          quadratic: "y = " + mc(a) + shx(b) + "^2" + add(c),
+          cubic: "y = " + mc(a) + shx(b) + "^3" + add(c),
+          exp: "y = " + mc(a) + "e^{" + mc(b) + "x" + add(c) + "}" + add(d),
+          power: "y = " + mc(a) + (Math.abs(b - 1) < 0.001 ? "x" : "x^{" + fmt(b) + "}") + add(c),
+          log: "y = " + mc(a) + "ln(" + insx(b) + ")" + add(c),
+          sqrt: "y = " + mc(a) + "sqrt(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
+          rational: "y = " + fmt(a) + "/(" + (Math.abs(b - 1) < 0.001 && Math.abs(c) < 0.001 ? "x" : mc(b) + "x" + add(-c)) + ")" + add(d),
+          absLinear: "y = " + mc(a) + "|" + insx(b) + "|" + add(c),
+          absQuadratic: "y = |" + mc(a) + shx(b) + "^2" + add(c) + "|" + add(d),
+          sin: "y = " + mc(a) + "sin(" + mc(b) + "x" + add(c) + ")" + add(d),
+          cos: "y = " + mc(a) + "cos(" + mc(b) + "x" + add(c) + ")" + add(d),
+          tan: "y = " + mc(a) + "tan(" + mc(b) + "x" + add(c) + ")" + add(d)
+        }[type];
+      }
       const displayEq = simplifyAdjusterSigns(eq);
       const canvasEq = displayEq.replace(/sqrt\(/g, "√(").replace(/\^\{/g, "^").replace(/\}/g, "").replace(/\^2(?![0-9])/g, "²").replace(/\^3(?![0-9])/g, "³");
       lab.querySelector("#desmosEquation").innerHTML = formatMathHTML(displayEq);
@@ -5139,7 +5174,7 @@
       const x0 = px(0), y0 = py(0);
       const fn = {
         linear: x => a * x + b,
-        quadratic: x => a * (x - b) ** 2 + c,
+        quadratic: x => qForm === "standard" ? (a * x * x + b * x + c) : (a * (x - b) ** 2 + c),
         cubic: x => a * (x - b) ** 3 + c,
         exp: x => a * Math.exp(b * x + c) + d,
         power: x => x > 0 ? a * Math.pow(x, b) + c : Infinity,
@@ -5185,7 +5220,15 @@
         }
       }
       const vertices = [];
-      if (isValid && type === "quadratic") vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
+      if (isValid && type === "quadratic") {
+        if (qForm === "standard") {
+          const vx = -b / (2 * a);
+          const vy = a * vx * vx + b * vx + c;
+          vertices.push({ x: vx, y: vy, label: "(" + vx.toFixed(2) + ", " + vy.toFixed(2) + ")" });
+        } else {
+          vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
+        }
+      }
       if (isValid && type === "absLinear") vertices.push({ x: b, y: c, label: "(" + b.toFixed(2) + ", " + c.toFixed(2) + ")" });
       if (isValid && type === "absQuadratic") vertices.push({ x: b, y: Math.abs(c) + d, label: "(" + b.toFixed(2) + ", " + (Math.abs(c) + d).toFixed(2) + ")" });
       if (isValid) {
@@ -6035,77 +6078,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var slider = document.getElementById('fj-font-slider');
   var ttsToggle = document.getElementById('fj-tts-toggle');
-  var btn = document.getElementById('fj-settings-btn');
-  var panel = document.getElementById('fj-settings-panel');
-  var overlay = document.getElementById('fj-settings-overlay');
-  var closeBtn = document.getElementById('fj-settings-close');
-  var iframe = document.getElementById('ai-popup-iframe');
-
-  function store(key, val) { try { localStorage.setItem(key, val); } catch (e) {} }
-  function read(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-
-  function getFont() { return read('fj_font_size') || 'medium'; }
-  function getTts() { var v = read('fj_tts'); return v === null ? true : v === '1'; }
-
-  function applyFont(level) {
-    var px = FONT_SIZES[level] || '16px';
-    document.documentElement.style.fontSize = px;
-    store('fj_font_size', level);
-    if (slider) slider.value = String(LEVELS.indexOf(level));
-  }
-
-  function applyTts(on) {
-    store('fj_tts', on ? '1' : '0');
-    if (ttsToggle) ttsToggle.checked = on;
-    if (!on && 'speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
-  }
-
-  function sendToIframe() {
-    if (iframe && iframe.contentWindow) {
-      try {
-        iframe.contentWindow.postMessage({
-          source: 'function-junction',
-          type: 'fj-settings',
-          font: getFont(),
-          tts: getTts()
-        }, '*');
-      } catch (e) {}
-    }
-  }
-
-  function openPanel() { panel.classList.add('open'); overlay.classList.add('show'); }
-  function closePanel() { panel.classList.remove('open'); overlay.classList.remove('show'); }
-
-  // Init
-  applyFont(getFont());
-  applyTts(getTts());
-
-  slider.addEventListener('input', function () {
-    applyFont(LEVELS[parseInt(slider.value, 10)] || 'medium');
-    sendToIframe();
-  });
-
-  ttsToggle.addEventListener('change', function () {
-    applyTts(ttsToggle.checked);
-    sendToIframe();
-  });
-
-  btn.addEventListener('click', openPanel);
-  closeBtn.addEventListener('click', closePanel);
-  overlay.addEventListener('click', closePanel);
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closePanel();
-  });
-
-  if (iframe) {
-    iframe.addEventListener('load', sendToIframe);
-    sendToIframe();
-  }
-})();
-</script>
-<!-- ===== End Function Junction Settings ===== -->
-
-</body>
-</html>
-
+ 
